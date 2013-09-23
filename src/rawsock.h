@@ -7,6 +7,9 @@
 struct Packet;
 struct Thread;
 
+void
+rawsock_init();
+
 /**
  * Does an "open" on the network adapter. What actually happens depends upon
  * the operating system and drivers that we are using, but usually this just

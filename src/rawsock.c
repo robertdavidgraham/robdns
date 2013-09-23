@@ -128,3 +128,16 @@ int rawsock_recv_packet(
 }
 
 
+/***************************************************************************
+ ***************************************************************************/
+void
+rawsock_init()
+{
+    /* Once-per-process: initialize 'libpcap' */
+    pcaplive_init();
+
+#if defined(__linux)
+    PFRING_init();
+#endif
+    return;
+}

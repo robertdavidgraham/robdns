@@ -1,9 +1,8 @@
-# robdns: a DNS server
+# robdns: a fast DNS server
 
-This DNS server bypasses the kernel, interacting with the network
-using raw packets. It has built-in ARP, IP, UDP, and DNS protocol
-stack. It is designed to handle the .com zone, servicing random
-request at a rate of 10 million per second.
+This DNS server bypasses the kernel. It has it's own TCP/IP stack
+that interacts directly with the network adapter. It's designed
+to service DNS requests at rates of 10 million per second.
 
 Currently it is in "prototype" stage. There is much that almost works,
 but will still take some effort to finish.
@@ -15,6 +14,7 @@ On Debian/Ubuntu, it goes something like this:
 	$ git clone https://github.com/robertdavidgraham/robdns
 	$ cd robdns
 	$ make
+	$ make regress
 
 This puts the program in the `robdns/bin` subdirectory. You'll have to
 manually copy it to something like `/usr/local/bin` if you want to
@@ -48,7 +48,7 @@ a different network address not used by another machine on the local subnet.
 
 	# robdns example.con 192.168.1.222
 
-To verify that it's working, use the `dig` tool:
+To verify that it's working, use the `dig` tool from another machine:
 
 	$ dig chaos txt version.bind @192.168.1.122
 
@@ -56,6 +56,9 @@ This should return a record with the value of `robdns/1`. Then, try normal
 DNS requests, such as:
 
 	$ dig ns1.example.com @192.168.1.122
+
+There is a sample `example.zone` file to test with in the top directory. Or,
+consider getting a copy of the `com.zone` file (8-gigabytes) to test with.
 
 # Features
 

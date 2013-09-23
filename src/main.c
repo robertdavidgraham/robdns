@@ -53,8 +53,6 @@ main(int argc, char *argv[])
 {
     int i;
 
-    printf("sizeof(void*) = %u\n", (unsigned)sizeof(void*));
-
     /*
      * Once-per-process: initialize some data structures in the zone-file
      * parsing module. 
@@ -62,9 +60,8 @@ main(int argc, char *argv[])
     zonefile_parser_init();
 
 
-    /* Once-per-process: initialize 'libpcap' */
-    pcaplive_init();
-
+    rawsock_init();
+    
     /*
      * If nothing on command-line, print usage, then self-test for good
      * measure, then exit

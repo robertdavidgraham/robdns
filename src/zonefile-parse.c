@@ -665,8 +665,6 @@ block_process(struct ParsedBlock *block, RESOURCE_RECORD_CALLBACK callback, void
         rdata = &buf[i];
         i += rdlength;
 
-        if (i > max)
-            printf(".");
 
         callback(
             domain,
