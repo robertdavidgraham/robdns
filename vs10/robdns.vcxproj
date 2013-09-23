@@ -118,7 +118,9 @@
     <ClInclude Include="..\src\zonefile-tracker.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\example.zone" />
     <None Include="..\Makefile" />
+    <None Include="..\README.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C41F4EA3-3D4E-41B1-BB5D-5E5ED191F32B}</ProjectGuid>

@@ -328,5 +328,11 @@
     <None Include="..\Makefile">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\README.md">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\example.zone">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
