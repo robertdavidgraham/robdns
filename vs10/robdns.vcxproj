@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\adapter-pcapfile.c" />
+    <ClCompile Include="..\src\adapter-pcaplive.c" />
+    <ClCompile Include="..\src\adapter-recv.c" />
+    <ClCompile Include="..\src\adapter-xmit.c" />
+    <ClCompile Include="..\src\adapter.c" />
+    <ClCompile Include="..\src\crypto-md5.c" />
+    <ClCompile Include="..\src\crypto-murmur3.c" />
+    <ClCompile Include="..\src\crypto-siphash.c" />
+    <ClCompile Include="..\src\db-catalog.c" />
+    <ClCompile Include="..\src\db-entry.c" />
+    <ClCompile Include="..\src\db-xdomain.c" />
+    <ClCompile Include="..\src\db-zone.c" />
+    <ClCompile Include="..\src\grind-config.c" />
+    <ClCompile Include="..\src\grind.c" />
+    <ClCompile Include="..\src\logger.c" />
+    <ClCompile Include="..\src\main-checkzone.c" />
+    <ClCompile Include="..\src\main-conf.c" />
+    <ClCompile Include="..\src\main-listif.c" />
+    <ClCompile Include="..\src\main-pcap2zone.c" />
+    <ClCompile Include="..\src\main-regression.c" />
+    <ClCompile Include="..\src\main-server.c" />
+    <ClCompile Include="..\src\main-slowsockets.c" />
+    <ClCompile Include="..\src\main-thread.c" />
+    <ClCompile Include="..\src\main.c" />
+    <ClCompile Include="..\src\pixie-nic.c" />
+    <ClCompile Include="..\src\pixie.c" />
+    <ClCompile Include="..\src\proto-arp.c" />
+    <ClCompile Include="..\src\proto-dns-compressor.c" />
+    <ClCompile Include="..\src\proto-dns-formatter.c" />
+    <ClCompile Include="..\src\proto-dns-parse.c" />
+    <ClCompile Include="..\src\proto-icmp.c" />
+    <ClCompile Include="..\src\proto-ip.c" />
+    <ClCompile Include="..\src\proto-preprocess.c" />
+    <ClCompile Include="..\src\proto-udp.c" />
+    <ClCompile Include="..\src\rawsock-pfring.c" />
+    <ClCompile Include="..\src\rawsock.c" />
+    <ClCompile Include="..\src\resolver.c" />
+    <ClCompile Include="..\src\selftest-parsefast.c" />
+    <ClCompile Include="..\src\selftest.c" />
+    <ClCompile Include="..\src\string_s.c" />
+    <ClCompile Include="..\src\util-filename.c" />
+    <ClCompile Include="..\src\util-ipaddr.c" />
+    <ClCompile Include="..\src\util-keyword.c" />
+    <ClCompile Include="..\src\zonefile-dfa.c" />
+    <ClCompile Include="..\src\zonefile-fields.c" />
+    <ClCompile Include="..\src\zonefile-load.c" />
+    <ClCompile Include="..\src\zonefile-parse.c" />
+    <ClCompile Include="..\src\zonefile-print.c" />
+    <ClCompile Include="..\src\zonefile-rr.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\adapter-pcapfile.h" />
+    <ClInclude Include="..\src\adapter-pcaplive.h" />
+    <ClInclude Include="..\src\adapter.h" />
+    <ClInclude Include="..\src\crypto-md5.h" />
+    <ClInclude Include="..\src\crypto-murmur3.h" />
+    <ClInclude Include="..\src\crypto-siphash.h" />
+    <ClInclude Include="..\src\db-entry.h" />
+    <ClInclude Include="..\src\db-rrset.h" />
+    <ClInclude Include="..\src\db-xdomain.h" />
+    <ClInclude Include="..\src\db-zone.h" />
+    <ClInclude Include="..\src\db.h" />
+    <ClInclude Include="..\src\domainname.h" />
+    <ClInclude Include="..\src\extract.h" />
+    <ClInclude Include="..\src\grind.h" />
+    <ClInclude Include="..\src\logger.h" />
+    <ClInclude Include="..\src\main-conf.h" />
+    <ClInclude Include="..\src\main-regression.h" />
+    <ClInclude Include="..\src\main-thread.h" />
+    <ClInclude Include="..\src\network.h" />
+    <ClInclude Include="..\src\packet.h" />
+    <ClInclude Include="..\src\pixie-nic.h" />
+    <ClInclude Include="..\src\pixie.h" />
+    <ClInclude Include="..\src\proto-dns-compressor.h" />
+    <ClInclude Include="..\src\proto-dns-formatter.h" />
+    <ClInclude Include="..\src\proto-dns.h" />
+    <ClInclude Include="..\src\proto-preprocess.h" />
+    <ClInclude Include="..\src\rawsock-pfring.h" />
+    <ClInclude Include="..\src\rawsock.h" />
+    <ClInclude Include="..\src\resolver.h" />
+    <ClInclude Include="..\src\robdns.h" />
+    <ClInclude Include="..\src\selftest.h" />
+    <ClInclude Include="..\src\source.h" />
+    <ClInclude Include="..\src\string_s.h" />
+    <ClInclude Include="..\src\success-failure.h" />
+    <ClInclude Include="..\src\thread-atomic.h" />
+    <ClInclude Include="..\src\thread.h" />
+    <ClInclude Include="..\src\unusedparm.h" />
+    <ClInclude Include="..\src\util-filename.h" />
+    <ClInclude Include="..\src\util-ipaddr.h" />
+    <ClInclude Include="..\src\util-keyword.h" />
+    <ClInclude Include="..\src\zonefile-dfa.h" />
+    <ClInclude Include="..\src\zonefile-fields.h" />
+    <ClInclude Include="..\src\zonefile-load.h" />
+    <ClInclude Include="..\src\zonefile-parse.h" />
+    <ClInclude Include="..\src\zonefile-rr.h" />
+    <ClInclude Include="..\src\zonefile-tracker.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Makefile" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C41F4EA3-3D4E-41B1-BB5D-5E5ED191F32B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>robdns</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)/../bin/</OutDir>
+    <IntDir>$(SolutionDir)/../tmp/</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)/../bin/</OutDir>
+    <IntDir>$(SolutionDir)/../tmp/</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)/../bin/</OutDir>
+    <IntDir>$(SolutionDir)/../tmp/</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

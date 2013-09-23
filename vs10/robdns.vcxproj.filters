@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\adapter">
+      <UniqueIdentifier>{e6fbb4c2-81d1-4423-aa27-1e9cc2d7eaec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\catalog">
+      <UniqueIdentifier>{83c6a91d-b5a6-4885-85c4-e51494ab1b08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{4166bfaf-c0f0-40df-b5b9-2ea7ba69f2f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\main">
+      <UniqueIdentifier>{928def2e-7b14-4d4c-b92d-4843e5cf7047}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\proto">
+      <UniqueIdentifier>{bc0188b6-410f-4edd-a9d5-76c1fb5a7e2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\zonefile">
+      <UniqueIdentifier>{6bc5772d-eda9-4e5e-9466-26db188418b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\misc">
+      <UniqueIdentifier>{6a6cb21b-442f-4d8d-96d1-cc8c0b93cf0b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\adapter-pcapfile.c">
+      <Filter>Source Files\adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\adapter-pcaplive.c">
+      <Filter>Source Files\adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\adapter-recv.c">
+      <Filter>Source Files\adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\adapter-xmit.c">
+      <Filter>Source Files\adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\adapter.c">
+      <Filter>Source Files\adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\db-catalog.c">
+      <Filter>Source Files\catalog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\db-entry.c">
+      <Filter>Source Files\catalog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\db-xdomain.c">
+      <Filter>Source Files\catalog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\db-zone.c">
+      <Filter>Source Files\catalog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\crypto-md5.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\crypto-murmur3.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\crypto-siphash.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-checkzone.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-conf.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-listif.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-pcap2zone.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-regression.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-server.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-slowsockets.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-thread.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pixie-nic.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pixie.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\logger.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto-arp.c">
+      <Filter>Source Files\proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto-udp.c">
+      <Filter>Source Files\proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto-dns-compressor.c">
+      <Filter>Source Files\proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto-dns-formatter.c">
+      <Filter>Source Files\proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto-dns-parse.c">
+      <Filter>Source Files\proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto-icmp.c">
+      <Filter>Source Files\proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto-ip.c">
+      <Filter>Source Files\proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto-preprocess.c">
+      <Filter>Source Files\proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rawsock-pfring.c">
+      <Filter>Source Files\adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rawsock.c">
+      <Filter>Source Files\adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zonefile-dfa.c">
+      <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zonefile-fields.c">
+      <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zonefile-load.c">
+      <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zonefile-parse.c">
+      <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zonefile-print.c">
+      <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zonefile-rr.c">
+      <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\util-filename.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\util-ipaddr.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\util-keyword.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\string_s.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\grind-config.c">
+      <Filter>Source Files\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\grind.c">
+      <Filter>Source Files\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\resolver.c">
+      <Filter>Source Files\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\selftest-parsefast.c">
+      <Filter>Source Files\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\selftest.c">
+      <Filter>Source Files\misc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\adapter-pcapfile.h">
+      <Filter>Source Files\adapter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\adapter-pcaplive.h">
+      <Filter>Source Files\adapter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\adapter.h">
+      <Filter>Source Files\adapter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\db.h">
+      <Filter>Source Files\catalog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\db-entry.h">
+      <Filter>Source Files\catalog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\db-rrset.h">
+      <Filter>Source Files\catalog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\db-xdomain.h">
+      <Filter>Source Files\catalog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\db-zone.h">
+      <Filter>Source Files\catalog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\crypto-md5.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\crypto-murmur3.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\crypto-siphash.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\main-conf.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\main-regression.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\main-thread.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pixie.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pixie-nic.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\logger.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\extract.h">
+      <Filter>Source Files\proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\network.h">
+      <Filter>Source Files\proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto-dns-compressor.h">
+      <Filter>Source Files\proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto-dns-formatter.h">
+      <Filter>Source Files\proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto-dns.h">
+      <Filter>Source Files\proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto-preprocess.h">
+      <Filter>Source Files\proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rawsock.h">
+      <Filter>Source Files\adapter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rawsock-pfring.h">
+      <Filter>Source Files\adapter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\zonefile-tracker.h">
+      <Filter>Source Files\zonefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\zonefile-dfa.h">
+      <Filter>Source Files\zonefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\zonefile-fields.h">
+      <Filter>Source Files\zonefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\zonefile-load.h">
+      <Filter>Source Files\zonefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\zonefile-parse.h">
+      <Filter>Source Files\zonefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\zonefile-rr.h">
+      <Filter>Source Files\zonefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\util-keyword.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\util-filename.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\util-ipaddr.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\unusedparm.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\string_s.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\grind.h">
+      <Filter>Source Files\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\packet.h">
+      <Filter>Source Files\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resolver.h">
+      <Filter>Source Files\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\selftest.h">
+      <Filter>Source Files\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\source.h">
+      <Filter>Source Files\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\domainname.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\success-failure.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\thread-atomic.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\thread.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\robdns.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Makefile">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
