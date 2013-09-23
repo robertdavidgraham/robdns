@@ -174,14 +174,14 @@
     <ClCompile Include="..\src\grind.c">
       <Filter>Source Files\misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\resolver.c">
-      <Filter>Source Files\misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\selftest-parsefast.c">
       <Filter>Source Files\misc</Filter>
     </ClCompile>
     <ClCompile Include="..\src\selftest.c">
       <Filter>Source Files\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\resolver.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

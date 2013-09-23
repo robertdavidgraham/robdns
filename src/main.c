@@ -3,6 +3,7 @@
 #include "selftest.h"
 #include "adapter-pcaplive.h"
 #include "zonefile-parse.h"
+#include "rawsock.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

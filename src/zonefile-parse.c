@@ -534,7 +534,13 @@ void mm_domain_end(struct ZoneFileParser *parser)
 {
     //parser->rr_domain.name[-1] = parser->rr_domain.length;
     parser->block->offset += parser->rr_domain.length;
-    if (!parser->rr_domain.is_absolute || (parser->rr_domain.label + 1 == parser->rr_domain.length && parser->rr_domain.name[parser->rr_domain.label] == 0)) {
+
+    if (parser->rr_domain.is_absolute)
+        return;
+
+    /*if ((parser->rr_domain.label + 1 == parser->rr_domain.length &
+        & parser->rr_domain.name[parser->rr_domain.label] == 0))*/
+    {
         /* we have a relative name, so copy the $ORIGIN */
         /* TODO: [VULN]: there should be a vuln here, we need to create
          * a test case to exercise it before fixing it */
@@ -546,7 +552,6 @@ void mm_domain_end(struct ZoneFileParser *parser)
             parser->block->buf[parser->block->offset++] = '\0';
         }
     }
-    UNUSEDPARM(parser);
 }
 
 void mm_buffer_start(struct ZoneFileParser *parser)
@@ -678,6 +683,7 @@ block_process(struct ParsedBlock *block, RESOURCE_RECORD_CALLBACK callback, void
     }
 
     block->offset = 0;
+    block->offset_start = 0;
     block->status = BLOCK_EMPTY;
 }
 
@@ -815,6 +821,7 @@ rr_end:
             rdlength = block->offset - i - 8;
             block->buf[i+6] = (unsigned char)(rdlength>>8);
             block->buf[i+7] = (unsigned char)(rdlength>>0);
+            block->offset_start = block->offset;
         }
 		s = $UNTIL_EOL;
 
@@ -860,7 +867,7 @@ rr_end:
 		s = $DOMAIN;
 
         /* Mark the start of the next resource record */
-        block->offset_start = block->offset;
+        assert(block->offset_start == block->offset);
         parser->s2 = 0;
         parser->rr_domain.name = block->buf + block->offset + 1;
 

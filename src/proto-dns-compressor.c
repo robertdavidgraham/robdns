@@ -186,7 +186,8 @@ compressor_append_name(struct Compressor *compressor, struct Packet *pkt, struct
     unsigned id_index;
 
     id_index = compressor_append_partialname(compressor, pkt, origin, 0,        name.length);
-    id_index = compressor_append_partialname(compressor, pkt, name,   id_index, 0          );
+    if (name.length)
+        id_index = compressor_append_partialname(compressor, pkt, name,   id_index, 0          );
 }
 
 

@@ -170,7 +170,28 @@ struct Checker
     struct CheckerB b[100];
 };
 
-void expand_soa(unsigned char *buf, unsigned *buf_offset, size_t buf_size,
+/****************************************************************************
+ * Expands the packet's SOA record to a full uncompressed SOA record so
+ * that we can compare it with the origin SOA that we parsed.
+ *
+ * @param buf
+ *      The target buffer that will hold the expanded SOA record.
+ * @param buf_offset
+ *      The current offset into this buffer. We'll move this index
+ *      forward as we append to the buffer
+ * @param buf_size
+ *      The size of the buffer, to prevent buffer overruns.
+ * @param soa
+ *      The compressed SOA record from the packet.
+ * @param soa_length
+ *      The RDLENGTH (compressed length) of the packet SOA record.
+ * @param hdr
+ *      The beginning of the packet header, which we need when decompressing
+ *      names (because DNS name compression is done as offsets from the
+ *      start of the packet).
+ ****************************************************************************/
+int expand_soa(
+    unsigned char *buf, unsigned *buf_offset, size_t buf_size,
     const unsigned char *soa, unsigned soa_length,
     const unsigned char *hdr)
 {
@@ -178,7 +199,8 @@ void expand_soa(unsigned char *buf, unsigned *buf_offset, size_t buf_size,
     unsigned soa_offset = (unsigned)(soa-hdr);
     unsigned soa_max = soa_length + soa_offset;
 
-    /* first dns name */
+    /* Decompress the first DNS name in the record (which is the 
+     * primary DNS server name) */
     d.name = buf + *buf_offset;
     dns_extract_name(hdr, soa_offset, soa_max, &d);
     soa_offset = dns_name_skip(hdr, soa_offset, soa_max);
@@ -186,7 +208,8 @@ void expand_soa(unsigned char *buf, unsigned *buf_offset, size_t buf_size,
     buf[*buf_offset] = 0;
     *buf_offset += 1;
 
-    /* second */
+    /* Decompress the second DNS name in the record (which is the
+     * contact email address */
     d.name = buf + *buf_offset;
     dns_extract_name(hdr, soa_offset, soa_max, &d);
     soa_offset = dns_name_skip(hdr, soa_offset, soa_max);
@@ -195,9 +218,12 @@ void expand_soa(unsigned char *buf, unsigned *buf_offset, size_t buf_size,
     *buf_offset += 1;
 
     /* remainder */
+    if (soa_offset > soa_max)
+        return Failure;
     memcpy(buf + *buf_offset, hdr+soa_offset, soa_max-soa_offset);
 
     *buf_offset += soa_max - soa_offset;
+    return Success;
 }
 
 
@@ -265,11 +291,14 @@ checker_check(const struct CheckerA *a, const struct CheckerB *b, const unsigned
         {
             unsigned char buf[1024];
             unsigned buf_length = 0;
+            int x;
             
 
-            expand_soa(buf, &buf_length, sizeof(buf),
+            x = expand_soa(buf, &buf_length, sizeof(buf),
                 b_rdata, b_rdlength,
                 px);
+            if (x == Failure)
+                return 0;
             if (a->rdlength != buf_length)
                 return 0;
             

@@ -744,6 +744,8 @@ entry_create_self(
     if (!entry_has_rr(*p_record, type, ttl, rdlength, rdata)) {
         int x;
         
+        if (type == 6)
+            printf(".");
         x = entry_add_rr(p_record, type, ttl, rdlength, rdata);
         if (x == Failure)
             print_entry(*p_record, stdout);
