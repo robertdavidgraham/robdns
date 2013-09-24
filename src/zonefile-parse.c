@@ -941,6 +941,7 @@ rr_end:
 			case TYPE_AAAA:			s = $RR_AAAA;		mm_ipv6_start(parser); continue;
 			case TYPE_TXT:			s = $RR_TXT_START;	continue;
             case TYPE_SRV:          s = $RR_TXT_START;  continue;
+            case TYPE_SPF:          s = $RR_TXT_START;  continue;
 			case TYPE_MX:			s = $RR_MX;			mm_integer_start(parser); continue;
 			case TYPE_CNAME:		s = $RR_CNAME;		mm_domain_start(parser); continue;
 			default:

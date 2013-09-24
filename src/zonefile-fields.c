@@ -400,7 +400,9 @@ x_parse_txt(
 		$TEXT, 
 		$TEXT_ESC,
 		$QUOTED,
-		$QUOTED_ESC,
+		$QUOTED_ESC0,
+		$QUOTED_ESC1,
+		$QUOTED_ESC2,
 	};
 	for (i=*offset; i<length; i++) {
 	unsigned char c = buf[i];
@@ -456,6 +458,8 @@ x_parse_txt(
             s = $END;
             continue;
         case '\\':
+            s = $QUOTED_ESC0;
+            continue;
         case '\n':
             parser->src.line_number++;
             parse_err(parser, "TXT: unhandled condition\n");
@@ -477,6 +481,52 @@ x_parse_txt(
 			goto end;
 		}
 
+		break;
+	case $QUOTED_ESC0:
+		if ('0' <= c && c <= '9') {
+			parser->substring_esc = c - '0';
+			s = $QUOTED_ESC1;
+			continue;
+		} else {
+			if (buffer->length < (65536-12))
+				buffer->data[buffer->length++] = '\\';
+			if (buffer->length < (65536-12))
+				buffer->data[buffer->length++] = c;
+			s = $QUOTED;
+			continue;
+		}
+		break;
+	case $QUOTED_ESC1:
+		if ('0' <= c && c <= '9') {
+			parser->substring_esc *= 10;
+			parser->substring_esc = c - '0';
+			s = $QUOTED_ESC2;
+			continue;
+		} else {
+			if (buffer->length < (65536-12))
+				buffer->data[buffer->length++] = parser->substring_esc;
+			if (buffer->length < (65536-12))
+				buffer->data[buffer->length++] = c;
+			s = $QUOTED;
+			continue;
+		}
+		break;
+	case $QUOTED_ESC2:
+		if ('0' <= c && c <= '9') {
+			parser->substring_esc *= 10;
+			parser->substring_esc = c - '0';
+			if (buffer->length < (65536-12))
+				buffer->data[buffer->length++] = parser->substring_esc;
+			s = $QUOTED;
+			continue;
+		} else {
+			if (buffer->length < (65536-12))
+				buffer->data[buffer->length++] = parser->substring_esc;
+			if (buffer->length < (65536-12))
+				buffer->data[buffer->length++] = c;
+			s = $QUOTED;
+			continue;
+		}
 		break;
 
 	case $END:
@@ -841,6 +891,9 @@ x_parse_base64(struct ZoneFileParser *parser, const unsigned char *buf, unsigned
 		case ')':
 			parser->is_multiline = 0;
 			continue;
+        case ';':
+            s = $END;
+            goto end;
 		default:
 			parse_err(parser, "unexpected character\n");
 			s = $PARSE_ERROR;
