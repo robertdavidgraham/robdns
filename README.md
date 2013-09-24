@@ -24,11 +24,6 @@ While Linux is the primary target platform, the code runs well on many other
 systems. Here's some additional build info:
 * Windows w/ Visual Studio: use the VS10 project
 * Windows w/ MingGW: just type `make`
-* Windows w/ cygwin: won't work
-* Mac OS X /w XCode: use the XCode4 project
-* Mac OS X /w cmdline: just type `make`
-* FreeBSD: type `gmake`
-* other: I don't know, don't care
 
 
 # Usage
