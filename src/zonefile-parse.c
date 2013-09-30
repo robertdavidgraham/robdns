@@ -793,6 +793,7 @@ x_parse(struct ZoneFileParser *parser, const unsigned char *buf, unsigned length
 		$RR_NSEC3, $RR_NSEC3_ALGO, $RR_NSEC3_FLAGS, $RR_NSEC3_ITERATIONS, 
 		$RR_NSEC3_SALT, $RR_NSEC3_HASH, $RR_NSEC3_TYPES,
 		$RR_NSEC, $RR_NSEC_DOMAIN, $RR_NSEC_TYPES, 
+		$RR_TLSA, $RR_TLSA_USAGE, $RR_TLSA_SELECTOR, $RR_TLSA_TYPE, $RR_TLSA_CERT,
 		$RR_A,
 		$RR_AAAA,
 		$RR_TXT, $RR_TXT_START,
@@ -937,6 +938,7 @@ rr_end:
 			case TYPE_NSEC3PARAM:	s = $RR_NSEC3PARAM;	continue;
 			case TYPE_RRSIG:		s = $RR_RRSIG;		continue;
 			case TYPE_DS:			s = $RR_DS;			continue;
+			case TYPE_TLSA:			s = $RR_TLSA;		continue;
 			case TYPE_A:			s = $RR_A;			mm_integer_start(parser); continue;
 			case TYPE_AAAA:			s = $RR_AAAA;		mm_ipv6_start(parser); continue;
 			case TYPE_TXT:			s = $RR_TXT_START;	continue;
@@ -1187,6 +1189,49 @@ rr_end:
 		if (i >= length)
 			break;
         mm_base64_end(parser);
+		s = $RR_END;
+		goto rr_end;
+
+	/*
+                        1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  Cert. Usage  |   Selector    | Matching Type |               /
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               /
+   /                                                               /
+   /                 Certificate Association Data                  /
+   /                                                               /
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   */
+	case $RR_TLSA:
+		s = $RR_TLSA_USAGE;
+		mm_integer_start(parser);
+	case $RR_TLSA_USAGE:
+		x_parse_ttl(parser, buf, &i, length);
+		if (i >= length)
+			break;
+        mm_integer8_end(parser);
+		mm_integer_start(parser);
+		s = $RR_TLSA_SELECTOR;
+	case $RR_TLSA_SELECTOR:
+		x_parse_ttl(parser, buf, &i, length);
+		if (i >= length)
+			break;
+        mm_integer8_end(parser);
+		mm_integer_start(parser);
+		s = $RR_TLSA_TYPE;
+	case $RR_TLSA_TYPE:
+		x_parse_ttl(parser, buf, &i, length);
+		if (i >= length)
+			break;
+        mm_integer8_end(parser);
+		mm_hex_start(parser);
+		s = $RR_TLSA_CERT;
+	case $RR_TLSA_CERT:
+		x_parse_hex(parser, buf, &i, length, 1);
+		if (i >= length)
+			break;
+        mm_hex_end(parser);
 		s = $RR_END;
 		goto rr_end;
 

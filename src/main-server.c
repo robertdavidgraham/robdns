@@ -408,8 +408,9 @@ initialize_adapter(
     else {
         /* no adapter specified, so find a default one */
         int err;
+		ifname2[0] = '\0';
         err = pixie_nic_get_default(ifname2, sizeof(ifname2));
-        if (err) {
+        if (err || ifname2[0] == '\0') {
             fprintf(stderr, "FAIL: could not determine default interface\n");
             fprintf(stderr, "FAIL:... try \"--interface ethX\"\n");
             return -1;
