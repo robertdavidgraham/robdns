@@ -215,6 +215,8 @@ static unsigned null_CAN_TRANSMIT(const char *devicename)
 	return result;
 #elif defined(__linux__)
 	return 1;
+#elif defined(__APPLE__)
+    return 0;
 #endif
 }
 

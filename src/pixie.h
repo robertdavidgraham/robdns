@@ -92,11 +92,12 @@ bool pixie_locked_CAS64(volatile uint64_t *dst, uint64_t src, uint64_t expected)
 #if defined(_MSC_VER)
 #include <intrin.h>
 #elif defined(__GNUC__)
-static inline volatile long long __rdtsc() {
-   register long long TSC asm("eax");
-   asm volatile (".byte 15, 49" : : : "eax", "edx");
-   return TSC;
-}
+    static __inline__ unsigned long long __rdtsc(void)
+    {
+        unsigned long hi = 0, lo = 0;
+        __asm__ __volatile__ ("lfence\n\trdtsc" : "=a"(lo), "=d"(hi));
+        return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
+    }
 #endif
 
 void

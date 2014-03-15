@@ -1,0 +1,496 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		11C2FE4018D506D700061E8B /* adapter-pcapfile.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE118D506D700061E8B /* adapter-pcapfile.c */; };
+		11C2FE4118D506D700061E8B /* adapter-pcaplive.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE318D506D700061E8B /* adapter-pcaplive.c */; };
+		11C2FE4218D506D700061E8B /* adapter-recv.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE518D506D700061E8B /* adapter-recv.c */; };
+		11C2FE4318D506D700061E8B /* adapter-xmit.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE618D506D700061E8B /* adapter-xmit.c */; };
+		11C2FE4418D506D700061E8B /* adapter.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE718D506D700061E8B /* adapter.c */; };
+		11C2FE4518D506D700061E8B /* crypto-md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE918D506D700061E8B /* crypto-md5.c */; };
+		11C2FE4618D506D700061E8B /* crypto-murmur3.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDEB18D506D700061E8B /* crypto-murmur3.c */; };
+		11C2FE4718D506D700061E8B /* crypto-siphash.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDED18D506D700061E8B /* crypto-siphash.c */; };
+		11C2FE4818D506D700061E8B /* db-catalog.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDEF18D506D700061E8B /* db-catalog.c */; };
+		11C2FE4918D506D700061E8B /* db-entry.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDF018D506D700061E8B /* db-entry.c */; };
+		11C2FE4A18D506D700061E8B /* db-xdomain.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDF318D506D700061E8B /* db-xdomain.c */; };
+		11C2FE4B18D506D700061E8B /* db-zone.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDF518D506D700061E8B /* db-zone.c */; };
+		11C2FE4C18D506D700061E8B /* grind-config.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDFA18D506D700061E8B /* grind-config.c */; };
+		11C2FE4D18D506D700061E8B /* grind.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDFB18D506D700061E8B /* grind.c */; };
+		11C2FE4E18D506D700061E8B /* logger.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDFD18D506D700061E8B /* logger.c */; };
+		11C2FE4F18D506D700061E8B /* main-checkzone.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDFF18D506D700061E8B /* main-checkzone.c */; };
+		11C2FE5018D506D700061E8B /* main-conf.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0018D506D700061E8B /* main-conf.c */; };
+		11C2FE5118D506D700061E8B /* main-listif.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0218D506D700061E8B /* main-listif.c */; };
+		11C2FE5218D506D700061E8B /* main-pcap2zone.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0318D506D700061E8B /* main-pcap2zone.c */; };
+		11C2FE5318D506D700061E8B /* main-regression.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0418D506D700061E8B /* main-regression.c */; };
+		11C2FE5418D506D700061E8B /* main-server.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0618D506D700061E8B /* main-server.c */; };
+		11C2FE5518D506D700061E8B /* main-slowsockets.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0718D506D700061E8B /* main-slowsockets.c */; };
+		11C2FE5618D506D700061E8B /* main-thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0818D506D700061E8B /* main-thread.c */; };
+		11C2FE5718D506D700061E8B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0A18D506D700061E8B /* main.c */; };
+		11C2FE5818D506D700061E8B /* pixie-nic.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0D18D506D700061E8B /* pixie-nic.c */; };
+		11C2FE5918D506D700061E8B /* pixie.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0F18D506D700061E8B /* pixie.c */; };
+		11C2FE5A18D506D700061E8B /* proto-arp.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1118D506D700061E8B /* proto-arp.c */; };
+		11C2FE5B18D506D700061E8B /* proto-dns-compressor.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1218D506D700061E8B /* proto-dns-compressor.c */; };
+		11C2FE5C18D506D700061E8B /* proto-dns-formatter.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1418D506D700061E8B /* proto-dns-formatter.c */; };
+		11C2FE5D18D506D700061E8B /* proto-dns-parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1618D506D700061E8B /* proto-dns-parse.c */; };
+		11C2FE5E18D506D700061E8B /* proto-icmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1818D506D700061E8B /* proto-icmp.c */; };
+		11C2FE5F18D506D700061E8B /* proto-ip.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1918D506D700061E8B /* proto-ip.c */; };
+		11C2FE6018D506D700061E8B /* proto-preprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1A18D506D700061E8B /* proto-preprocess.c */; };
+		11C2FE6118D506D700061E8B /* proto-udp.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1C18D506D700061E8B /* proto-udp.c */; };
+		11C2FE6218D506D700061E8B /* rawsock-pfring.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1D18D506D700061E8B /* rawsock-pfring.c */; };
+		11C2FE6318D506D700061E8B /* rawsock.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE1F18D506D700061E8B /* rawsock.c */; };
+		11C2FE6418D506D700061E8B /* resolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE2118D506D700061E8B /* resolver.c */; };
+		11C2FE6518D506D700061E8B /* selftest-parsefast.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE2418D506D700061E8B /* selftest-parsefast.c */; };
+		11C2FE6618D506D700061E8B /* selftest.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE2518D506D700061E8B /* selftest.c */; };
+		11C2FE6718D506D700061E8B /* string_s.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE2818D506D700061E8B /* string_s.c */; };
+		11C2FE6818D506D700061E8B /* util-filename.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE2E18D506D700061E8B /* util-filename.c */; };
+		11C2FE6918D506D700061E8B /* util-ipaddr.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE3018D506D700061E8B /* util-ipaddr.c */; };
+		11C2FE6A18D506D700061E8B /* util-keyword.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE3218D506D700061E8B /* util-keyword.c */; };
+		11C2FE6B18D506D700061E8B /* zonefile-dfa.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE3418D506D700061E8B /* zonefile-dfa.c */; };
+		11C2FE6C18D506D700061E8B /* zonefile-fields.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE3618D506D700061E8B /* zonefile-fields.c */; };
+		11C2FE6D18D506D700061E8B /* zonefile-load.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE3818D506D700061E8B /* zonefile-load.c */; };
+		11C2FE6E18D506D700061E8B /* zonefile-parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE3A18D506D700061E8B /* zonefile-parse.c */; };
+		11C2FE6F18D506D700061E8B /* zonefile-print.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE3C18D506D700061E8B /* zonefile-print.c */; };
+		11C2FE7018D506D700061E8B /* zonefile-rr.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE3D18D506D700061E8B /* zonefile-rr.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		11C2FDD118D506A300061E8B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		11C2FDD318D506A300061E8B /* robdns */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = robdns; sourceTree = BUILT_PRODUCTS_DIR; };
+		11C2FDE118D506D700061E8B /* adapter-pcapfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "adapter-pcapfile.c"; path = "../src/adapter-pcapfile.c"; sourceTree = "<group>"; };
+		11C2FDE218D506D700061E8B /* adapter-pcapfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "adapter-pcapfile.h"; path = "../src/adapter-pcapfile.h"; sourceTree = "<group>"; };
+		11C2FDE318D506D700061E8B /* adapter-pcaplive.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "adapter-pcaplive.c"; path = "../src/adapter-pcaplive.c"; sourceTree = "<group>"; };
+		11C2FDE418D506D700061E8B /* adapter-pcaplive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "adapter-pcaplive.h"; path = "../src/adapter-pcaplive.h"; sourceTree = "<group>"; };
+		11C2FDE518D506D700061E8B /* adapter-recv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "adapter-recv.c"; path = "../src/adapter-recv.c"; sourceTree = "<group>"; };
+		11C2FDE618D506D700061E8B /* adapter-xmit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "adapter-xmit.c"; path = "../src/adapter-xmit.c"; sourceTree = "<group>"; };
+		11C2FDE718D506D700061E8B /* adapter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = adapter.c; path = ../src/adapter.c; sourceTree = "<group>"; };
+		11C2FDE818D506D700061E8B /* adapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adapter.h; path = ../src/adapter.h; sourceTree = "<group>"; };
+		11C2FDE918D506D700061E8B /* crypto-md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "crypto-md5.c"; path = "../src/crypto-md5.c"; sourceTree = "<group>"; };
+		11C2FDEA18D506D700061E8B /* crypto-md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "crypto-md5.h"; path = "../src/crypto-md5.h"; sourceTree = "<group>"; };
+		11C2FDEB18D506D700061E8B /* crypto-murmur3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "crypto-murmur3.c"; path = "../src/crypto-murmur3.c"; sourceTree = "<group>"; };
+		11C2FDEC18D506D700061E8B /* crypto-murmur3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "crypto-murmur3.h"; path = "../src/crypto-murmur3.h"; sourceTree = "<group>"; };
+		11C2FDED18D506D700061E8B /* crypto-siphash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "crypto-siphash.c"; path = "../src/crypto-siphash.c"; sourceTree = "<group>"; };
+		11C2FDEE18D506D700061E8B /* crypto-siphash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "crypto-siphash.h"; path = "../src/crypto-siphash.h"; sourceTree = "<group>"; };
+		11C2FDEF18D506D700061E8B /* db-catalog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "db-catalog.c"; path = "../src/db-catalog.c"; sourceTree = "<group>"; };
+		11C2FDF018D506D700061E8B /* db-entry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "db-entry.c"; path = "../src/db-entry.c"; sourceTree = "<group>"; };
+		11C2FDF118D506D700061E8B /* db-entry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "db-entry.h"; path = "../src/db-entry.h"; sourceTree = "<group>"; };
+		11C2FDF218D506D700061E8B /* db-rrset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "db-rrset.h"; path = "../src/db-rrset.h"; sourceTree = "<group>"; };
+		11C2FDF318D506D700061E8B /* db-xdomain.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "db-xdomain.c"; path = "../src/db-xdomain.c"; sourceTree = "<group>"; };
+		11C2FDF418D506D700061E8B /* db-xdomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "db-xdomain.h"; path = "../src/db-xdomain.h"; sourceTree = "<group>"; };
+		11C2FDF518D506D700061E8B /* db-zone.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "db-zone.c"; path = "../src/db-zone.c"; sourceTree = "<group>"; };
+		11C2FDF618D506D700061E8B /* db-zone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "db-zone.h"; path = "../src/db-zone.h"; sourceTree = "<group>"; };
+		11C2FDF718D506D700061E8B /* db.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = db.h; path = ../src/db.h; sourceTree = "<group>"; };
+		11C2FDF818D506D700061E8B /* domainname.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = domainname.h; path = ../src/domainname.h; sourceTree = "<group>"; };
+		11C2FDF918D506D700061E8B /* extract.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = extract.h; path = ../src/extract.h; sourceTree = "<group>"; };
+		11C2FDFA18D506D700061E8B /* grind-config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "grind-config.c"; path = "../src/grind-config.c"; sourceTree = "<group>"; };
+		11C2FDFB18D506D700061E8B /* grind.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = grind.c; path = ../src/grind.c; sourceTree = "<group>"; };
+		11C2FDFC18D506D700061E8B /* grind.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grind.h; path = ../src/grind.h; sourceTree = "<group>"; };
+		11C2FDFD18D506D700061E8B /* logger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = logger.c; path = ../src/logger.c; sourceTree = "<group>"; };
+		11C2FDFE18D506D700061E8B /* logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logger.h; path = ../src/logger.h; sourceTree = "<group>"; };
+		11C2FDFF18D506D700061E8B /* main-checkzone.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-checkzone.c"; path = "../src/main-checkzone.c"; sourceTree = "<group>"; };
+		11C2FE0018D506D700061E8B /* main-conf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-conf.c"; path = "../src/main-conf.c"; sourceTree = "<group>"; };
+		11C2FE0118D506D700061E8B /* main-conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "main-conf.h"; path = "../src/main-conf.h"; sourceTree = "<group>"; };
+		11C2FE0218D506D700061E8B /* main-listif.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-listif.c"; path = "../src/main-listif.c"; sourceTree = "<group>"; };
+		11C2FE0318D506D700061E8B /* main-pcap2zone.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-pcap2zone.c"; path = "../src/main-pcap2zone.c"; sourceTree = "<group>"; };
+		11C2FE0418D506D700061E8B /* main-regression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-regression.c"; path = "../src/main-regression.c"; sourceTree = "<group>"; };
+		11C2FE0518D506D700061E8B /* main-regression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "main-regression.h"; path = "../src/main-regression.h"; sourceTree = "<group>"; };
+		11C2FE0618D506D700061E8B /* main-server.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-server.c"; path = "../src/main-server.c"; sourceTree = "<group>"; };
+		11C2FE0718D506D700061E8B /* main-slowsockets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-slowsockets.c"; path = "../src/main-slowsockets.c"; sourceTree = "<group>"; };
+		11C2FE0818D506D700061E8B /* main-thread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-thread.c"; path = "../src/main-thread.c"; sourceTree = "<group>"; };
+		11C2FE0918D506D700061E8B /* main-thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "main-thread.h"; path = "../src/main-thread.h"; sourceTree = "<group>"; };
+		11C2FE0A18D506D700061E8B /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../src/main.c; sourceTree = "<group>"; };
+		11C2FE0B18D506D700061E8B /* network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = network.h; path = ../src/network.h; sourceTree = "<group>"; };
+		11C2FE0C18D506D700061E8B /* packet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = packet.h; path = ../src/packet.h; sourceTree = "<group>"; };
+		11C2FE0D18D506D700061E8B /* pixie-nic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "pixie-nic.c"; path = "../src/pixie-nic.c"; sourceTree = "<group>"; };
+		11C2FE0E18D506D700061E8B /* pixie-nic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "pixie-nic.h"; path = "../src/pixie-nic.h"; sourceTree = "<group>"; };
+		11C2FE0F18D506D700061E8B /* pixie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pixie.c; path = ../src/pixie.c; sourceTree = "<group>"; };
+		11C2FE1018D506D700061E8B /* pixie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pixie.h; path = ../src/pixie.h; sourceTree = "<group>"; };
+		11C2FE1118D506D700061E8B /* proto-arp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "proto-arp.c"; path = "../src/proto-arp.c"; sourceTree = "<group>"; };
+		11C2FE1218D506D700061E8B /* proto-dns-compressor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "proto-dns-compressor.c"; path = "../src/proto-dns-compressor.c"; sourceTree = "<group>"; };
+		11C2FE1318D506D700061E8B /* proto-dns-compressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "proto-dns-compressor.h"; path = "../src/proto-dns-compressor.h"; sourceTree = "<group>"; };
+		11C2FE1418D506D700061E8B /* proto-dns-formatter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "proto-dns-formatter.c"; path = "../src/proto-dns-formatter.c"; sourceTree = "<group>"; };
+		11C2FE1518D506D700061E8B /* proto-dns-formatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "proto-dns-formatter.h"; path = "../src/proto-dns-formatter.h"; sourceTree = "<group>"; };
+		11C2FE1618D506D700061E8B /* proto-dns-parse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "proto-dns-parse.c"; path = "../src/proto-dns-parse.c"; sourceTree = "<group>"; };
+		11C2FE1718D506D700061E8B /* proto-dns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "proto-dns.h"; path = "../src/proto-dns.h"; sourceTree = "<group>"; };
+		11C2FE1818D506D700061E8B /* proto-icmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "proto-icmp.c"; path = "../src/proto-icmp.c"; sourceTree = "<group>"; };
+		11C2FE1918D506D700061E8B /* proto-ip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "proto-ip.c"; path = "../src/proto-ip.c"; sourceTree = "<group>"; };
+		11C2FE1A18D506D700061E8B /* proto-preprocess.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "proto-preprocess.c"; path = "../src/proto-preprocess.c"; sourceTree = "<group>"; };
+		11C2FE1B18D506D700061E8B /* proto-preprocess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "proto-preprocess.h"; path = "../src/proto-preprocess.h"; sourceTree = "<group>"; };
+		11C2FE1C18D506D700061E8B /* proto-udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "proto-udp.c"; path = "../src/proto-udp.c"; sourceTree = "<group>"; };
+		11C2FE1D18D506D700061E8B /* rawsock-pfring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "rawsock-pfring.c"; path = "../src/rawsock-pfring.c"; sourceTree = "<group>"; };
+		11C2FE1E18D506D700061E8B /* rawsock-pfring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rawsock-pfring.h"; path = "../src/rawsock-pfring.h"; sourceTree = "<group>"; };
+		11C2FE1F18D506D700061E8B /* rawsock.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rawsock.c; path = ../src/rawsock.c; sourceTree = "<group>"; };
+		11C2FE2018D506D700061E8B /* rawsock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rawsock.h; path = ../src/rawsock.h; sourceTree = "<group>"; };
+		11C2FE2118D506D700061E8B /* resolver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = resolver.c; path = ../src/resolver.c; sourceTree = "<group>"; };
+		11C2FE2218D506D700061E8B /* resolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resolver.h; path = ../src/resolver.h; sourceTree = "<group>"; };
+		11C2FE2318D506D700061E8B /* robdns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = robdns.h; path = ../src/robdns.h; sourceTree = "<group>"; };
+		11C2FE2418D506D700061E8B /* selftest-parsefast.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "selftest-parsefast.c"; path = "../src/selftest-parsefast.c"; sourceTree = "<group>"; };
+		11C2FE2518D506D700061E8B /* selftest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = selftest.c; path = ../src/selftest.c; sourceTree = "<group>"; };
+		11C2FE2618D506D700061E8B /* selftest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = selftest.h; path = ../src/selftest.h; sourceTree = "<group>"; };
+		11C2FE2718D506D700061E8B /* source.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = source.h; path = ../src/source.h; sourceTree = "<group>"; };
+		11C2FE2818D506D700061E8B /* string_s.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = string_s.c; path = ../src/string_s.c; sourceTree = "<group>"; };
+		11C2FE2918D506D700061E8B /* string_s.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = string_s.h; path = ../src/string_s.h; sourceTree = "<group>"; };
+		11C2FE2A18D506D700061E8B /* success-failure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "success-failure.h"; path = "../src/success-failure.h"; sourceTree = "<group>"; };
+		11C2FE2B18D506D700061E8B /* thread-atomic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "thread-atomic.h"; path = "../src/thread-atomic.h"; sourceTree = "<group>"; };
+		11C2FE2C18D506D700061E8B /* thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = thread.h; path = ../src/thread.h; sourceTree = "<group>"; };
+		11C2FE2D18D506D700061E8B /* unusedparm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unusedparm.h; path = ../src/unusedparm.h; sourceTree = "<group>"; };
+		11C2FE2E18D506D700061E8B /* util-filename.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "util-filename.c"; path = "../src/util-filename.c"; sourceTree = "<group>"; };
+		11C2FE2F18D506D700061E8B /* util-filename.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "util-filename.h"; path = "../src/util-filename.h"; sourceTree = "<group>"; };
+		11C2FE3018D506D700061E8B /* util-ipaddr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "util-ipaddr.c"; path = "../src/util-ipaddr.c"; sourceTree = "<group>"; };
+		11C2FE3118D506D700061E8B /* util-ipaddr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "util-ipaddr.h"; path = "../src/util-ipaddr.h"; sourceTree = "<group>"; };
+		11C2FE3218D506D700061E8B /* util-keyword.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "util-keyword.c"; path = "../src/util-keyword.c"; sourceTree = "<group>"; };
+		11C2FE3318D506D700061E8B /* util-keyword.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "util-keyword.h"; path = "../src/util-keyword.h"; sourceTree = "<group>"; };
+		11C2FE3418D506D700061E8B /* zonefile-dfa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-dfa.c"; path = "../src/zonefile-dfa.c"; sourceTree = "<group>"; };
+		11C2FE3518D506D700061E8B /* zonefile-dfa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-dfa.h"; path = "../src/zonefile-dfa.h"; sourceTree = "<group>"; };
+		11C2FE3618D506D700061E8B /* zonefile-fields.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-fields.c"; path = "../src/zonefile-fields.c"; sourceTree = "<group>"; };
+		11C2FE3718D506D700061E8B /* zonefile-fields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-fields.h"; path = "../src/zonefile-fields.h"; sourceTree = "<group>"; };
+		11C2FE3818D506D700061E8B /* zonefile-load.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-load.c"; path = "../src/zonefile-load.c"; sourceTree = "<group>"; };
+		11C2FE3918D506D700061E8B /* zonefile-load.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-load.h"; path = "../src/zonefile-load.h"; sourceTree = "<group>"; };
+		11C2FE3A18D506D700061E8B /* zonefile-parse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-parse.c"; path = "../src/zonefile-parse.c"; sourceTree = "<group>"; };
+		11C2FE3B18D506D700061E8B /* zonefile-parse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-parse.h"; path = "../src/zonefile-parse.h"; sourceTree = "<group>"; };
+		11C2FE3C18D506D700061E8B /* zonefile-print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-print.c"; path = "../src/zonefile-print.c"; sourceTree = "<group>"; };
+		11C2FE3D18D506D700061E8B /* zonefile-rr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-rr.c"; path = "../src/zonefile-rr.c"; sourceTree = "<group>"; };
+		11C2FE3E18D506D700061E8B /* zonefile-rr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-rr.h"; path = "../src/zonefile-rr.h"; sourceTree = "<group>"; };
+		11C2FE3F18D506D700061E8B /* zonefile-tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-tracker.h"; path = "../src/zonefile-tracker.h"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		11C2FDD018D506A300061E8B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		11C2FDC818D506A300061E8B = {
+			isa = PBXGroup;
+			children = (
+				11C2FDE018D506BC00061E8B /* src */,
+				11C2FDD618D506A300061E8B /* robdns */,
+				11C2FDD418D506A300061E8B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		11C2FDD418D506A300061E8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				11C2FDD318D506A300061E8B /* robdns */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		11C2FDD618D506A300061E8B /* robdns */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = robdns;
+			sourceTree = "<group>";
+		};
+		11C2FDE018D506BC00061E8B /* src */ = {
+			isa = PBXGroup;
+			children = (
+				11C2FDE118D506D700061E8B /* adapter-pcapfile.c */,
+				11C2FDE218D506D700061E8B /* adapter-pcapfile.h */,
+				11C2FDE318D506D700061E8B /* adapter-pcaplive.c */,
+				11C2FDE418D506D700061E8B /* adapter-pcaplive.h */,
+				11C2FDE518D506D700061E8B /* adapter-recv.c */,
+				11C2FDE618D506D700061E8B /* adapter-xmit.c */,
+				11C2FDE718D506D700061E8B /* adapter.c */,
+				11C2FDE818D506D700061E8B /* adapter.h */,
+				11C2FDE918D506D700061E8B /* crypto-md5.c */,
+				11C2FDEA18D506D700061E8B /* crypto-md5.h */,
+				11C2FDEB18D506D700061E8B /* crypto-murmur3.c */,
+				11C2FDEC18D506D700061E8B /* crypto-murmur3.h */,
+				11C2FDED18D506D700061E8B /* crypto-siphash.c */,
+				11C2FDEE18D506D700061E8B /* crypto-siphash.h */,
+				11C2FDEF18D506D700061E8B /* db-catalog.c */,
+				11C2FDF018D506D700061E8B /* db-entry.c */,
+				11C2FDF118D506D700061E8B /* db-entry.h */,
+				11C2FDF218D506D700061E8B /* db-rrset.h */,
+				11C2FDF318D506D700061E8B /* db-xdomain.c */,
+				11C2FDF418D506D700061E8B /* db-xdomain.h */,
+				11C2FDF518D506D700061E8B /* db-zone.c */,
+				11C2FDF618D506D700061E8B /* db-zone.h */,
+				11C2FDF718D506D700061E8B /* db.h */,
+				11C2FDF818D506D700061E8B /* domainname.h */,
+				11C2FDF918D506D700061E8B /* extract.h */,
+				11C2FDFA18D506D700061E8B /* grind-config.c */,
+				11C2FDFB18D506D700061E8B /* grind.c */,
+				11C2FDFC18D506D700061E8B /* grind.h */,
+				11C2FDFD18D506D700061E8B /* logger.c */,
+				11C2FDFE18D506D700061E8B /* logger.h */,
+				11C2FDFF18D506D700061E8B /* main-checkzone.c */,
+				11C2FE0018D506D700061E8B /* main-conf.c */,
+				11C2FE0118D506D700061E8B /* main-conf.h */,
+				11C2FE0218D506D700061E8B /* main-listif.c */,
+				11C2FE0318D506D700061E8B /* main-pcap2zone.c */,
+				11C2FE0418D506D700061E8B /* main-regression.c */,
+				11C2FE0518D506D700061E8B /* main-regression.h */,
+				11C2FE0618D506D700061E8B /* main-server.c */,
+				11C2FE0718D506D700061E8B /* main-slowsockets.c */,
+				11C2FE0818D506D700061E8B /* main-thread.c */,
+				11C2FE0918D506D700061E8B /* main-thread.h */,
+				11C2FE0A18D506D700061E8B /* main.c */,
+				11C2FE0B18D506D700061E8B /* network.h */,
+				11C2FE0C18D506D700061E8B /* packet.h */,
+				11C2FE0D18D506D700061E8B /* pixie-nic.c */,
+				11C2FE0E18D506D700061E8B /* pixie-nic.h */,
+				11C2FE0F18D506D700061E8B /* pixie.c */,
+				11C2FE1018D506D700061E8B /* pixie.h */,
+				11C2FE1118D506D700061E8B /* proto-arp.c */,
+				11C2FE1218D506D700061E8B /* proto-dns-compressor.c */,
+				11C2FE1318D506D700061E8B /* proto-dns-compressor.h */,
+				11C2FE1418D506D700061E8B /* proto-dns-formatter.c */,
+				11C2FE1518D506D700061E8B /* proto-dns-formatter.h */,
+				11C2FE1618D506D700061E8B /* proto-dns-parse.c */,
+				11C2FE1718D506D700061E8B /* proto-dns.h */,
+				11C2FE1818D506D700061E8B /* proto-icmp.c */,
+				11C2FE1918D506D700061E8B /* proto-ip.c */,
+				11C2FE1A18D506D700061E8B /* proto-preprocess.c */,
+				11C2FE1B18D506D700061E8B /* proto-preprocess.h */,
+				11C2FE1C18D506D700061E8B /* proto-udp.c */,
+				11C2FE1D18D506D700061E8B /* rawsock-pfring.c */,
+				11C2FE1E18D506D700061E8B /* rawsock-pfring.h */,
+				11C2FE1F18D506D700061E8B /* rawsock.c */,
+				11C2FE2018D506D700061E8B /* rawsock.h */,
+				11C2FE2118D506D700061E8B /* resolver.c */,
+				11C2FE2218D506D700061E8B /* resolver.h */,
+				11C2FE2318D506D700061E8B /* robdns.h */,
+				11C2FE2418D506D700061E8B /* selftest-parsefast.c */,
+				11C2FE2518D506D700061E8B /* selftest.c */,
+				11C2FE2618D506D700061E8B /* selftest.h */,
+				11C2FE2718D506D700061E8B /* source.h */,
+				11C2FE2818D506D700061E8B /* string_s.c */,
+				11C2FE2918D506D700061E8B /* string_s.h */,
+				11C2FE2A18D506D700061E8B /* success-failure.h */,
+				11C2FE2B18D506D700061E8B /* thread-atomic.h */,
+				11C2FE2C18D506D700061E8B /* thread.h */,
+				11C2FE2D18D506D700061E8B /* unusedparm.h */,
+				11C2FE2E18D506D700061E8B /* util-filename.c */,
+				11C2FE2F18D506D700061E8B /* util-filename.h */,
+				11C2FE3018D506D700061E8B /* util-ipaddr.c */,
+				11C2FE3118D506D700061E8B /* util-ipaddr.h */,
+				11C2FE3218D506D700061E8B /* util-keyword.c */,
+				11C2FE3318D506D700061E8B /* util-keyword.h */,
+				11C2FE3418D506D700061E8B /* zonefile-dfa.c */,
+				11C2FE3518D506D700061E8B /* zonefile-dfa.h */,
+				11C2FE3618D506D700061E8B /* zonefile-fields.c */,
+				11C2FE3718D506D700061E8B /* zonefile-fields.h */,
+				11C2FE3818D506D700061E8B /* zonefile-load.c */,
+				11C2FE3918D506D700061E8B /* zonefile-load.h */,
+				11C2FE3A18D506D700061E8B /* zonefile-parse.c */,
+				11C2FE3B18D506D700061E8B /* zonefile-parse.h */,
+				11C2FE3C18D506D700061E8B /* zonefile-print.c */,
+				11C2FE3D18D506D700061E8B /* zonefile-rr.c */,
+				11C2FE3E18D506D700061E8B /* zonefile-rr.h */,
+				11C2FE3F18D506D700061E8B /* zonefile-tracker.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		11C2FDD218D506A300061E8B /* robdns */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11C2FDDD18D506A300061E8B /* Build configuration list for PBXNativeTarget "robdns" */;
+			buildPhases = (
+				11C2FDCF18D506A300061E8B /* Sources */,
+				11C2FDD018D506A300061E8B /* Frameworks */,
+				11C2FDD118D506A300061E8B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = robdns;
+			productName = robdns;
+			productReference = 11C2FDD318D506A300061E8B /* robdns */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		11C2FDCA18D506A300061E8B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 11C2FDCD18D506A300061E8B /* Build configuration list for PBXProject "robdns" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 11C2FDC818D506A300061E8B;
+			productRefGroup = 11C2FDD418D506A300061E8B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				11C2FDD218D506A300061E8B /* robdns */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		11C2FDCF18D506A300061E8B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11C2FE4018D506D700061E8B /* adapter-pcapfile.c in Sources */,
+				11C2FE4118D506D700061E8B /* adapter-pcaplive.c in Sources */,
+				11C2FE4218D506D700061E8B /* adapter-recv.c in Sources */,
+				11C2FE4318D506D700061E8B /* adapter-xmit.c in Sources */,
+				11C2FE4418D506D700061E8B /* adapter.c in Sources */,
+				11C2FE4518D506D700061E8B /* crypto-md5.c in Sources */,
+				11C2FE4618D506D700061E8B /* crypto-murmur3.c in Sources */,
+				11C2FE4718D506D700061E8B /* crypto-siphash.c in Sources */,
+				11C2FE4818D506D700061E8B /* db-catalog.c in Sources */,
+				11C2FE4918D506D700061E8B /* db-entry.c in Sources */,
+				11C2FE4A18D506D700061E8B /* db-xdomain.c in Sources */,
+				11C2FE4B18D506D700061E8B /* db-zone.c in Sources */,
+				11C2FE4C18D506D700061E8B /* grind-config.c in Sources */,
+				11C2FE4D18D506D700061E8B /* grind.c in Sources */,
+				11C2FE4E18D506D700061E8B /* logger.c in Sources */,
+				11C2FE4F18D506D700061E8B /* main-checkzone.c in Sources */,
+				11C2FE5018D506D700061E8B /* main-conf.c in Sources */,
+				11C2FE5118D506D700061E8B /* main-listif.c in Sources */,
+				11C2FE5218D506D700061E8B /* main-pcap2zone.c in Sources */,
+				11C2FE5318D506D700061E8B /* main-regression.c in Sources */,
+				11C2FE5418D506D700061E8B /* main-server.c in Sources */,
+				11C2FE5518D506D700061E8B /* main-slowsockets.c in Sources */,
+				11C2FE5618D506D700061E8B /* main-thread.c in Sources */,
+				11C2FE5718D506D700061E8B /* main.c in Sources */,
+				11C2FE5818D506D700061E8B /* pixie-nic.c in Sources */,
+				11C2FE5918D506D700061E8B /* pixie.c in Sources */,
+				11C2FE5A18D506D700061E8B /* proto-arp.c in Sources */,
+				11C2FE5B18D506D700061E8B /* proto-dns-compressor.c in Sources */,
+				11C2FE5C18D506D700061E8B /* proto-dns-formatter.c in Sources */,
+				11C2FE5D18D506D700061E8B /* proto-dns-parse.c in Sources */,
+				11C2FE5E18D506D700061E8B /* proto-icmp.c in Sources */,
+				11C2FE5F18D506D700061E8B /* proto-ip.c in Sources */,
+				11C2FE6018D506D700061E8B /* proto-preprocess.c in Sources */,
+				11C2FE6118D506D700061E8B /* proto-udp.c in Sources */,
+				11C2FE6218D506D700061E8B /* rawsock-pfring.c in Sources */,
+				11C2FE6318D506D700061E8B /* rawsock.c in Sources */,
+				11C2FE6418D506D700061E8B /* resolver.c in Sources */,
+				11C2FE6518D506D700061E8B /* selftest-parsefast.c in Sources */,
+				11C2FE6618D506D700061E8B /* selftest.c in Sources */,
+				11C2FE6718D506D700061E8B /* string_s.c in Sources */,
+				11C2FE6818D506D700061E8B /* util-filename.c in Sources */,
+				11C2FE6918D506D700061E8B /* util-ipaddr.c in Sources */,
+				11C2FE6A18D506D700061E8B /* util-keyword.c in Sources */,
+				11C2FE6B18D506D700061E8B /* zonefile-dfa.c in Sources */,
+				11C2FE6C18D506D700061E8B /* zonefile-fields.c in Sources */,
+				11C2FE6D18D506D700061E8B /* zonefile-load.c in Sources */,
+				11C2FE6E18D506D700061E8B /* zonefile-parse.c in Sources */,
+				11C2FE6F18D506D700061E8B /* zonefile-print.c in Sources */,
+				11C2FE7018D506D700061E8B /* zonefile-rr.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		11C2FDDB18D506A300061E8B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		11C2FDDC18D506A300061E8B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		11C2FDDE18D506A300061E8B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		11C2FDDF18D506A300061E8B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		11C2FDCD18D506A300061E8B /* Build configuration list for PBXProject "robdns" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11C2FDDB18D506A300061E8B /* Debug */,
+				11C2FDDC18D506A300061E8B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		11C2FDDD18D506A300061E8B /* Build configuration list for PBXNativeTarget "robdns" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11C2FDDE18D506A300061E8B /* Debug */,
+				11C2FDDF18D506A300061E8B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 11C2FDCA18D506A300061E8B /* Project object */;
+}

@@ -285,7 +285,7 @@ pixie_get_proc_symbol(void *library, const char *symbol)
 unsigned
 pixie_get_mac_address(unsigned char macaddr[6])
 {
-    memset(macaddr, 0, sizeof(macaddr));
+    memset(macaddr, 0, 6);
 #ifdef WIN32
     {
         DWORD dwStatus;

@@ -447,8 +447,8 @@ entry_has_rr(
     unsigned i;
     struct RRSETPARSER R = {0};
 
-    if (type == 0x2e)
-        ;//printf(".");
+    //if (type == 0x2e)
+    //    ;//printf(".");
 
     for (i=entry->domain_length; i<entry->offset; ) {
         R_init(&R, entry->buf + i);

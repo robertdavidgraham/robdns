@@ -804,6 +804,12 @@ again:
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <net/route.h>
+#include <netinet/in.h>
+#include <net/if_dl.h>
+#include <ctype.h>
 
 
 #ifdef AF_LINK
@@ -886,6 +892,7 @@ get_rt_address(struct rt_msghdr *rtm, int desired)
     return NULL;
     
 }
+
 
 unsigned
 pxie_nic_get_default(char *ifname, size_t sizeof_ifname)
@@ -1026,34 +1033,6 @@ pixie_nic_get_ipv4(const char *ifname)
 error:
     freeifaddrs(ifap);
     return 0;
-}
-#include <unistd.h>
-#include <sys/socket.h>
-#include <net/route.h>
-#include <netinet/in.h>
-#include <net/if_dl.h>
-#include <ctype.h>
-
-#define ROUNDUP(a)							\
-((a) > 0 ? (1 + (((a) - 1) | (sizeof(int) - 1))) : sizeof(int))
-
-struct sockaddr *
-get_rt_address(struct rt_msghdr *rtm, int desired)
-{
-    int i;
-    int bitmask = rtm->rtm_addrs;
-    struct sockaddr *sa = (struct sockaddr *)(rtm + 1);
-    
-    for (i = 0; i < RTAX_MAX; i++) {
-        if (bitmask & (1 << i)) {
-            if ((1<<i) == desired)
-                return sa;
-            sa = (struct sockaddr *)(ROUNDUP(sa->sa_len) + (char *)sa);
-        } else
-            ;
-    }
-    return NULL;
-
 }
 
 static void

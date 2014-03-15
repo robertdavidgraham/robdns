@@ -21,7 +21,7 @@
 #include <iphlpapi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h> 
