@@ -207,6 +207,33 @@
 		11C2FDE018D506BC00061E8B /* src */ = {
 			isa = PBXGroup;
 			children = (
+				11C2FE8518D6772200061E8B /* zonefile */,
+				11C2FE8418D676EF00061E8B /* util */,
+				11C2FE8318D676DF00061E8B /* main */,
+				11C2FE8218D676BF00061E8B /* misc */,
+				11C2FE8118D6768700061E8B /* proto */,
+				11C2FE8018D6767700061E8B /* db */,
+				11C2FE7F18D6766700061E8B /* crypto */,
+				11C2FE7D18D6765B00061E8B /* adapter */,
+				11C2FE2118D506D700061E8B /* resolver.c */,
+				11C2FE2218D506D700061E8B /* resolver.h */,
+				11C2FDF818D506D700061E8B /* domainname.h */,
+				11C2FE2318D506D700061E8B /* robdns.h */,
+				11C2FE2418D506D700061E8B /* selftest-parsefast.c */,
+				11C2FE2518D506D700061E8B /* selftest.c */,
+				11C2FE2618D506D700061E8B /* selftest.h */,
+				11C2FE2D18D506D700061E8B /* unusedparm.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		11C2FE7D18D6765B00061E8B /* adapter */ = {
+			isa = PBXGroup;
+			children = (
+				11C2FE1D18D506D700061E8B /* rawsock-pfring.c */,
+				11C2FE1E18D506D700061E8B /* rawsock-pfring.h */,
+				11C2FE1F18D506D700061E8B /* rawsock.c */,
+				11C2FE2018D506D700061E8B /* rawsock.h */,
 				11C2FDE118D506D700061E8B /* adapter-pcapfile.c */,
 				11C2FDE218D506D700061E8B /* adapter-pcapfile.h */,
 				11C2FDE318D506D700061E8B /* adapter-pcaplive.c */,
@@ -215,12 +242,26 @@
 				11C2FDE618D506D700061E8B /* adapter-xmit.c */,
 				11C2FDE718D506D700061E8B /* adapter.c */,
 				11C2FDE818D506D700061E8B /* adapter.h */,
+			);
+			name = adapter;
+			sourceTree = "<group>";
+		};
+		11C2FE7F18D6766700061E8B /* crypto */ = {
+			isa = PBXGroup;
+			children = (
 				11C2FDE918D506D700061E8B /* crypto-md5.c */,
 				11C2FDEA18D506D700061E8B /* crypto-md5.h */,
 				11C2FDEB18D506D700061E8B /* crypto-murmur3.c */,
 				11C2FDEC18D506D700061E8B /* crypto-murmur3.h */,
 				11C2FDED18D506D700061E8B /* crypto-siphash.c */,
 				11C2FDEE18D506D700061E8B /* crypto-siphash.h */,
+			);
+			name = crypto;
+			sourceTree = "<group>";
+		};
+		11C2FE8018D6767700061E8B /* db */ = {
+			isa = PBXGroup;
+			children = (
 				11C2FDEF18D506D700061E8B /* db-catalog.c */,
 				11C2FDF018D506D700061E8B /* db-entry.c */,
 				11C2FDF118D506D700061E8B /* db-entry.h */,
@@ -230,13 +271,57 @@
 				11C2FDF518D506D700061E8B /* db-zone.c */,
 				11C2FDF618D506D700061E8B /* db-zone.h */,
 				11C2FDF718D506D700061E8B /* db.h */,
-				11C2FDF818D506D700061E8B /* domainname.h */,
+			);
+			name = db;
+			sourceTree = "<group>";
+		};
+		11C2FE8118D6768700061E8B /* proto */ = {
+			isa = PBXGroup;
+			children = (
+				11C2FE1A18D506D700061E8B /* proto-preprocess.c */,
+				11C2FE1B18D506D700061E8B /* proto-preprocess.h */,
+				11C2FE1C18D506D700061E8B /* proto-udp.c */,
+				11C2FE1118D506D700061E8B /* proto-arp.c */,
+				11C2FE1218D506D700061E8B /* proto-dns-compressor.c */,
+				11C2FE1318D506D700061E8B /* proto-dns-compressor.h */,
+				11C2FE1418D506D700061E8B /* proto-dns-formatter.c */,
+				11C2FE1518D506D700061E8B /* proto-dns-formatter.h */,
+				11C2FE1618D506D700061E8B /* proto-dns-parse.c */,
+				11C2FE1718D506D700061E8B /* proto-dns.h */,
+				11C2FE1818D506D700061E8B /* proto-icmp.c */,
+				11C2FE1918D506D700061E8B /* proto-ip.c */,
+			);
+			name = proto;
+			sourceTree = "<group>";
+		};
+		11C2FE8218D676BF00061E8B /* misc */ = {
+			isa = PBXGroup;
+			children = (
+				11C2FE0B18D506D700061E8B /* network.h */,
+				11C2FE0C18D506D700061E8B /* packet.h */,
+				11C2FE0D18D506D700061E8B /* pixie-nic.c */,
+				11C2FE0E18D506D700061E8B /* pixie-nic.h */,
+				11C2FE0F18D506D700061E8B /* pixie.c */,
+				11C2FE1018D506D700061E8B /* pixie.h */,
+				11C2FE2718D506D700061E8B /* source.h */,
+				11C2FE2818D506D700061E8B /* string_s.c */,
+				11C2FE2918D506D700061E8B /* string_s.h */,
+				11C2FE2A18D506D700061E8B /* success-failure.h */,
+				11C2FE2B18D506D700061E8B /* thread-atomic.h */,
+				11C2FE2C18D506D700061E8B /* thread.h */,
 				11C2FDF918D506D700061E8B /* extract.h */,
 				11C2FDFA18D506D700061E8B /* grind-config.c */,
 				11C2FDFB18D506D700061E8B /* grind.c */,
 				11C2FDFC18D506D700061E8B /* grind.h */,
 				11C2FDFD18D506D700061E8B /* logger.c */,
 				11C2FDFE18D506D700061E8B /* logger.h */,
+			);
+			name = misc;
+			sourceTree = "<group>";
+		};
+		11C2FE8318D676DF00061E8B /* main */ = {
+			isa = PBXGroup;
+			children = (
 				11C2FDFF18D506D700061E8B /* main-checkzone.c */,
 				11C2FE0018D506D700061E8B /* main-conf.c */,
 				11C2FE0118D506D700061E8B /* main-conf.h */,
@@ -249,47 +334,26 @@
 				11C2FE0818D506D700061E8B /* main-thread.c */,
 				11C2FE0918D506D700061E8B /* main-thread.h */,
 				11C2FE0A18D506D700061E8B /* main.c */,
-				11C2FE0B18D506D700061E8B /* network.h */,
-				11C2FE0C18D506D700061E8B /* packet.h */,
-				11C2FE0D18D506D700061E8B /* pixie-nic.c */,
-				11C2FE0E18D506D700061E8B /* pixie-nic.h */,
-				11C2FE0F18D506D700061E8B /* pixie.c */,
-				11C2FE1018D506D700061E8B /* pixie.h */,
-				11C2FE1118D506D700061E8B /* proto-arp.c */,
-				11C2FE1218D506D700061E8B /* proto-dns-compressor.c */,
-				11C2FE1318D506D700061E8B /* proto-dns-compressor.h */,
-				11C2FE1418D506D700061E8B /* proto-dns-formatter.c */,
-				11C2FE1518D506D700061E8B /* proto-dns-formatter.h */,
-				11C2FE1618D506D700061E8B /* proto-dns-parse.c */,
-				11C2FE1718D506D700061E8B /* proto-dns.h */,
-				11C2FE1818D506D700061E8B /* proto-icmp.c */,
-				11C2FE1918D506D700061E8B /* proto-ip.c */,
-				11C2FE1A18D506D700061E8B /* proto-preprocess.c */,
-				11C2FE1B18D506D700061E8B /* proto-preprocess.h */,
-				11C2FE1C18D506D700061E8B /* proto-udp.c */,
-				11C2FE1D18D506D700061E8B /* rawsock-pfring.c */,
-				11C2FE1E18D506D700061E8B /* rawsock-pfring.h */,
-				11C2FE1F18D506D700061E8B /* rawsock.c */,
-				11C2FE2018D506D700061E8B /* rawsock.h */,
-				11C2FE2118D506D700061E8B /* resolver.c */,
-				11C2FE2218D506D700061E8B /* resolver.h */,
-				11C2FE2318D506D700061E8B /* robdns.h */,
-				11C2FE2418D506D700061E8B /* selftest-parsefast.c */,
-				11C2FE2518D506D700061E8B /* selftest.c */,
-				11C2FE2618D506D700061E8B /* selftest.h */,
-				11C2FE2718D506D700061E8B /* source.h */,
-				11C2FE2818D506D700061E8B /* string_s.c */,
-				11C2FE2918D506D700061E8B /* string_s.h */,
-				11C2FE2A18D506D700061E8B /* success-failure.h */,
-				11C2FE2B18D506D700061E8B /* thread-atomic.h */,
-				11C2FE2C18D506D700061E8B /* thread.h */,
-				11C2FE2D18D506D700061E8B /* unusedparm.h */,
+			);
+			name = main;
+			sourceTree = "<group>";
+		};
+		11C2FE8418D676EF00061E8B /* util */ = {
+			isa = PBXGroup;
+			children = (
 				11C2FE2E18D506D700061E8B /* util-filename.c */,
 				11C2FE2F18D506D700061E8B /* util-filename.h */,
 				11C2FE3018D506D700061E8B /* util-ipaddr.c */,
 				11C2FE3118D506D700061E8B /* util-ipaddr.h */,
 				11C2FE3218D506D700061E8B /* util-keyword.c */,
 				11C2FE3318D506D700061E8B /* util-keyword.h */,
+			);
+			name = util;
+			sourceTree = "<group>";
+		};
+		11C2FE8518D6772200061E8B /* zonefile */ = {
+			isa = PBXGroup;
+			children = (
 				11C2FE3418D506D700061E8B /* zonefile-dfa.c */,
 				11C2FE3518D506D700061E8B /* zonefile-dfa.h */,
 				11C2FE3618D506D700061E8B /* zonefile-fields.c */,
@@ -303,7 +367,7 @@
 				11C2FE3E18D506D700061E8B /* zonefile-rr.h */,
 				11C2FE3F18D506D700061E8B /* zonefile-tracker.h */,
 			);
-			name = src;
+			name = zonefile;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -489,6 +553,7 @@
 				11C2FDDF18D506A300061E8B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
