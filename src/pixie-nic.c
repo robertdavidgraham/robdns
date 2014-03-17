@@ -793,7 +793,7 @@ again:
 
 /*****************************************************************************
  *****************************************************************************/
-#elif defined(__APPLE__) || defined(__FreeBSD__) || 1
+#elif defined(__APPLE__) || defined(__FreeBSD__)
 #include <ctype.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
@@ -895,7 +895,7 @@ get_rt_address(struct rt_msghdr *rtm, int desired)
 
 
 unsigned
-pxie_nic_get_default(char *ifname, size_t sizeof_ifname)
+pixie_nic_get_default(char *ifname, size_t sizeof_ifname)
 {
     int fd;
     int seq = time(0);

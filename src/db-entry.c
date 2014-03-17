@@ -74,7 +74,7 @@ struct RRSETPARSER {
     int type;
     unsigned ttl;
 };
-__inline void R_init(struct RRSETPARSER *r, const void *rrset)
+void R_init(struct RRSETPARSER *r, const void *rrset)
 {
     r->buf = (const unsigned char *)rrset;
     r->max = r->buf[0]<<8 | r->buf[1];
@@ -82,7 +82,7 @@ __inline void R_init(struct RRSETPARSER *r, const void *rrset)
     r->ttl = r->buf[4]<<24 | r->buf[5]<<16 | r->buf[6]<<8 | r->buf[7];
     r->offset = 8;
 }
-__inline void R_next_rr(struct RRSETPARSER *r, unsigned *rdlength, unsigned *rdoffset)
+void R_next_rr(struct RRSETPARSER *r, unsigned *rdlength, unsigned *rdoffset)
 {
     *rdlength = r->buf[r->offset+0]<<8 | r->buf[r->offset+1];
     *rdoffset = r->offset + 2;
