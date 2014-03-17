@@ -96,6 +96,10 @@ struct Selftest
     struct TestAdapter client;
     struct TestAdapter server;
 
+    /* During unite/regression test, we send a DNS query through the system,
+     * then parse the response to verify it matches what we expect as a 
+     * response. This code is set to either Failure or Success during
+     * the test */
     int test_code;
     int total_code;
 
@@ -228,7 +232,9 @@ int expand_soa(
 
 
 int
-checker_check(const struct CheckerA *a, const struct CheckerB *b, const unsigned char *px)
+checker_check(const struct CheckerA *a, 
+              const struct CheckerB *b, const unsigned char *px,
+              int print_message)
 {
     const unsigned char *a_name = (const unsigned char *)a->rname;
     const unsigned char *b_name = px;
@@ -248,7 +254,9 @@ checker_check(const struct CheckerA *a, const struct CheckerB *b, const unsigned
     b_rdlength = px[b->offset_data+8]<<8 | px[b->offset_data+9];
     b_rdata = px + b->offset_data + 10;
 
-
+    if (print_message)
+        printf("*******************************\n");
+    
     /*
      * First let's check the names
      */
@@ -268,6 +276,10 @@ checker_check(const struct CheckerA *a, const struct CheckerB *b, const unsigned
             ;
         b_len = b_name[b_offset++];
 
+        if (print_message) {
+            printf("\"%.*s\" -- \"%.*s\n", a_len, &a_name[a_offset], b_len, &b_name[b_offset]);
+        }
+        
         /* compare the labels */
         if (a_len != b_len)
             return 0;
@@ -284,7 +296,9 @@ checker_check(const struct CheckerA *a, const struct CheckerB *b, const unsigned
         if (a_len == 0)
             break; 
     }
-
+    if (print_message)
+        printf("names match\n");
+    
     /* now let's check the data */
     switch (b_type) {
     case TYPE_SOA:
@@ -309,7 +323,20 @@ checker_check(const struct CheckerA *a, const struct CheckerB *b, const unsigned
     default:
         if (a->rdlength != b_rdlength)
             return 0;
-        return memcmp(a->rdata, b_rdata, b_rdlength) == 0;
+        {
+            
+            int x = (memcmp(a->rdata, b_rdata, b_rdlength) == 0);
+            
+            if (print_message) {
+                if (x)
+                    printf("rdata matches\n");
+                else {
+                    printf("rdata FAIL\n");
+                }
+            }
+                
+            return x;
+        }
     }
 }
  enum {
@@ -328,7 +355,9 @@ checker_check(const struct CheckerA *a, const struct CheckerB *b, const unsigned
  * it's an independent check of the real code.
  ****************************************************************************/
 static int
-selftest_verify(struct Selftest *selftest, const unsigned char *px, unsigned offset, unsigned max)
+selftest_verify(struct Selftest *selftest, 
+                const unsigned char *px, unsigned offset, unsigned max,
+                int print_message)
 {
     unsigned qdcount;
     unsigned ancount;
@@ -418,7 +447,11 @@ selftest_verify(struct Selftest *selftest, const unsigned char *px, unsigned off
      * Now go through and pull out all the variable length parms
      */
     for (;;) {
-        unsigned i = checker->a_count;;
+        unsigned i = checker->a_count;
+        
+        if (print_message) {
+            printf(">");
+        }
         checker->a[i].rname = va_arg(marker, const char *);
         if (checker->a[i].rname == 0)
             break;
@@ -427,6 +460,8 @@ selftest_verify(struct Selftest *selftest, const unsigned char *px, unsigned off
         checker->a[i].rtype = va_arg(marker, int);
         checker->a_count++;
     }
+    if (print_message)
+        printf("\n");
 
     /*
      * Now make sure that the response contains all the expected data
@@ -435,7 +470,7 @@ selftest_verify(struct Selftest *selftest, const unsigned char *px, unsigned off
         unsigned j;
 
         for (j=0; j<checker->b_count; j++) {
-            if (checker_check(&checker->a[i], &checker->b[j], dns_header))
+            if (checker_check(&checker->a[i], &checker->b[j], dns_header, print_message))
                 break;
         }
         if (j == checker->b_count) {
@@ -448,9 +483,13 @@ selftest_verify(struct Selftest *selftest, const unsigned char *px, unsigned off
 }
 
 /****************************************************************************
+ * Send packet from the server. Of course, during self-test, we don't
+ * actually transmit the packet, but parse the result to see if it matches
+ * what we expect.
  ****************************************************************************/
 void
-selftest_server_xmit_packet(struct Adapter *adapter, struct Thread *thread, struct Packet *pkt)
+selftest_server_xmit_packet(struct Adapter *adapter,
+                            struct Thread *thread, struct Packet *pkt)
 {
     struct TestAdapter *testadapter = (struct TestAdapter *)adapter->userdata;
     struct TestAdapter *other;
@@ -472,7 +511,10 @@ selftest_server_xmit_packet(struct Adapter *adapter, struct Thread *thread, stru
         pcapfile_close(x);
     }
 
-    selftest->test_code = selftest_verify(selftest, pkt->buf, 42, pkt->max);
+    selftest->test_code = selftest_verify(selftest, pkt->buf, 42, pkt->max, 0);
+    if (selftest->test_code != Success) {
+        selftest->test_code = selftest_verify(selftest, pkt->buf, 42, pkt->max, 1);
+    }
 
 }
 
@@ -675,7 +717,7 @@ selftest(int argc, char *argv[])
                 "\x00\x12\x75\x00"
                 "\x00\x00\x0e\x10",
         TYPE_SOA,
-        0);
+        NULL);
 
 
     /*
@@ -685,11 +727,11 @@ selftest(int argc, char *argv[])
     LOAD("hydrogen A 1.0.0.1                ; a simple IP address\n", parser);
     QUERY("hydrogen", TYPE_A, selftest,
         "hydrogen.example.com.", 4, "\1\0\0\1", TYPE_A,
-        0, selftest);
+        NULL, selftest);
     selftest->is_edns0 = 1;
     QUERY("hydrogen", TYPE_A, selftest,
         "hydrogen.example.com.", 4, "\1\0\0\1", TYPE_A,
-        0, selftest);
+        NULL, selftest);
     
     /*
      * tests that an "Entry" can hold multiple "RRsets", in this case
@@ -702,7 +744,7 @@ selftest(int argc, char *argv[])
         "helium.example.com", 4, "\2\0\0\1", TYPE_A,
         "helium.example.com", 13, "\x0c" "hello, world", TYPE_TXT,
         "helium.example.com", 16, "\x20\2\0\0\0\0\0\0\0\0\0\0\0\0\0\1", TYPE_AAAA,
-        0);
+        NULL);
 
 
     /*
@@ -723,23 +765,28 @@ selftest(int argc, char *argv[])
         "lithium.example.com", 4, "\3\0\0\2", TYPE_A,
         "lithium.example.com", 4, "\3\0\0\3", TYPE_A,
         "lithium.example.com", 4, "\3\0\0\4", TYPE_A,
-        0);
+        NULL);
     QUERY("lithium", TYPE_TXT, selftest,
         "lithium.example.com", 6, "\x05" "hello", TYPE_TXT,
         "lithium.example.com", 6, "\x05" "world", TYPE_TXT,
         "lithium.example.com", 3, "\x02" "42", TYPE_TXT,
         "lithium.example.com", 22, "\x15" "don't eat yellow snow", TYPE_TXT,
-        0);
+        NULL);
 
     /*
      * This verifies that domain-names are case-insensitive
      */
     LOAD("Beryllium A 4.0.0.1               ; case sensitivity\n", parser);
     LOAD("bErYlLiUm A 4.0.0.2               ; case sensitivity\n", parser);
+    QUERY("Beryllium", TYPE_A, selftest,
+          "Beryllium.example.com", 4, "\4\0\0\1", TYPE_A,
+          "Beryllium.example.com", 4, "\4\0\0\2", TYPE_A,
+          NULL);
+
     QUERY("berylliuM", TYPE_A, selftest,
-        "berylliuM.example.com", 4, "\4\0\0\1", TYPE_A,
-        "berylliuM.example.com", 4, "\4\0\0\2", TYPE_A,
-        0);
+          "berylliuM.example.com", 4, "\4\0\0\1", TYPE_A,
+          "berylliuM.example.com", 4, "\4\0\0\2", TYPE_A,
+          NULL);
 
     /* try to cause a buffer overflow */
     element = "boron";
@@ -760,7 +807,7 @@ selftest(int argc, char *argv[])
     }
     QUERY("0007.boron", TYPE_TXT, selftest,
         "0007.boron.example.com", 2, "\x01" "o", TYPE_TXT,
-        0);
+        NULL);
 
     /* try to cause a buffer overflow */
     element = "nitrogen";
@@ -787,7 +834,7 @@ selftest(int argc, char *argv[])
     LOAD("\"bb\" \"ccc\" )\n", parser);
     QUERY("oxygen", TYPE_TXT, selftest,
         "oxygen.example.com", 9, "\x01" "a" "\x02" "bb" "\x03" "ccc", TYPE_TXT,
-        0);
+        NULL);
 
 
     /* we are now done parsing the zonefile, so free the parser */
