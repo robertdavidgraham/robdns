@@ -125,7 +125,11 @@ selftest_alloc_packet(struct Adapter *adapter, struct Thread *thread)
     return pkt;
 }
 
-void selftest_client_xmit_packet(struct Adapter *adapter, struct Thread *thread, struct Packet *pkt)
+/****************************************************************************
+ ****************************************************************************/
+void 
+selftest_client_xmit_packet(struct Adapter *adapter, 
+                            struct Thread *thread, struct Packet *pkt)
 {
     struct TestAdapter *testadapter = (struct TestAdapter *)adapter->userdata;
     struct TestAdapter *other;
@@ -154,6 +158,8 @@ void selftest_client_xmit_packet(struct Adapter *adapter, struct Thread *thread,
                 pkt->max);
 }
 
+/****************************************************************************
+ ****************************************************************************/
 struct CheckerA
 {
     const char *rname;
@@ -173,6 +179,11 @@ struct Checker
     struct CheckerA a[100];
     struct CheckerB b[100];
 };
+enum {
+    VERIFY_PARTIAL,
+    VERIFY_EXACT = 1,
+};
+
 
 /****************************************************************************
  * Expands the packet's SOA record to a full uncompressed SOA record so
@@ -194,7 +205,7 @@ struct Checker
  *      names (because DNS name compression is done as offsets from the
  *      start of the packet).
  ****************************************************************************/
-int expand_soa(
+int decompress_soa(
     unsigned char *buf, unsigned *buf_offset, size_t buf_size,
     const unsigned char *soa, unsigned soa_length,
     const unsigned char *hdr)
@@ -231,8 +242,19 @@ int expand_soa(
 }
 
 
+/****************************************************************************
+ * Compares an expected response record 'a' with a record in the produced
+ * response packet 'b'.
+ *
+ * Normally, the response will be "failure". That's because for each
+ * expected record, we test if it exists anywhere in the response packet.
+ * Thus, the caller of this function will be going through many non-matches
+ * in a packet until it finds the match.
+ *
+ ****************************************************************************/
 int
-checker_check(const struct CheckerA *a, 
+selftest_verify_one_item(
+              const struct CheckerA *a, 
               const struct CheckerB *b, const unsigned char *px,
               int print_message)
 {
@@ -245,6 +267,12 @@ checker_check(const struct CheckerA *a,
     unsigned b_rdlength;
     const unsigned char *b_rdata;
 
+    /*
+     * STEP #1:
+     *   quick checks:
+     *      type must equal
+     *      class must equal
+     */
     b_type = px[b->offset_data+0]<<8 | px[b->offset_data+1];
     if (b_type != a->rtype)
         return 0;
@@ -258,7 +286,8 @@ checker_check(const struct CheckerA *a,
         printf("*******************************\n");
     
     /*
-     * First let's check the names
+     * STEP #2:
+     *  check that the "label" (domain name) matches
      */
     a_offset = 0;
     b_offset = b->offset_name;
@@ -299,7 +328,12 @@ checker_check(const struct CheckerA *a,
     if (print_message)
         printf("names match\n");
     
-    /* now let's check the data */
+    /* 
+     * STEP #3
+     *  check that the 'rdata' (contents) of the record matches. Note that
+     *  some records (e.g. SOA) that contain compressable domain names
+     *  need to first be decompressed/expanded.
+     */
     switch (b_type) {
     case TYPE_SOA:
         {
@@ -308,7 +342,7 @@ checker_check(const struct CheckerA *a,
             int x;
             
 
-            x = expand_soa(buf, &buf_length, sizeof(buf),
+            x = decompress_soa(buf, &buf_length, sizeof(buf),
                 b_rdata, b_rdlength,
                 px);
             if (x == Failure)
@@ -339,10 +373,6 @@ checker_check(const struct CheckerA *a,
         }
     }
 }
- enum {
-     VERIFY_PARTIAL,
-     VERIFY_EXACT = 1,
- };
 
 /****************************************************************************
  * Verifies a response sorta matches the expected response. We do this by
@@ -470,7 +500,9 @@ selftest_verify(struct Selftest *selftest,
         unsigned j;
 
         for (j=0; j<checker->b_count; j++) {
-            if (checker_check(&checker->a[i], &checker->b[j], dns_header, print_message))
+            if (selftest_verify_one_item(&checker->a[i], 
+                                         &checker->b[j], dns_header, 
+                                         print_message))
                 break;
         }
         if (j == checker->b_count) {
