@@ -44,6 +44,7 @@
     <ClCompile Include="..\src\main-thread.c" />
     <ClCompile Include="..\src\main.c" />
     <ClCompile Include="..\src\pixie-nic.c" />
+    <ClCompile Include="..\src\pixie-timer.c" />
     <ClCompile Include="..\src\pixie.c" />
     <ClCompile Include="..\src\proto-arp.c" />
     <ClCompile Include="..\src\proto-dns-compressor.c" />
@@ -91,6 +92,7 @@
     <ClInclude Include="..\src\network.h" />
     <ClInclude Include="..\src\packet.h" />
     <ClInclude Include="..\src\pixie-nic.h" />
+    <ClInclude Include="..\src\pixie-timer.h" />
     <ClInclude Include="..\src\pixie.h" />
     <ClInclude Include="..\src\proto-dns-compressor.h" />
     <ClInclude Include="..\src\proto-dns-formatter.h" />

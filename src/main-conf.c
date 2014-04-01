@@ -7,9 +7,28 @@
 #include "success-failure.h"
 #include "pixie.h"
 #include "pixie-nic.h"
+#include "pixie-timer.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdint.h>
+
+/****************************************************************************
+ * This function parses the zone-file. Since parsing can take a long time,
+ * such as when reading the .com file, we print status indicating how long
+ * things are taking.
+ ****************************************************************************/
+void
+zonefile_benchmark(
+        struct DomainPointer domain,
+        struct DomainPointer origin,
+	    unsigned type,
+        unsigned ttl,
+        unsigned rdlength,
+        const unsigned char *rdata,
+        uint64_t filesize,
+	    void *userdata)
+{
+}
 
 
 /****************************************************************************
@@ -18,14 +37,16 @@
  * things are taking.
  ****************************************************************************/
 static enum Status
-parse_zone_file(struct Catalog *db, const char *filename)
+parse_zone_file(struct Catalog *db, const char *filename, struct Core *conf)
 {
     struct ZoneFileParser *parser;
     FILE *fp;
     int err;
     uint64_t filesize;
     uint64_t total_read = 0;
+    uint64_t last_printed = 0;
     static const struct DomainPointer root = {(const unsigned char*)"\0",1};
+    uint64_t start, stop;
 
 
 
@@ -52,16 +73,30 @@ parse_zone_file(struct Catalog *db, const char *filename)
     /*
      * Start the parsing
      */
-    parser = zonefile_begin(root, 60, filesize,             
-            filename, 
-            zonefile_load, 
-            db
-            );
+    if (conf->is_zonefile_benchmark) {
+        fprintf(stderr, "benchmarking...\n");
+        parser = zonefile_begin(
+                root, 
+                60, filesize,             
+                filename, 
+                zonefile_benchmark,
+                db
+                );
+    } else {
+        parser = zonefile_begin(
+                root, 
+                60, filesize,             
+                filename, 
+                zonefile_load, 
+                db
+                );
+    }
 
     /*
      * Continue parsing the file until end, reporting progress as we
      * go along
      */
+    start = pixie_gettime();
     for (;;) {
         unsigned char buf[65536];
         size_t bytes_read;
@@ -77,13 +112,23 @@ parse_zone_file(struct Catalog *db, const char *filename)
             );
 
         total_read += bytes_read;
-        if ((total_read & 0x3FFFFF) == 0) {
-            double percent_done = total_read*100.0/filesize;
+        if (total_read > last_printed + 400*1000*1000) {
+            double percent_done = (total_read*100.0)/filesize;
             fprintf(stderr, "%2.1f%% done, %12llu mbytes read\r", percent_done, total_read/(1024ULL*1024ULL));
+            last_printed = total_read;
         }
     }
-
+    stop = pixie_gettime();
     fclose(fp);
+
+    /*
+     * If benchmarking
+     */
+    if (conf->is_zonefile_benchmark) {
+        double rate = ((1.0*total_read)/(stop-start))*1.0;
+        printf("parse-speed: %5.3f-megabytes/second\n", rate);
+        exit(0);
+    }
 
 
     if (zonefile_end(parser) == Success) {
@@ -347,6 +392,8 @@ conf_set_parameter(struct Core *conf, const char *name, const char *value)
 
     if (EQUALS("conf", name) || EQUALS("config", name)) {
         conf_read_config_file(conf, value);
+    } else if (EQUALS("zonefile-benchmark", name)) {
+        conf->is_zonefile_benchmark = 1;
     } else if (EQUALS("adapter", name) || EQUALS("if", name) || EQUALS("interface", name)) {
         if (conf->nic[index].ifname[0]) {
             fprintf(stderr, "CONF: overwriting \"adapter=%s\"\n", conf->nic[index].ifname);
@@ -518,7 +565,7 @@ conf_command_line(struct Core *conf, int argc, char *argv[])
             continue;
         }
         else if (ends_with(argv[i], ".zone"))
-            parse_zone_file(conf->db, argv[i]);
+            parse_zone_file(conf->db, argv[i], conf);
         else if (parse_ip_address(argv[i], 0, 0, &ipaddr)) {
             conf_set_parameter(conf, "adapter-ip", argv[i]);
         } else if (pixie_nic_exists(argv[i])) {

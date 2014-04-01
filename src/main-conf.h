@@ -20,6 +20,7 @@ struct Core
     unsigned is_sendq:1;
     unsigned is_offline:1;
     unsigned is_packet_trace:1;
+    unsigned is_zonefile_benchmark:1;
 
     char working_directory[512];
 };
