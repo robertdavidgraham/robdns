@@ -124,10 +124,16 @@ parse_zone_file(struct Catalog *db, const char *filename, struct Core *conf)
     /*
      * If benchmarking
      */
-    if (conf->is_zonefile_benchmark) {
+    {
         double rate = ((1.0*total_read)/(stop-start))*1.0;
+        printf("elapsed: %02u:%02u (minutes:seconds)\n",
+            (unsigned)((stop-start)/(60*1000000)),
+            (unsigned)(((stop-start)/(1000000))%60)
+            );
+
         printf("parse-speed: %5.3f-megabytes/second\n", rate);
-        exit(0);
+        if (conf->is_zonefile_benchmark) 
+            exit(0);
     }
 
 
