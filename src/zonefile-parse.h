@@ -53,14 +53,24 @@ typedef void (*RESOURCE_RECORD_CALLBACK)(
  *      diagnostic information -- it's not used to open/close files.
  * @param callback
  *      This function will be called once we've parsed a resource record.
+ *      This is almost always the function "zonefile_load()", which will
+ *      insert the parsed record into the database. The only case when
+ *      it isn't is when we are just benchmarking the parser, in which
+ *      case this function just drops the record.
  * @param callbackdata
- *      Opaque user data associated with the callback.
- * 
+ *      Opaque user data associated with the callback. This is almost
+ *      always the global catalog/db.
+ * @param extra_threads
+ *      The number of extra insertion threads to spawn, 0 if not using 
+ *      multi-threaded parsing. Inserting records into the database
+ *      is the slow part, so it's useful to have more than one thread
+ *      doing it.
  */
 struct ZoneFileParser *
 zonefile_begin(struct DomainPointer origin, uint64_t ttl, 
                uint64_t filesize, const char *filename, 
-               RESOURCE_RECORD_CALLBACK callback, void *callbackdata);
+               RESOURCE_RECORD_CALLBACK callback, void *callbackdata,
+               unsigned extra_threads);
 
 /* Call this when done, check return code for success(1) or failure(0) */
 int zonefile_end(struct ZoneFileParser *parser);

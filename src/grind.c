@@ -235,7 +235,8 @@ grind_load_zonefile(struct Grind *grind, const char *filename, struct DomainPoin
     parser = zonefile_begin(origin, ttl, filesize,
                 filename,                   /* used for printing error messages */
                 zonefile_load,              /* called for each resource record */
-                grind                       /* opaque user data (void*) */
+                grind,                       /* opaque user data (void*) */
+                0
             );
 
 

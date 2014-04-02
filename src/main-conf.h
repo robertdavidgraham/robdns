@@ -22,6 +22,8 @@ struct Core
     unsigned is_packet_trace:1;
     unsigned is_zonefile_benchmark:1;
 
+    unsigned insertion_threads;
+
     char working_directory[512];
 };
 

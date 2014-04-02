@@ -5,7 +5,7 @@
 #ifndef SOURCE_H
 #define SOURCE_H
 
-struct Source
+struct InputSource
 {
     const char *filename;
     unsigned line_number;

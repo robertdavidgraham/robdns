@@ -13,4 +13,5 @@ zonefile_load(
         uint64_t filesize,
 	    void *userdata);
 
+
 #endif

@@ -126,6 +126,7 @@ grab_dns_response(struct Catalog *catalog, const unsigned char *px, unsigned off
 
         case TYPE_NS:
         case TYPE_CNAME:
+        case TYPE_PTR:
             extract_name(   tmp_buffer, &tmp_offset, sizeof(tmp_buffer),
                             px, &src_offset, max);
             rdata = tmp_buffer;
@@ -195,7 +196,8 @@ pcap2zone(int argc, char *argv[])
                     10000,          /* filesize */
                     "<pcap2zone>",  /* filename */
                     zonefile_load,  /* callback */
-                    catalog         /* callback data */
+                    catalog,        /* callback data */
+                    0
                     );
         LOAD("$TTL 60\r\n"
              "@    IN    SOA   ns hostmaster (\r\n"

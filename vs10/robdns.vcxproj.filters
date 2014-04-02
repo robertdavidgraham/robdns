@@ -186,6 +186,15 @@
     <ClCompile Include="..\src\pixie-timer.c">
       <Filter>Source Files\misc</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\rte-ring.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pixie-threads.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zonefile-insertion.c">
+      <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\adapter-pcapfile.h">
@@ -328,6 +337,15 @@
     </ClInclude>
     <ClInclude Include="..\src\pixie-timer.h">
       <Filter>Source Files\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rte-ring.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pixie-threads.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\zonefile-insertion.h">
+      <Filter>Source Files\zonefile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

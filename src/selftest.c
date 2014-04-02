@@ -20,6 +20,7 @@
 #include "thread.h"
 #include "zonefile-load.h"
 #include "string_s.h"
+#include "rte-ring.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -694,6 +695,12 @@ selftest(int argc, char *argv[])
     UNUSEDPARM(argc);
     UNUSEDPARM(argv);
 
+    if (rte_ring_selftest() != 0) {
+        fprintf(stderr, "rte-ring: selftest failed\n");
+        return Failure;
+    }
+
+
     selftest->total_code = Success;
 
     /*
@@ -726,7 +733,8 @@ selftest(int argc, char *argv[])
                 10000,          /* filesize */
                 "<selftest>",   /* filename */
                 zonefile_load,  /* callback */
-                db              /* callback data */
+                db,             /* callback data */
+                0
                 );
     selftest->parser = parser;
 

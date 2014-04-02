@@ -4,38 +4,15 @@
 #ifndef ZONE_FIELDS_H
 #define ZONE_FIELDS_H
 #include "zonefile-rr.h"
+#include "zonefile-insertion.h"
+#include "source.h"
+#include "zonefile-parse.h"
 
 struct ParseBuffer
 {
     unsigned length;
     unsigned line_offset;
     unsigned char *data;
-};
-
-enum BlockStatus {
-    BLOCK_EMPTY=0,
-    BLOCK_FULL=1,
-    BLOCK_INSERTING=2,
-};
-/****************************************************************************
- * A "block" contains many parsed records from a zone file. This will be
- * handed off to a separate thread that will then insert them into
- ****************************************************************************/
-struct ParsedBlock
-{
-    enum BlockStatus status;
-
-    /* The "origin" domain name. Whenever the origin changes in a zonefile
-     * it forces the creation of a new block. Thus, the single origin
-     * parameter can be considered valid for all records within a block. */
-	struct DomainPointer origin;
-    unsigned char origin_buffer[256];
-
-    /* The buffer containing parsed resource-records */
-    unsigned char buf[256*1024];
-    unsigned offset;
-    unsigned offset_start;
-
 };
 
 struct DomainBuilder
@@ -46,6 +23,7 @@ struct DomainBuilder
 	unsigned char *name;
 };
 
+struct rte_ring;
 
 /****************************************************************************
  ****************************************************************************/
@@ -58,10 +36,6 @@ struct ZoneFileParser
     uint64_t filesize;
 	struct MyDFA *type_dfa;
 	struct MyDFA *variable_dfa;
-
-	struct DomainPointer origin;
-    unsigned char origin_buffer[256];
-	uint64_t ttl;
 
     uint64_t rr_number;
     struct DomainBuilder rr_domain;
@@ -97,15 +71,21 @@ struct ZoneFileParser
     } rr_ipv4;
     
 
-	struct ParsedBlock blocks[64]; /*IMPORTANT: count must be power of 2 */
-    uint64_t block_index;
-    struct ParsedBlock *block;
 
-    struct Source src;
+    struct InputSource src;
 
+    /*
+     * Insertion stuff
+     */
     RESOURCE_RECORD_CALLBACK callback;
     void *callbackdata;
-
+	struct ParsedBlock the_blocks[64]; /*IMPORTANT: count must be power of 2 */
+    struct ParsedBlock *block;
+    struct rte_ring *insertion_queue;
+    struct rte_ring *free_queue;
+    unsigned additional_threads;
+    volatile unsigned running_threads;
+    volatile unsigned is_running;
 };
 struct Bytes;
 

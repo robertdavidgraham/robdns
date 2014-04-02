@@ -46,7 +46,8 @@ selftest2(int argc, char *argv[])
             zonetext_size,  /* filesize */
             "<selftest>",   /* filename */
             zonefile_load,  /* callback */
-            catalog         /* callback data */
+            catalog,        /* callback data */
+            0
             );
 
     LOAD("$TTL 60\r\n"

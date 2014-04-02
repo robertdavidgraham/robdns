@@ -44,6 +44,7 @@
     <ClCompile Include="..\src\main-thread.c" />
     <ClCompile Include="..\src\main.c" />
     <ClCompile Include="..\src\pixie-nic.c" />
+    <ClCompile Include="..\src\pixie-threads.c" />
     <ClCompile Include="..\src\pixie-timer.c" />
     <ClCompile Include="..\src\pixie.c" />
     <ClCompile Include="..\src\proto-arp.c" />
@@ -57,12 +58,14 @@
     <ClCompile Include="..\src\rawsock-pfring.c" />
     <ClCompile Include="..\src\rawsock.c" />
     <ClCompile Include="..\src\resolver.c" />
+    <ClCompile Include="..\src\rte-ring.c" />
     <ClCompile Include="..\src\selftest-parsefast.c" />
     <ClCompile Include="..\src\selftest.c" />
     <ClCompile Include="..\src\string_s.c" />
     <ClCompile Include="..\src\util-filename.c" />
     <ClCompile Include="..\src\util-ipaddr.c" />
     <ClCompile Include="..\src\util-keyword.c" />
+    <ClCompile Include="..\src\zonefile-insertion.c" />
     <ClCompile Include="..\src\zonefile-dfa.c" />
     <ClCompile Include="..\src\zonefile-fields.c" />
     <ClCompile Include="..\src\zonefile-load.c" />
@@ -92,6 +95,7 @@
     <ClInclude Include="..\src\network.h" />
     <ClInclude Include="..\src\packet.h" />
     <ClInclude Include="..\src\pixie-nic.h" />
+    <ClInclude Include="..\src\pixie-threads.h" />
     <ClInclude Include="..\src\pixie-timer.h" />
     <ClInclude Include="..\src\pixie.h" />
     <ClInclude Include="..\src\proto-dns-compressor.h" />
@@ -102,6 +106,7 @@
     <ClInclude Include="..\src\rawsock.h" />
     <ClInclude Include="..\src\resolver.h" />
     <ClInclude Include="..\src\robdns.h" />
+    <ClInclude Include="..\src\rte-ring.h" />
     <ClInclude Include="..\src\selftest.h" />
     <ClInclude Include="..\src\source.h" />
     <ClInclude Include="..\src\string_s.h" />
@@ -112,6 +117,7 @@
     <ClInclude Include="..\src\util-filename.h" />
     <ClInclude Include="..\src\util-ipaddr.h" />
     <ClInclude Include="..\src\util-keyword.h" />
+    <ClInclude Include="..\src\zonefile-insertion.h" />
     <ClInclude Include="..\src\zonefile-dfa.h" />
     <ClInclude Include="..\src\zonefile-fields.h" />
     <ClInclude Include="..\src\zonefile-load.h" />

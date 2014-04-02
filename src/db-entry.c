@@ -153,6 +153,7 @@ rrset_packet_append(
         switch (r->type) {
         case TYPE_NS:
         case TYPE_CNAME:
+        case TYPE_PTR:
             {
                 struct DomainPointer domain;
                 domain.name = r->buf + rdoffset;
@@ -246,6 +247,7 @@ rrset_get_glue(const struct DBZone *zone, const struct DBEntry *entry, const str
     switch (type) {
     case TYPE_NS:
     case TYPE_CNAME:
+    case TYPE_PTR:
         domain_pointer->length = GET_RDLENGTH(buf, offset);
         domain_pointer->name = buf+offset+HDR_LENGTH;
         return zone_lookup_exact2(zone, domain_pointer->name, domain_pointer->length);

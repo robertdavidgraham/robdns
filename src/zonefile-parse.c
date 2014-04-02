@@ -15,6 +15,7 @@
 #include "unusedparm.h"
 
 #include "thread-atomic.h"
+#include "pixie-timer.h"
 
 
 #if defined(EVIL_KLUDGES)
@@ -532,8 +533,10 @@ int is_fqdn_terminated(struct DomainPointer domain)
 
 void mm_domain_end(struct ZoneFileParser *parser)
 {
+    struct ParsedBlock *block = parser->block;
+
     //parser->rr_domain.name[-1] = parser->rr_domain.length;
-    parser->block->offset += parser->rr_domain.length;
+    block->offset += parser->rr_domain.length;
 
     if (parser->rr_domain.is_absolute)
         return;
@@ -544,12 +547,12 @@ void mm_domain_end(struct ZoneFileParser *parser)
         /* we have a relative name, so copy the $ORIGIN */
         /* TODO: [VULN]: there should be a vuln here, we need to create
          * a test case to exercise it before fixing it */
-        memcpy( parser->block->buf + parser->block->offset,
-                parser->origin.name,
-                parser->origin.length);
-        parser->block->offset += parser->origin.length;
-        if (!is_fqdn_terminated(parser->origin)) {
-            parser->block->buf[parser->block->offset++] = '\0';
+        memcpy( block->buf + block->offset,
+                block->origin.name,
+                block->origin.length);
+        block->offset += block->origin.length;
+        if (!is_fqdn_terminated(block->origin)) {
+            block->buf[block->offset++] = '\0';
         }
     }
 }
@@ -641,124 +644,7 @@ void mm_ipv6_end(struct ZoneFileParser *parser)
     parser->block->offset += 16;
 }
 
-/****************************************************************************
- ****************************************************************************/
-void
-block_process(struct ParsedBlock *block, RESOURCE_RECORD_CALLBACK callback, void *userdata, uint64_t filesize)
-{
-    unsigned i;
-    unsigned max = block->offset;
 
-    for (i=0; i<max; ) {
-        const unsigned char *buf = block->buf;
-        struct DomainPointer domain;
-        const unsigned char *rdata;
-        unsigned type;
-        unsigned ttl;
-        unsigned rdlength;
-
-        domain.length = buf[i];
-        domain.name = &buf[i+1];
-
-        i += domain.length + 1;
-
-        type = buf[i+0]<<8 | buf[i+1];
-        ttl = buf[i+2]<<24 | buf[i+3]<<16 | buf[i+4]<<8 | buf[i+5];
-        rdlength = buf[i+6]<<8 | buf[i+7];
-        i += 8;
-
-        rdata = &buf[i];
-        i += rdlength;
-
-
-        callback(
-            domain,
-            block->origin,
-            type,
-            ttl,
-            rdlength,
-            rdata,
-            filesize,
-            userdata);
-    }
-
-    block->offset = 0;
-    block->offset_start = 0;
-    block->status = BLOCK_EMPTY;
-}
-
-
-/****************************************************************************
- ****************************************************************************/
-struct ParsedBlock *
-block_next_to_insert(struct ZoneFileParser *parser)
-{
-    static const unsigned INDEX_MASK = sizeof(parser->blocks)/sizeof(parser->blocks[0]) - 1;
-    uint64_t start_index = parser->block_index + 1;
-    uint64_t stop_index = start_index + INDEX_MASK;
-    uint64_t i;
-
-    for (i=start_index; i<stop_index; i++) {
-        struct ParsedBlock *block = &parser->blocks[i & INDEX_MASK];
-        int x;
-
-        if (block->status != BLOCK_FULL)
-            continue;
-        x = thread_compare_and_swap(&parser->blocks[i&INDEX_MASK].status, BLOCK_FULL, BLOCK_INSERTING);
-        if (x)
-            return block;
-    }
-
-    return NULL;
-}
-
-/****************************************************************************
- * BLOCKS: By grouping multiple RRs together in a "block", we can have
- * multiple threads updating the zone database without having to interact
- * much with each other.
- ****************************************************************************/
-struct ParsedBlock *
-block_next_to_parse(struct ZoneFileParser *parser)
-{
-    block_process(parser->block, parser->callback, parser->callbackdata, parser->filesize);
-    return parser->block;
-#if 0
-    static const unsigned INDEX_MASK = sizeof(parser->blocks)/sizeof(parser->blocks[0]) - 1;
-    uint64_t next_index;
-    struct ParsedBlock *next_block;
-    struct ParsedBlock *prev_block = parser->block;
-
-    /* mark the current block as full */
-    parser->block->status = BLOCK_FULL;
-    printf("-");
-
-again:
-    next_index = parser->block_index + 1;
-    next_block = &parser->blocks[next_index & INDEX_MASK];
-
-    if (next_block->status != BLOCK_EMPTY) {
-        struct ParsedBlock *block;
-
-        
-        /* Oops, we are parsing the file faster than the lookup threads
-         * can keep up. Therefore, we need to stop parsing the file creaing
-         * new blocks and instead process a block ourselves */
-        block = block_next_to_insert(parser);
-        if (block)
-            block_process(block, parser->callback, parser->callbackdata, parser->filesize);
-        goto again;
-    }
-
-    /* Carry over the previous origin to the new block */
-    memcpy(next_block->origin_buffer, prev_block->origin_buffer, prev_block->origin.length);
-    next_block->origin.name = next_block->origin_buffer;
-    next_block->origin.length = prev_block->origin.length;
-
-    parser->block_index = next_index;
-    parser->block = next_block;
-    return next_block;
-#endif
-}
 
 /****************************************************************************
  ****************************************************************************/
@@ -798,6 +684,7 @@ x_parse(struct ZoneFileParser *parser, const unsigned char *buf, unsigned length
 		$RR_AAAA,
 		$RR_TXT, $RR_TXT_START,
 		$RR_MX, $RR_MX_DOMAIN,
+		$RR_PTR,
 		$RR_CNAME,
 		$RR_END,
 	};
@@ -841,13 +728,20 @@ rr_end:
 		s = $LINE_START;
 
 	case $LINE_START:
-        /* See if we need to start a new buffer */
+        /* IMPORTANT: this is where we hand off a block of resource-reocrds
+         * to another thread to be inserted into the database. If yo uare 
+         * tracing the path how a record goes from the parser to the
+         * database, here is where it happens
+         */
         if (block->offset + 64*1024 > sizeof(block->buf))
-            block_next_to_parse(parser);
+            block = block_next_to_parse(parser);
 
 		switch (buf[i]) {
 		case ' ':
 		case '\t':
+            /* If the line starts with a space, then that means we'll use the
+             * the domain-name from the previous line, and just skip to the
+             * next field */
 			s = $TYPE;
 			continue;
 		case '\r':
@@ -922,10 +816,10 @@ rr_end:
             /* First, align the start of the buffer */
             block->buf[block->offset++] = (unsigned char)(type>>8);
             block->buf[block->offset++] = (unsigned char)(type>>0);
-            block->buf[block->offset++] = (unsigned char)(parser->ttl>>24);
-            block->buf[block->offset++] = (unsigned char)(parser->ttl>>16);
-            block->buf[block->offset++] = (unsigned char)(parser->ttl>> 8);
-            block->buf[block->offset++] = (unsigned char)(parser->ttl>> 0);
+            block->buf[block->offset++] = (unsigned char)(parser->block->ttl>>24);
+            block->buf[block->offset++] = (unsigned char)(parser->block->ttl>>16);
+            block->buf[block->offset++] = (unsigned char)(parser->block->ttl>> 8);
+            block->buf[block->offset++] = (unsigned char)(parser->block->ttl>> 0);
             block->buf[block->offset++] = (unsigned char)(0); /* placeholder for RDLENGTH */
             block->buf[block->offset++] = (unsigned char)(0); /* placeholder for RDLENGTH */
 
@@ -945,6 +839,7 @@ rr_end:
             case TYPE_SRV:          s = $RR_TXT_START;  continue;
             case TYPE_SPF:          s = $RR_TXT_START;  continue;
 			case TYPE_MX:			s = $RR_MX;			mm_integer_start(parser); continue;
+			case TYPE_PTR:		    s = $RR_PTR;		mm_domain_start(parser); continue;
 			case TYPE_CNAME:		s = $RR_CNAME;		mm_domain_start(parser); continue;
 			default:
 				parse_err(parser, "unknown type: %u\n", type);
@@ -967,7 +862,7 @@ rr_end:
 				s = $COMMENT;
 				continue;
 			} else if ('0' <= buf[i] && buf[i] <= '9') {
-				parser->ttl = buf[i] - '0';
+				parser->block->ttl = buf[i] - '0';
 				s = $TTL;
 				continue;
 			} else {
@@ -1002,7 +897,7 @@ rr_end:
 		x_parse_ttl(parser, buf, &i, length);
 		if (i >= length)
 			break;
-        parser->ttl = parser->rr_number & 0xFFFFFFFF;
+        parser->block->ttl = parser->rr_number & 0xFFFFFFFF;
 		i--;
 		s = $TYPE;
 		continue;
@@ -1011,7 +906,7 @@ rr_end:
 		x_parse_ttl(parser, buf, &i, length);
 		if (i >= length)
 			break;
-        parser->ttl = parser->rr_number & 0xFFFFFFFF;
+        parser->block->ttl = parser->rr_number & 0xFFFFFFFF;
 		i--;
 		s = $UNTIL_EOL;
 		continue;
@@ -1084,6 +979,7 @@ rr_end:
 
 	/*****************/
 	case $RR_CNAME:
+    case $RR_PTR:
 		x_parse_domain(parser, buf, &i, length);
 		if (i >= length)
 			break;
@@ -1538,7 +1434,7 @@ rr_end:
 				i--;
 				s = $ORIGIN;
                 mm_domain_start(parser);
-                parser->rr_domain.name = parser->origin_buffer;
+                parser->rr_domain.name = block->origin_buffer;
 				parser->s2 = 0;
 				continue;
 			case 2: /* $TTL */
@@ -1587,16 +1483,8 @@ rr_end:
 
         /* We need to update both the 'parser' and the current 'block' with
          * the new origin info */
-        parser->origin.length = parser->rr_domain.label;
-        {
-            struct ParsedBlock *block = parser->block;
-
-            memcpy( block->origin_buffer,
-                    parser->origin.name,
-                    parser->origin.length);
-            block->origin.name = block->origin_buffer;
-            block->origin.length = parser->origin.length;
-        }
+        parser->block->origin.length = parser->rr_domain.label;
+        printf("todo\n");
 
 		i--;
 		s = $UNTIL_EOL;
@@ -1666,13 +1554,14 @@ zonefile_parse(
  ****************************************************************************/
 struct ZoneFileParser *
 zonefile_begin(struct DomainPointer origin, uint64_t ttl, uint64_t filesize,
-    const char *filename, RESOURCE_RECORD_CALLBACK callback, void *callbackdata)
+    const char *filename, RESOURCE_RECORD_CALLBACK callback, void *callbackdata,
+    unsigned extra_threads)
 {
     struct ZoneFileParser *parser;
 
     parser = (struct ZoneFileParser *)malloc(sizeof(parser[0]));
     memset(parser, 0, sizeof(parser[0]));
-  	
+
     /* remember filesize as a hint when creating the zone hash table */
     parser->filesize = filesize;
     parser->callback = callback;
@@ -1682,21 +1571,11 @@ zonefile_begin(struct DomainPointer origin, uint64_t ttl, uint64_t filesize,
     parser->type_dfa = _type_dfa;
 	parser->variable_dfa = _variable_dfa;
 
-    if (origin.length) {
-        parser->origin.length = (unsigned char)origin.length;
-        parser->origin.name = parser->origin_buffer;
-        memcpy(parser->origin_buffer, origin.name, parser->origin.length);
-    }
-    if (ttl) {
-        parser->ttl = ttl;
-    }
-
-    parser->block = &parser->blocks[0];
-
-    memcpy(parser->block->origin_buffer, parser->origin_buffer, 256);
-    parser->block->origin.name = parser->block->origin_buffer;
-    parser->block->origin.length = parser->origin.length;
-
+    /*
+     * Initialize the "block-insertion" system
+     */
+    parser->additional_threads = extra_threads;
+    parser->block = block_init(parser, origin, ttl);
 
     return parser;
 }
@@ -1708,7 +1587,15 @@ zonefile_end(struct ZoneFileParser *parser)
 {
     int result;
     
+    /*
+     * Wait for all threads to finish inserting data
+     */
     zonefile_flush(parser);
+
+    /*
+     * Cleanup the block-insertiong stuff
+     */
+    block_end(parser);
 
     if (parser->src.error_count)
         result = Failure;
@@ -1744,32 +1631,13 @@ zonefile_parser_init(void)
  ****************************************************************************/
 int zonefile_flush(struct ZoneFileParser *parser)
 {
-    unsigned i;
-    int x;
     struct ParsedBlock *block = parser->block;
 
-    /* First, flush the current block. This will normally be the only block
-     * that we process. */
-    block->status = BLOCK_FULL;
-    x = thread_compare_and_swap(&parser->block->status, BLOCK_EMPTY, BLOCK_INSERTING);
-    if (x)
-        block_process(parser->block, parser->callback, parser->callbackdata, parser->filesize);
+    /* First, terminate processing of the current block */
+    block_next_to_parse(parser);
 
-    /* Now wait until all blocks have been flushed */
-    for (;;) {
-        int is_empty = 1;
-        for (i=0; i<sizeof(parser->blocks)/sizeof(parser->blocks[0]); i++) {
-            block = &parser->blocks[i];
-            if (block->offset) {
-                x = thread_compare_and_swap(&parser->block->status, BLOCK_FULL, BLOCK_INSERTING);
-                if (x)
-                    block_process(parser->block, parser->callback, parser->callbackdata, parser->filesize);
-                is_empty = 0;
-            }
-        }
-        if (is_empty)
-            break;
-    }
+    /* Second, wait for all blocks to be processed */
+    block_flush(parser);
 
     return Success;
 }

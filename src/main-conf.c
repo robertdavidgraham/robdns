@@ -80,7 +80,8 @@ parse_zone_file(struct Catalog *db, const char *filename, struct Core *conf)
                 60, filesize,             
                 filename, 
                 zonefile_benchmark,
-                db
+                db,
+                0
                 );
     } else {
         parser = zonefile_begin(
@@ -88,7 +89,8 @@ parse_zone_file(struct Catalog *db, const char *filename, struct Core *conf)
                 60, filesize,             
                 filename, 
                 zonefile_load, 
-                db
+                db,
+                conf->insertion_threads
                 );
     }
 
@@ -400,6 +402,8 @@ conf_set_parameter(struct Core *conf, const char *name, const char *value)
         conf_read_config_file(conf, value);
     } else if (EQUALS("zonefile-benchmark", name)) {
         conf->is_zonefile_benchmark = 1;
+    } else if (EQUALS("insertion-threads", name) || EQUALS("insertion-thread", name)) {
+        conf->insertion_threads = (unsigned)parseInt(value);
     } else if (EQUALS("adapter", name) || EQUALS("if", name) || EQUALS("interface", name)) {
         if (conf->nic[index].ifname[0]) {
             fprintf(stderr, "CONF: overwriting \"adapter=%s\"\n", conf->nic[index].ifname);

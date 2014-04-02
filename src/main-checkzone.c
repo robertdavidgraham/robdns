@@ -49,7 +49,8 @@ int checkzone(int argc, char *argv[])
         parser = zonefile_begin(root, 60, filesize,
                 filename, 
                 zonefile_load, 
-                zonecheck->db
+                zonecheck->db,
+                0
                 );
 
         for (;;) {
