@@ -264,6 +264,247 @@ end:
 /****************************************************************************
  ****************************************************************************/
 void
+x_parse_location(struct ZoneFileParser *parser, 
+    const unsigned char *buf, unsigned *offset, unsigned length)
+{
+	unsigned i;
+	unsigned s = parser->s2;
+    unsigned number = parser->rr_location.number;
+    unsigned field = parser->rr_location.field;
+	
+    /*
+The LOC record is expressed in a master file in the following format:
+
+owner TTL class LOC ( d1 [m1 [s1]] {"N"|"S"} d2 [m2 [s2]]
+                           {"E"|"W"} alt["m"] [siz["m"] [hp["m"]
+                           [vp["m"]]]] )
+
+where:
+
+   d1:     [0 .. 90]            (degrees latitude)
+   d2:     [0 .. 180]           (degrees longitude)
+   m1, m2: [0 .. 59]            (minutes latitude/longitude)
+   s1, s2: [0 .. 59.999]        (seconds latitude/longitude)
+   alt:    [-100000.00 .. 42849672.95] BY .01 (altitude in meters)
+   siz, hp, vp: [0 .. 90000000.00] (size/precision in meters)
+
+If omitted, minutes and seconds default to zero, size defaults to 1m,
+horizontal precision defaults to 10000m, and vertical precision
+defaults to 10m.  These defaults are chosen to represent typical
+ZIP/postal code area sizes, since it is often easy to find
+approximate geographical location by ZIP/postal code.
+*/
+    enum {
+        $LATITUDE_DEGREES,
+        $LATITUDE_MINUTES,
+        $LATITUDE_SECONDS,
+        $LATITUDE_SECONDS_FRACTION,
+        $LONGITUDE_DEGREES,
+        $LONGITUDE_MINUTES,
+        $LONGITUDE_SECONDS,
+        $LONGITUDE_SECONDS_FRACTION,
+        $ALTITUDE,
+        $SIZE,
+        $HORIZONTAL_PRECISION,
+        $VERTICAL_PRECISION,
+    };
+#define IS_LATITUDE(field) ($LATITUDE_DEGREES < (field) && (field) <= $LONGITUDE_DEGREES)
+#define IS_LONGITUDE(field) ($LONGITUDE_DEGREES < (field) && (field) <= $ALTITUDE)
+
+	enum {
+		$START			= 0,
+		$END			= 1,
+		$COMMENT		= 2,
+		$PARSE_ERROR	= 3,
+
+        $NUMBER_START,
+        $NUMBER_CONTINUE,
+        $NUMBER_END,
+	};
+
+	for (i=*offset; i<length; i++) {
+	    unsigned char c = buf[i];
+
+	switch (s) {
+	case $START:
+		if (parse_default(parser, &s, buf, &i, &length))
+			break;
+		s = $NUMBER_START;
+
+    case $NUMBER_START:
+    number_start:
+		switch (c) {
+		case ' ':
+		case '\t':
+		case '\r':
+            /* normal white space */
+			continue;
+
+		case '\n':
+            parser->src.line_number++;
+            if (!parser->is_multiline)
+                s = $END;
+            continue;
+		case '(':
+			parser->is_multiline = 1;
+			continue;
+		case ')':
+			parser->is_multiline = 0;
+			continue;
+        case ';':
+            s = $COMMENT;
+            continue;
+		}
+        if (isdigit(c)) {
+            number = (c - '0');
+            parser->rr_location.digits = 1;
+            s = $NUMBER_CONTINUE;
+            continue;
+        } else if ('N' == toupper(c) && IS_LATITUDE(field)) {
+            parser->rr_location.latitude += (1<<31);
+            field = $LONGITUDE_DEGREES;
+            continue;
+        } else if ('S' == toupper(c) && IS_LATITUDE(field)) {
+            field = $LONGITUDE_DEGREES;
+            continue;
+        } else if ('E' == toupper(c) && IS_LONGITUDE(field)) {
+            parser->rr_location.latitude += (1<<31);
+            field = $ALTITUDE;
+            continue;
+        } else if ('W' == toupper(c) && IS_LONGITUDE(field)) {
+            field = $ALTITUDE;
+            continue;
+        }  else {
+            parse_err(parser, "LOC: unexpected char, field=%u\n", field);
+            s = $PARSE_ERROR;
+            continue;
+        }
+        break;
+    case $NUMBER_CONTINUE:
+        if (isdigit(c)) {
+            if (parser->rr_location.digits < 3) {
+                number = number * 10 + (c - '0');
+                parser->rr_location.digits++;
+            }
+            continue;
+        } else if (c == 'm') {
+            switch (field) {
+            case $ALTITUDE:
+            case $SIZE:
+            case $HORIZONTAL_PRECISION:
+            case $VERTICAL_PRECISION:
+                /* these fields optionally end in 'm' meaning 'meters' */
+                s = $NUMBER_END;
+                continue;
+            }
+        }
+        s = $NUMBER_END;
+        /* fall; through */
+    case $NUMBER_END:
+        switch (field) {
+        case $LATITUDE_DEGREES:
+            parser->rr_location.latitude = number * 60 * 60 * 1000;
+            break;
+        case $LATITUDE_MINUTES:
+            parser->rr_location.latitude += number * 60 * 1000;
+            break;
+        case $LATITUDE_SECONDS:
+            parser->rr_location.latitude += number * 1000;
+            if (c == '.')
+                c = ' ';
+            break;
+        case $LATITUDE_SECONDS_FRACTION:
+            while (parser->rr_location.digits < 3) {
+                parser->rr_location.digits++;
+                number *= 10;
+            }
+            parser->rr_location.latitude += number;
+            break;
+        case $LONGITUDE_DEGREES:
+            parser->rr_location.longitude = number * 60 * 60 * 1000;
+            break;
+        case $LONGITUDE_MINUTES:
+            parser->rr_location.longitude = number * 60 * 1000;
+            break;
+        case $LONGITUDE_SECONDS:
+            parser->rr_location.longitude = number * 1000;
+            if (c == '.')
+                c = ' ';
+            break;
+        case $LONGITUDE_SECONDS_FRACTION:
+            while (parser->rr_location.digits < 3) {
+                parser->rr_location.digits++;
+                number *= 10;
+            }
+            parser->rr_location.longitude = number;
+            break;
+        case $ALTITUDE:
+            parser->rr_location.altitude = number;
+            break;
+        case $SIZE:
+            parser->rr_location.altitude = number;
+            break;
+        case $HORIZONTAL_PRECISION:
+            parser->rr_location.altitude = number;
+            break;
+        case $VERTICAL_PRECISION:
+            parser->rr_location.altitude = number;
+            s = $END;
+            goto end;
+            break;
+        }
+        field++;
+        s = $NUMBER_START;
+        goto number_start;
+        break;
+
+	case $COMMENT:
+		while (i < length && buf[i] != '\n')
+			i++;
+		if (i < length) {
+			if (parser->is_multiline)
+				s = $NUMBER_START;
+			else
+                s = $END;
+		}
+		break;
+
+	case $END:
+		if (c == ';') {
+			s = $COMMENT;
+			continue;
+		} else if (c == ' ' || c == '\t' || c == '\r') {
+			continue;
+		} else if (c == '\n') {
+			if (parser->is_multiline) {
+                parser->src.line_number++;
+				continue;
+            } else
+				goto end;
+		} else if (c == ')' && parser->is_multiline) {
+			parser->is_multiline = 0;
+			continue;
+		} else {
+			goto end;
+		}
+
+
+	case $PARSE_ERROR:
+		while (i<length && !(buf[i] == ' ' || buf[i] == '\t' || buf[i] == '\r'))
+			i++;
+		break;
+	}
+	}
+end:
+	parser->rr_location.number = number;
+    parser->rr_location.field = field;
+	parser->s2 = s;
+	*offset = i;
+}
+
+/****************************************************************************
+ ****************************************************************************/
+void
 x_parse_ipv4(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length)
 {
 	unsigned i;

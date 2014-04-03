@@ -620,6 +620,40 @@ void mm_typelist_end(struct ZoneFileParser *parser)
     UNUSEDPARM(parser);
 }
 
+void mm_location_start(struct ZoneFileParser *parser)
+{
+    memset(&parser->rr_location, 0, sizeof(parser->rr_location));
+    parser->s2 = 0;
+}
+void mm_location_end(struct ZoneFileParser *parser)
+{
+    unsigned char *px = parser->block->buf + parser->block->offset;
+
+    /*
+      MSB                                           LSB
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+  0|        VERSION        |         SIZE          |
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+  2|       HORIZ PRE       |       VERT PRE        |
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+  4|                   LATITUDE                    |
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+  6|                   LATITUDE                    |
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+  8|                   LONGITUDE                   |
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ 10|                   LONGITUDE                   |
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ 12|                   ALTITUDE                    |
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ 14|                   ALTITUDE                    |
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+   */
+    memset(px, 0, 16);
+
+    parser->block->offset += 16;
+}
+
 void mm_ipv6_start(struct ZoneFileParser *parser)
 {
     parser->rr_ipv6.length = 0;
@@ -680,6 +714,7 @@ x_parse(struct ZoneFileParser *parser, const unsigned char *buf, unsigned length
 		$RR_NSEC3_SALT, $RR_NSEC3_HASH, $RR_NSEC3_TYPES,
 		$RR_NSEC, $RR_NSEC_DOMAIN, $RR_NSEC_TYPES, 
 		$RR_TLSA, $RR_TLSA_USAGE, $RR_TLSA_SELECTOR, $RR_TLSA_TYPE, $RR_TLSA_CERT,
+        $RR_LOC,
 		$RR_A,
 		$RR_AAAA,
 		$RR_TXT, $RR_TXT_START,
@@ -835,6 +870,7 @@ rr_end:
 			case TYPE_TLSA:			s = $RR_TLSA;		continue;
 			case TYPE_A:			s = $RR_A;			mm_integer_start(parser); continue;
 			case TYPE_AAAA:			s = $RR_AAAA;		mm_ipv6_start(parser); continue;
+			case TYPE_LOC:			s = $RR_LOC;		mm_location_start(parser); continue;
 			case TYPE_TXT:			s = $RR_TXT_START;	continue;
             case TYPE_SRV:          s = $RR_TXT_START;  continue;
             case TYPE_SPF:          s = $RR_TXT_START;  continue;
@@ -1022,6 +1058,15 @@ rr_end:
 		if (i >= length)
 			break;
         mm_ipv6_end(parser);
+		s = $RR_END;
+		goto rr_end;
+
+	/*****************/
+	case $RR_LOC:
+		x_parse_location(parser, buf, &i, length);
+		if (i >= length)
+			break;
+        mm_location_end(parser);
 		s = $RR_END;
 		goto rr_end;
 

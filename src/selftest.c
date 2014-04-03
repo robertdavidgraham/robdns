@@ -876,6 +876,16 @@ selftest(int argc, char *argv[])
         "oxygen.example.com", 9, "\x01" "a" "\x02" "bb" "\x03" "ccc", TYPE_TXT,
         NULL);
 
+    /*
+     * LOC record
+     */
+    LOAD("flourine  IN LOC   (\n"
+            "   52 22 23.000 N  ;latitude\n"
+            "    4 53 32.000 E  ;longitude\n"
+            "   -2.00m          ;altitude\n"
+            "    0.00m 10000m 10m)\n", parser);
+
+
 
     /* we are now done parsing the zonefile, so free the parser */
     parse_results = zonefile_end(parser);

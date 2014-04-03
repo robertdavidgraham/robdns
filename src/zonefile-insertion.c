@@ -124,7 +124,7 @@ block_next_to_parse(struct ZoneFileParser *parser)
             }
         }
         insert_block_into_catalog(block, parser->callback, parser->callbackdata, parser->filesize);
-        printf("." "MAIN-THREAD: inserted block\n");
+        //printf("." "MAIN-THREAD: inserted block\n");
         rte_ring_enqueue(parser->free_queue, block);
     }
 
@@ -162,7 +162,7 @@ insertion_thread(void *v)
             }
         }
         insert_block_into_catalog(block, parser->callback, parser->callbackdata, parser->filesize);
-        printf("." "INSERTION-THREAD: inserted block\n");
+        //printf("." "INSERTION-THREAD: inserted block\n");
         rte_ring_enqueue(parser->free_queue, block);
 
     }

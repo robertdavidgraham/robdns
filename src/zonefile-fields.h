@@ -50,6 +50,17 @@ struct ZoneFileParser
         unsigned val;
     } rr_ipv6;
     struct {
+        unsigned number;
+        unsigned longitude;
+        unsigned latitude;
+        unsigned altitude;
+        unsigned char size;
+        unsigned char horiz_pre;
+        unsigned char vert_pre;
+        unsigned char field;
+        unsigned char digits;
+    } rr_location;
+    struct {
 	    uint64_t result;
 	    unsigned count;
     } rr_base64;
@@ -91,6 +102,7 @@ struct Bytes;
 
 void x_parse_ipv4(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
 void x_parse_ipv6(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length, unsigned char *ipv6);
+void x_parse_location(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
 void x_parse_txt(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
 void x_parse_base32hex(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
 void x_parse_base64(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
