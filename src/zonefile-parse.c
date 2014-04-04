@@ -620,39 +620,6 @@ void mm_typelist_end(struct ZoneFileParser *parser)
     UNUSEDPARM(parser);
 }
 
-void mm_location_start(struct ZoneFileParser *parser)
-{
-    memset(&parser->rr_location, 0, sizeof(parser->rr_location));
-    parser->s2 = 0;
-}
-void mm_location_end(struct ZoneFileParser *parser)
-{
-    unsigned char *px = parser->block->buf + parser->block->offset;
-
-    /*
-      MSB                                           LSB
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-  0|        VERSION        |         SIZE          |
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-  2|       HORIZ PRE       |       VERT PRE        |
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-  4|                   LATITUDE                    |
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-  6|                   LATITUDE                    |
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-  8|                   LONGITUDE                   |
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- 10|                   LONGITUDE                   |
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- 12|                   ALTITUDE                    |
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- 14|                   ALTITUDE                    |
-   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-   */
-    memset(px, 0, 16);
-
-    parser->block->offset += 16;
-}
 
 void mm_ipv6_start(struct ZoneFileParser *parser)
 {
@@ -1063,7 +1030,7 @@ rr_end:
 
 	/*****************/
 	case $RR_LOC:
-		x_parse_location(parser, buf, &i, length);
+		mm_location_parse(parser, buf, &i, length);
 		if (i >= length)
 			break;
         mm_location_end(parser);

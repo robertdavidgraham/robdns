@@ -195,6 +195,9 @@
     <ClCompile Include="..\src\zonefile-insertion.c">
       <Filter>Source Files\zonefile</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\zonefile-field-loc.c">
+      <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\adapter-pcapfile.h">

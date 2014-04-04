@@ -65,6 +65,7 @@
     <ClCompile Include="..\src\util-filename.c" />
     <ClCompile Include="..\src\util-ipaddr.c" />
     <ClCompile Include="..\src\util-keyword.c" />
+    <ClCompile Include="..\src\zonefile-field-loc.c" />
     <ClCompile Include="..\src\zonefile-insertion.c" />
     <ClCompile Include="..\src\zonefile-dfa.c" />
     <ClCompile Include="..\src\zonefile-fields.c" />

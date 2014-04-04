@@ -57,10 +57,10 @@ struct ZoneFileParser
         unsigned longitude;
         unsigned latitude;
         unsigned altitude;
-        unsigned char size;
-        unsigned char horiz_pre;
-        unsigned char vert_pre;
-        unsigned  field;
+        unsigned size;
+        unsigned horiz_pre;
+        unsigned vert_pre;
+        unsigned char field;
         unsigned char digits;
         unsigned is_negative:1;
     } rr_location;
@@ -106,7 +106,6 @@ struct Bytes;
 
 void x_parse_ipv4(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
 void x_parse_ipv6(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length, unsigned char *ipv6);
-void x_parse_location(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
 void x_parse_txt(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
 void x_parse_base32hex(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
 void x_parse_base64(struct ZoneFileParser *parser, const unsigned char *buf, unsigned *offset, unsigned length);
@@ -115,7 +114,16 @@ void x_parse_hex(struct ZoneFileParser *parser, const unsigned char *buf, unsign
 
 void parse_err(struct ZoneFileParser *parser,  const char *fmt, ...);
 
+void mm_location_start(struct ZoneFileParser *parser);
+void mm_location_end(struct ZoneFileParser *parser);
+void mm_location_parse(struct ZoneFileParser *parser, 
+    const unsigned char *buf, unsigned *offset, unsigned length);
 
+
+
+unsigned
+parse_default2( struct ZoneFileParser *parser, 
+                const unsigned char *buf, unsigned *offset, unsigned *length);
 
 
 #endif

@@ -658,7 +658,7 @@ QUERY(
     adapter_xmit(adapter, selftest->thread, &pkt);
 
     if (selftest->test_code == Failure) {
-        fprintf(stderr, "<selftest>:fail: qtype=%u qname=%s\n", query_type, query_name);
+        fprintf(stderr, "<selftest>:fail: qtype=%s qname=%s\n", name_of_type(query_type), query_name);
         //exit(1);
         selftest->total_code = Failure;
         return Failure;
@@ -878,13 +878,23 @@ selftest(int argc, char *argv[])
 
     /*
      * LOC record
+     * Example from:
+     * http://blog.cloudflare.com/the-weird-and-wonderful-world-of-dns-loc-records
      */
     LOAD("flourine  IN LOC   (\n"
-            "   52 22 23.000 N  ;latitude\n"
-            "    4 53 32.000 E  ;longitude\n"
-            "   -2.00m          ;altitude\n"
-            "    0.00m 10000m 10m)\n", parser);
-
+            "   33 40 31.000 N;latitude\n"
+            "   106 28 29.000 W ;longitude\n"
+            "   10.00m\n1m 10000m 10m)\n", parser);
+    QUERY("geekatlas.flourine", TYPE_LOC, selftest,
+        "geekatlas.flourine.example.com", 16, 
+            "\x00" /* version */
+            "\x12"  /* size = 1 meter*/
+            "\x16"  /* h-prez = 10000 meters */
+            "\x13"  /* v-prez = 10 meters */
+            "\x87\x39\xd6\x98"
+            "\x69\x27\x2b\x38"
+            "\x00\x98\x9a\x68",
+            TYPE_LOC, NULL);
 
 
     /* we are now done parsing the zonefile, so free the parser */
