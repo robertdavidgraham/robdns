@@ -32,7 +32,10 @@ struct ZoneFileParser
 	unsigned s;
 	unsigned s2;
 	unsigned substring_esc;
-	unsigned is_multiline;
+	unsigned is_multiline:1;
+    unsigned is_commenting:1;
+    unsigned is_string:1;
+
     uint64_t filesize;
 	struct MyDFA *type_dfa;
 	struct MyDFA *variable_dfa;
@@ -57,8 +60,9 @@ struct ZoneFileParser
         unsigned char size;
         unsigned char horiz_pre;
         unsigned char vert_pre;
-        unsigned char field;
+        unsigned  field;
         unsigned char digits;
+        unsigned is_negative:1;
     } rr_location;
     struct {
 	    uint64_t result;
