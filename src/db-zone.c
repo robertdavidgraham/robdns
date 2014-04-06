@@ -126,7 +126,7 @@ zone_lookup_wildcard(const struct DBZone *zone, const struct DB_XDomain *xdomain
     wdomain.label_count = xdomain->label_count;
     memcpy(wdomain.labels, xdomain->labels, sizeof(wdomain.labels[0])*wdomain.label_count);
 
-    for (i=zone->wildcard.longest; i>=zone->wildcard.shortest; i--) {
+    for (i=zone->wildcard.longest+1; i>=zone->wildcard.shortest; i--) {
         uint64_t hash;
         const struct DBEntry *record;
 

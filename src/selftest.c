@@ -127,9 +127,14 @@ selftest_alloc_packet(struct Adapter *adapter, struct Thread *thread)
 }
 
 /****************************************************************************
+ * During a self-test, we intercept the client "transmit" function to
+ * instead forward directly to the server "receive" path, thus simulating
+ * from the server's point of a view the reception of a packet. We also
+ * intercept the reverse path in the function 
+ * "selftest_server_to_client_response".
  ****************************************************************************/
 void 
-selftest_client_xmit_packet(struct Adapter *adapter, 
+selftest_client_to_server_query(struct Adapter *adapter, 
                             struct Thread *thread, struct Packet *pkt)
 {
     struct TestAdapter *testadapter = (struct TestAdapter *)adapter->userdata;
@@ -142,6 +147,7 @@ selftest_client_xmit_packet(struct Adapter *adapter,
     else
         other = &selftest->client;
 
+    /* Save the query packet to a file for inspection */
     {
         struct PcapFile *x;
         x = pcapfile_openwrite("self-query.pcap", 1);
@@ -149,6 +155,12 @@ selftest_client_xmit_packet(struct Adapter *adapter,
         pcapfile_close(x);
     }
 
+    /*
+     * SHORT CIRCUIT
+     * This is supposed to be a "transmit" function from the DNS client,
+     * but what we are doing instead is just forwarding it to the 
+     * "receive" function of the DNS server.
+     */
     network_receive(
                 frame,
                 thread,
@@ -521,7 +533,7 @@ selftest_verify(struct Selftest *selftest,
  * what we expect.
  ****************************************************************************/
 void
-selftest_server_xmit_packet(struct Adapter *adapter,
+selftest_server_to_client_response(struct Adapter *adapter,
                             struct Thread *thread, struct Packet *pkt)
 {
     struct TestAdapter *testadapter = (struct TestAdapter *)adapter->userdata;
@@ -709,12 +721,12 @@ selftest(int argc, char *argv[])
     selftest->client.parent = selftest;
     selftest->client.adapter = adapter_create(
                                     selftest_alloc_packet, 
-                                    selftest_client_xmit_packet, 
+                                    selftest_client_to_server_query, 
                                     &selftest->client);
     selftest->server.parent = selftest;
     selftest->server.adapter = adapter_create(
                                     selftest_alloc_packet, 
-                                    selftest_server_xmit_packet, 
+                                    selftest_server_to_client_response, 
                                     &selftest->server);
     adapter_add_ipv4(selftest->client.adapter, 0x0a000001, 0xFFFFffff);
     adapter_add_ipv4(selftest->server.adapter, 0xC0A00002, 0xFFFFffff);
@@ -747,6 +759,7 @@ selftest(int argc, char *argv[])
          "                     1209600    ; ex = expiry = 2w\r\n"
          "                     1H         ; nx = nxdomain ttl = 1h\r\n"
          "                     )\r\n", parser);
+
     QUERY("example.com.", TYPE_SOA, selftest,
         "example.com.", 0x3c, 
                 "\x02" "ns" "\x07" "example" "\x03" "com" "\x00"
@@ -881,7 +894,7 @@ selftest(int argc, char *argv[])
      * Example from:
      * http://blog.cloudflare.com/the-weird-and-wonderful-world-of-dns-loc-records
      */
-    LOAD("flourine  IN LOC   (\n"
+    LOAD("geekatlas.flourine  IN LOC   (\n"
             "   33 40 31.000 N;latitude\n"
             "   106 28 29.000 W ;longitude\n"
             "   10.00m\n1m 10000m 10m)\n", parser);
@@ -895,6 +908,45 @@ selftest(int argc, char *argv[])
             "\x69\x27\x2b\x38"
             "\x00\x98\x9a\x68",
             TYPE_LOC, NULL);
+    LOAD(";; network LOC RR derived from ZIP data.  note use of precision defaults\n"
+        "rfc1876.flourine          LOC   42 21 54 N 71 06 18 W -24m 30m\n\n"
+        ";; higher-precision host LOC RR.  note use of vertical precision default\n"
+        "rfc1876.flourine          LOC   42 21 43.952 N 71 5 6.344 W -24m 1m 200m\n\n"
+        "rfc1876.flourine          LOC   52 14 05 N 00 08 50 E 10m\n\n"
+        "rfc1876.flourine          LOC   32 7 19 S 116 2 25 E 10m\n\n"
+        "rfc1876.flourine          LOC   42 21 28.764 N 71 00 51.617 W -44m 2000m\n" 
+        , parser);
+    QUERY("rfc1876.flourine", TYPE_LOC, selftest,
+            "rfc1876.flourine.example.com", 16, 
+            "\x00\x12\x16\x13\x79\x1b\x7d\x28\x98\xe6\x48\x68\x00\x98\x9a\x68",
+            TYPE_LOC, 
+
+            "rfc1876.flourine.example.com", 16, 
+            "\x00\x12\x16\x13\x8b\x35\x56\xc8\x80\x08\x16\x50\x00\x98\x9a\x68",
+            TYPE_LOC, 
+
+            "rfc1876.flourine.example.com", 16, 
+            "\x00\x12\x24\x13\x89\x17\x06\x90\x70\xbf\x2d\xd8\x00\x98\x8d\x20",
+            TYPE_LOC, 
+
+            "rfc1876.flourine.example.com", 16, 
+            "\x00\x25\x16\x13\x89\x16\xcb\x3c\x70\xc3\x10\xdf\x00\x98\x85\x50",
+            TYPE_LOC, 
+
+            "rfc1876.flourine.example.com", 16, 
+            "\x00\x33\x16\x13\x89\x17\x2d\xd0\x70\xbe\x15\xf0\x00\x98\x8d\x20",
+            TYPE_LOC, 
+            
+            NULL);
+    
+   
+    /*
+     * Wildcards
+     */
+    LOAD("*.neon  IN A 10.2.3.255\n", parser);
+    QUERY("test.neon", TYPE_A, selftest,
+        "test.neon.example.com", 4, "\x0a\x02\x03\xff", TYPE_A,
+        NULL);
 
 
     /* we are now done parsing the zonefile, so free the parser */

@@ -681,6 +681,7 @@ entry_create_self(
         name[name_length] = '\0'; /*FIXME: test this for overflow */
     }
 
+//printf("." " -> %s 0x%x\n", name, xdomain->hash);
 
     /* Move forward until we get a valid entry */
     chain_length = 0;
@@ -781,6 +782,7 @@ entry_find(
         name[name_length] = '\0'; /*FIXME: test this for overflow */
     }
 
+//printf("." "<-  %s 0x%x\n", name, xdomain->hash);
 
     /* Move forward until we get a valid entry */
     for (; entry; entry = entry->next) {

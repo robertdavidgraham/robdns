@@ -3,6 +3,21 @@
 #include <string.h>
 
 
+enum LocationField {
+    $LATITUDE_DEGREES,
+    $LATITUDE_MINUTES,
+    $LATITUDE_SECONDS,
+    $LATITUDE_SECONDS_FRACTION,
+    $LONGITUDE_DEGREES,
+    $LONGITUDE_MINUTES,
+    $LONGITUDE_SECONDS,
+    $LONGITUDE_SECONDS_FRACTION,
+    $ALTITUDE, $ALTITUDE_FRACTION,
+    $SIZE, $SIZE_FRACTION,
+    $HORIZONTAL_PRECISION, $HORIZONTAL_FRACTION,
+    $VERTICAL_PRECISION, $VERTICAL_FRACTION,
+};
+
 /****************************************************************************
  ****************************************************************************/
 void
@@ -25,6 +40,7 @@ centimeters_to_size(unsigned number)
     unsigned power = 0;
     unsigned x = 1;
 
+  
     /* RFC 1876:
              The diameter of a sphere enclosing the described entity, in
              centimeters, expressed as a pair of four-bit unsigned
@@ -66,6 +82,13 @@ void
 mm_location_end(struct ZoneFileParser *parser)
 {
     unsigned char *px = parser->block->buf + parser->block->offset;
+
+    if (parser->rr_location.field <= $SIZE)
+        parser->rr_location.size = 100; /* default = 1e2 cm = 1.00m */
+    if (parser->rr_location.field <= $HORIZONTAL_PRECISION)
+        parser->rr_location.horiz_pre = 1000000; /* default = 1e6 cm = 10000.00m = 10km */
+    if (parser->rr_location.field <= $VERTICAL_PRECISION)
+        parser->rr_location.vert_pre = 1000; /* default = 1e3 cm = 10.00m */
 
     /*
       MSB                                           LSB
@@ -143,20 +166,6 @@ defaults to 10m.  These defaults are chosen to represent typical
 ZIP/postal code area sizes, since it is often easy to find
 approximate geographical location by ZIP/postal code.
 */
-    enum {
-        $LATITUDE_DEGREES,
-        $LATITUDE_MINUTES,
-        $LATITUDE_SECONDS,
-        $LATITUDE_SECONDS_FRACTION,
-        $LONGITUDE_DEGREES,
-        $LONGITUDE_MINUTES,
-        $LONGITUDE_SECONDS,
-        $LONGITUDE_SECONDS_FRACTION,
-        $ALTITUDE, $ALTITUDE_FRACTION,
-        $SIZE, $SIZE_FRACTION,
-        $HORIZONTAL_PRECISION, $HORIZONTAL_FRACTION,
-        $VERTICAL_PRECISION, $VERTICAL_FRACTION,
-    };
 #define IS_LATITUDE(field) ($LATITUDE_DEGREES < (field) && (field) <= $LONGITUDE_DEGREES)
 #define IS_LONGITUDE(field) ($LONGITUDE_DEGREES < (field) && (field) <= $ALTITUDE)
 
