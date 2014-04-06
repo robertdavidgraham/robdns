@@ -17,6 +17,7 @@ TYPE_DNAME		= 39, //RFC 2672	delegation name	DNAME creates an alias for a name a
 TYPE_DNSKEY		= 48, //RFC 4034	DNS Key record	The key record used in DNSSEC. Uses the same format as the KEY record.
 TYPE_DS			= 43, //RFC 4034	Delegation signer	The record used to identify the DNSSEC signing key of a delegated zone
 TYPE_HIP		= 55, //RFC 5205	Host Identity Protocol	Method of separating the end-point identifier and locator roles of IP addresses.
+TYPE_HINFO      = 13, //RFC 1035    Host Information
 TYPE_IPSECKEY	= 45, //RFC 4025	IPsec Key	Key record that can be used with IPsec
 TYPE_KEY		= 25, //RFC 2535[3] and RFC 2930[4]	key record	Used only for SIG(0) (RFC 2931) and TKEY (RFC 2930).[5] RFC 3445 eliminated their use for application keys and limited their use to DNSSEC.[6] RFC 3755 designates DNSKEY as the replacement within DNSSEC.[7] RFC 4025 designates IPSECKEY as the replacement for use with IPsec.[8]
 TYPE_KX			= 36, //RFC 2230	Key eXchanger record	Used with some cryptographic systems (not including DNSSEC) to identify a key management agent for the associated domain-name. Note that this has nothing to do with DNS Security. It is Informational status, rather than being on the IETF standards-track. It has always had limited deployment, but is still in use.

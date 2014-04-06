@@ -33,8 +33,8 @@ static const struct {
 	const char *name;
 	unsigned value;
 } types[] = {
-{"A",		TYPE_A},	/* 1	RFC 1035[1]	address record	Returns a 32-bit IPv4 address, most commonly used to map hostnames to an IP address of the host, but also used for DNSBLs, storing subnet masks in RFC 1101, etc.*/
-{"AAAA",	TYPE_AAAA}, /* 28	RFC 3596[2]	IPv6 address record	Returns a 128-bit IPv6 address, most commonly used to map hostnames to an IP address of the host.*/
+{"A",		TYPE_A},	/*  1	RFC 1035[1]	address record	Returns a 32-bit IPv4 address, most commonly used to map hostnames to an IP address of the host, but also used for DNSBLs, storing subnet masks in RFC 1101, etc.*/
+{"AAAA",	TYPE_AAAA}, /*  28	RFC 3596[2]	IPv6 address record	Returns a 128-bit IPv6 address, most commonly used to map hostnames to an IP address of the host.*/
 {"AFSDB",	TYPE_AFSDB}, /*	18	RFC 1183	AFS database record	Location of database servers of an AFS cell. This record is commonly used by AFS clients to contact AFS cells outside their local domain. A subtype of this record is used by the obsolete DCE/DFS file system. */
 {"APL",		TYPE_APL}, /*	42	RFC 3123	Address Prefix List	Specify lists of address ranges, e.g. in CIDR format, for various address families. Experimental. */
 {"CAA",		TYPE_CAA}, /*	257	RFC 6844	Certification Authority Authorization	CA pinning, constraining acceptable CAs for a host/domain */
@@ -43,9 +43,10 @@ static const struct {
 {"DHCID",	TYPE_DHCID}, /*	49	RFC 4701	DHCP identifier	Used in conjunction with the FQDN option to DHCP */
 {"DLV",		TYPE_DLV}, /*	32769	RFC 4431	DNSSEC Lookaside Validation record	For publishing DNSSEC trust anchors outside of the DNS delegation chain. Uses the same format as the DS record. RFC 5074 describes a way of using these records. */
 {"DNAME",	TYPE_DNAME}, /*	39	RFC 2672	delegation name	DNAME creates an alias for a name and all its subnames, unlike CNAME, which aliases only the exact name in its label. Like the CNAME record, the DNS lookup will continue by retrying the lookup with the new name. */
-{"DNSKEY",	TYPE_DNSKEY}, /*	48	RFC 4034	DNS Key record	The key record used in DNSSEC. Uses the same format as the KEY record. */
+{"DNSKEY",	TYPE_DNSKEY}, /*48	RFC 4034	DNS Key record	The key record used in DNSSEC. Uses the same format as the KEY record. */
 {"DS",		TYPE_DS}, /*	43	RFC 4034	Delegation signer	The record used to identify the DNSSEC signing key of a delegated zone */
 {"HIP",		TYPE_HIP}, /*	55	RFC 5205	Host Identity Protocol	Method of separating the end-point identifier and locator roles of IP addresses. */
+{"HINFO",   TYPE_HINFO}, /* 13  RFC 1035    Host Information
 {"IPSECKEY",TYPE_IPSECKEY}, /*	45	RFC 4025	IPsec Key	Key record that can be used with IPsec */
 {"KEY",		TYPE_KEY}, /*	25	RFC 2535[3] and RFC 2930[4]	key record	Used only for SIG(0) (RFC 2931) and TKEY (RFC 2930).[5] RFC 3445 eliminated their use for application keys and limited their use to DNSSEC.[6] RFC 3755 designates DNSKEY as the replacement within DNSSEC.[7] RFC 4025 designates IPSECKEY as the replacement for use with IPsec.[8] */
 {"KX",		TYPE_KX}, /*	36	RFC 2230	Key eXchanger record	Used with some cryptographic systems (not including DNSSEC) to identify a key management agent for the associated domain-name. Note that this has nothing to do with DNS Security. It is Informational status, rather than being on the IETF standards-track. It has always had limited deployment, but is still in use. */
@@ -681,6 +682,8 @@ x_parse(struct ZoneFileParser *parser, const unsigned char *buf, unsigned length
 		$RR_NSEC3_SALT, $RR_NSEC3_HASH, $RR_NSEC3_TYPES,
 		$RR_NSEC, $RR_NSEC_DOMAIN, $RR_NSEC_TYPES, 
 		$RR_TLSA, $RR_TLSA_USAGE, $RR_TLSA_SELECTOR, $RR_TLSA_TYPE, $RR_TLSA_CERT,
+        $RR_SSHFP, $RR_SSHFP_ALGO, $RR_SSHFP_TYPE, $RR_SSHFP_FP,
+
         $RR_LOC,
 		$RR_A,
 		$RR_AAAA,
@@ -835,12 +838,14 @@ rr_end:
 			case TYPE_RRSIG:		s = $RR_RRSIG;		continue;
 			case TYPE_DS:			s = $RR_DS;			continue;
 			case TYPE_TLSA:			s = $RR_TLSA;		continue;
+            case TYPE_SSHFP:        s = $RR_SSHFP;      continue;
 			case TYPE_A:			s = $RR_A;			mm_integer_start(parser); continue;
 			case TYPE_AAAA:			s = $RR_AAAA;		mm_ipv6_start(parser); continue;
 			case TYPE_LOC:			s = $RR_LOC;		mm_location_start(parser); continue;
 			case TYPE_TXT:			s = $RR_TXT_START;	continue;
             case TYPE_SRV:          s = $RR_TXT_START;  continue;
             case TYPE_SPF:          s = $RR_TXT_START;  continue;
+            case TYPE_HINFO:        s = $RR_TXT_START;  continue;
 			case TYPE_MX:			s = $RR_MX;			mm_integer_start(parser); continue;
 			case TYPE_PTR:		    s = $RR_PTR;		mm_domain_start(parser); continue;
 			case TYPE_CNAME:		s = $RR_CNAME;		mm_domain_start(parser); continue;
@@ -1056,18 +1061,55 @@ rr_end:
 		s = $RR_END;
 		goto rr_end;
 
+    /*
+                           1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |   algorithm   |    fp type    |                               /
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               /
+       /                                                               /
+       /                          fingerprint                          /
+       /                                                               /
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    */
+    case $RR_SSHFP:
+        s = $RR_SSHFP_ALGO;
+        mm_integer_start(parser);
+	case $RR_SSHFP_ALGO:
+		x_parse_ttl(parser, buf, &i, length);
+		if (i >= length)
+			break;
+        mm_integer8_end(parser);
+		mm_integer_start(parser);
+		s = $RR_SSHFP_TYPE;
+	case $RR_SSHFP_TYPE:
+		x_parse_ttl(parser, buf, &i, length);
+		if (i >= length)
+			break;
+        mm_integer8_end(parser);
+		mm_hex_start(parser);
+		s = $RR_SSHFP_FP;
+	case $RR_SSHFP_FP:
+		x_parse_hex(parser, buf, &i, length, 1);
+		if (i >= length)
+			break;
+        mm_hex_end(parser);
+		s = $RR_END;
+		goto rr_end;
+
+
 	/*****************/
-        /*
-                                1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
-            0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-           |              Flags            |    Protocol   |   Algorithm   |
-           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-           /                                                               /
-           /                            Public Key                         /
-           /                                                               /
-           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        */
+    /*
+                            1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |              Flags            |    Protocol   |   Algorithm   |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        /                                                               /
+        /                            Public Key                         /
+        /                                                               /
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    */
 	case $RR_DNSKEY:
 		s = $RR_DNSKEY_FLAGS;
 		mm_integer_start(parser);

@@ -948,6 +948,24 @@ selftest(int argc, char *argv[])
         "test.neon.example.com", 4, "\x0a\x02\x03\xff", TYPE_A,
         NULL);
 
+    /*
+     * HINFO RR (host information record)
+     */
+    LOAD("win.sodium    IN HINFO \"x86\" \"WinNT-4.0\"\n", parser);
+    QUERY("win.sodium", TYPE_HINFO, selftest,
+        "win.sodium.example.com", 14, "\x03" "x86" "\x09" "WinNT-4.0", TYPE_HINFO,
+        NULL);
+    LOAD("sol.sodium    IN HINFO SPARC-64 SunOS/4.1.3\n", parser);
+    QUERY("sol.sodium", TYPE_HINFO, selftest,
+        "sol.sodium.example.com", 21, "\x08" "SPARC-64" "\x0b" "SunOS/4.1.3", TYPE_HINFO,
+        NULL);
+
+
+    LOAD("magnesium  SSHFP 2 1 123456789abcdef67890123456789abcdef67890\n", parser);
+    QUERY("magnesium", TYPE_SSHFP, selftest,
+        "magnesium.example.com", 22, "\x02\x01" "\x12\x34\x56\x78\x9a\xbc\xde\xf6\x78\x90\x12\x34\x56\x78\x9a\xbc\xde\xf6\x78\x90", TYPE_SSHFP,
+        NULL);
+
 
     /* we are now done parsing the zonefile, so free the parser */
     parse_results = zonefile_end(parser);
