@@ -20,13 +20,29 @@ void mydfa_init(struct MyDFA *dfa)
 	dfa->char_to_symbol[' '] = 0;
 	dfa->char_to_symbol['\t'] = 0;
 	dfa->char_to_symbol['\r'] = 0;
+
 	dfa->symbol_to_char[1] = '\n';
 	dfa->char_to_symbol['\n'] = 1;
 
-	dfa->symbol_count = 2;
+    dfa->symbol_to_char[2]  = '(';
+    dfa->char_to_symbol['('] = 2;
+
+    dfa->symbol_to_char[3]  = ')';
+    dfa->char_to_symbol[')'] = 3;
+
+
+	dfa->symbol_count = 4;
 
 	/* Create initial space transitions */
 	dfa->table[0][0] = 0;
+
+    /* Create accept state for parentheses */
+    {
+        unsigned accept_state = --dfa->accept_start;
+    	dfa->accepts[0xFF - accept_state] = 0;
+        dfa->table[0][dfa->char_to_symbol[')']] = (dfa_t)accept_state;
+        dfa->table[0][dfa->char_to_symbol['(']] = (dfa_t)accept_state;
+    }
 }
 
 void mydfa_add_symbols(struct MyDFA *dfa, const unsigned char *str, unsigned length)

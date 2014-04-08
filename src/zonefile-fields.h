@@ -121,9 +121,12 @@ void mm_location_parse(struct ZoneFileParser *parser,
 
 
 
+extern char CONTROLCHAR[257];
+
 unsigned
 parse_default2( struct ZoneFileParser *parser, 
-                const unsigned char *buf, unsigned *offset, unsigned *length);
+                const unsigned char *buf, unsigned *offset, unsigned *length,
+                unsigned char *c);
 
 
 #endif

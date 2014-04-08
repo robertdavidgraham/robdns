@@ -21,6 +21,7 @@ struct Core
     unsigned is_offline:1;
     unsigned is_packet_trace:1;
     unsigned is_zonefile_benchmark:1;
+    unsigned is_zonefile_check:1;
 
     unsigned insertion_threads;
 

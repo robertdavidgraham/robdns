@@ -1,8 +1,9 @@
 #ifndef ZONEFILE_LOAD_H
 #define ZONEFILE_LOAD_H
 #include "domainname.h"
+#include "success-failure.h"
 
-void
+enum SuccessFailure
 zonefile_load(
         struct DomainPointer domain,
         struct DomainPointer origin,
@@ -11,7 +12,9 @@ zonefile_load(
         unsigned rdlength,
         const unsigned char *rdata,
         uint64_t filesize,
-	    void *userdata);
+	    void *userdata,
+        const char *filename,
+        unsigned line_number);
 
 
 #endif

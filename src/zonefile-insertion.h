@@ -18,6 +18,8 @@ struct ParsedBlock
     unsigned char origin_buffer[256];
     uint64_t ttl;
 
+    char filename[256];
+
     /* The buffer containing parsed resource-records */
     unsigned char buf[256*1024];
     unsigned offset;

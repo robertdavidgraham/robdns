@@ -2,7 +2,9 @@
 #define ZONE_DFA_H
 
 #define MAX_DFA_SYMBOLS 32
-typedef	unsigned char SMALL_DFA_TABLE[256][MAX_DFA_SYMBOLS];
+typedef unsigned char dfa_t;
+typedef	dfa_t SMALL_DFA_TABLE[256][MAX_DFA_SYMBOLS];
+
 
 struct MyDFA
 {

@@ -17,7 +17,7 @@
  * such as when reading the .com file, we print status indicating how long
  * things are taking.
  ****************************************************************************/
-void
+enum SuccessFailure
 zonefile_benchmark(
         struct DomainPointer domain,
         struct DomainPointer origin,
@@ -26,8 +26,11 @@ zonefile_benchmark(
         unsigned rdlength,
         const unsigned char *rdata,
         uint64_t filesize,
-	    void *userdata)
+	    void *userdata,
+        const char *filename,
+        unsigned line_number)
 {
+    return Success;
 }
 
 

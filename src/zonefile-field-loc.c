@@ -185,10 +185,8 @@ approximate geographical location by ZIP/postal code.
 	for (i=*offset; i<length; i++) {
 	    unsigned char c;
 
-		if (parse_default2(parser, buf, &i, &length))
+		if (parse_default2(parser, buf, &i, &length, &c))
 			break;
-
-        c = buf[i];
 
 	    switch (s) {
 	    case $START:
@@ -203,7 +201,7 @@ approximate geographical location by ZIP/postal code.
                 s = $NUMBER_CONTINUE;
                 continue;
             } else if ('N' == toupper(c) && IS_LATITUDE(field)) {
-                parser->rr_location.latitude += (1<<31);
+                parser->rr_location.latitude |= (1<<31);
                 field = $LONGITUDE_DEGREES;
                 continue;
             } else if ('S' == toupper(c) && IS_LATITUDE(field)) {
@@ -211,7 +209,7 @@ approximate geographical location by ZIP/postal code.
                 field = $LONGITUDE_DEGREES;
                 continue;
             } else if ('E' == toupper(c) && IS_LONGITUDE(field)) {
-                parser->rr_location.longitude += (1<<31);
+                parser->rr_location.longitude |= (1<<31);
                 field = $ALTITUDE;
                 continue;
             } else if ('W' == toupper(c) && IS_LONGITUDE(field)) {
@@ -393,7 +391,7 @@ approximate geographical location by ZIP/postal code.
 	}
     
 	parser->rr_location.number = number;
-    parser->rr_location.field = field;
+    parser->rr_location.field = (unsigned char)field;
 	parser->s2 = s;
 	*offset = i;
 }

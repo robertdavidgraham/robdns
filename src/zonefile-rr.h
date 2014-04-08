@@ -42,6 +42,10 @@ TYPE_TLSA		= 52, //RFC 6698	TLSA certificate association	A record for DNS-based 
 TYPE_TSIG		= 250, //RFC 2845	Transaction Signature	Can be used to authenticate dynamic updates as coming from an approved client, or to authenticate responses as coming from an approved recursive name server[10] similar to DNSSEC.
 TYPE_TXT		= 16, //RFC 1035[1]	Text record	Originally for arbitrary human-readable text in a DNS record. Since the early 1990s, however, this record more often carries machine-readable data, such as specified by RFC 1464, opportunistic encryption, Sender Policy Framework, DKIM, DMARC DNS-SD, etc.
 TYPE_ANY		= 255, //RFC 1035[1]	Text record	Originally for arbitrary human-readable text in a DNS record. Since the early 1990s, however, this record more often carries machine-readable data, such as specified by RFC 1464, opportunistic encryption, Sender Policy Framework, DKIM, DMARC DNS-SD, etc.
+
+
+TYPE_PERENS_OPEN     = 0x40000,
+TYPE_PERENS_CLOSE    = 0x40001,
 };
 
 

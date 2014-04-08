@@ -102,7 +102,7 @@ catalog_lookup_zone(struct Catalog *db, const struct DB_XDomain *xdomain)
      * the zone
      */
 	if (zone == NULL) {
-		xdomain_err(xdomain, ": does not match any zones\n");
+		//xdomain_err(xdomain, ": does not match any zones\n");
 	}
 
 	return zone;

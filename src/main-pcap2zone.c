@@ -158,7 +158,9 @@ grab_dns_response(struct Catalog *catalog, const unsigned char *px, unsigned off
             rdlength,
             rdata,
             10000,
-            catalog);
+            catalog,
+            "",
+            0);
 
         
     }

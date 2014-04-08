@@ -89,6 +89,7 @@ void build_type_dfa(struct MyDFA *dfa)
 
 	mydfa_init(dfa);
 
+    
 	/* first go through and add all the symbols */
 	for (i=0; types[i].name; i++) {
 		mydfa_add_symbols(dfa, (const unsigned char*)types[i].name, (unsigned)strlen(types[i].name));
@@ -98,6 +99,7 @@ void build_type_dfa(struct MyDFA *dfa)
 	for (i=0; types[i].name; i++) {
 		mydfa_add_pattern(dfa, (const unsigned char*)types[i].name, (unsigned)strlen(types[i].name), types[i].value);
 	}
+
 
 	assert(mydfa_selftest(dfa, " IN 8\n", 0x10000|CLASS_IN));
 	assert(mydfa_selftest(dfa, "IN SOA\n", 0x10000|CLASS_IN));
@@ -121,6 +123,7 @@ void build_variable_dfa(struct MyDFA *dfa)
 
 	mydfa_init(dfa);
 
+    
 	/* first go through and add all the symbols */
 	for (i=0; variables[i]; i++) {
 		mydfa_add_symbols(dfa, (const unsigned char*)variables[i], (unsigned)strlen(variables[i]));
@@ -132,6 +135,7 @@ void build_variable_dfa(struct MyDFA *dfa)
 	}
 
 	assert(mydfa_selftest(dfa, " TTL \r\t\n", 2));
+	assert(mydfa_selftest(dfa, "ORIGIN x", 1));
 
 	return;
 }
@@ -710,6 +714,7 @@ rr_end:
 
             /* skip domain name */
             i += block->buf[i] + 1;
+            i += 4;
 
             rdlength = block->offset - i - 8;
             block->buf[i+6] = (unsigned char)(rdlength>>8);
@@ -768,6 +773,7 @@ rr_end:
 
         /* Mark the start of the next resource record */
         assert(block->offset_start == block->offset);
+
         parser->s2 = 0;
         parser->rr_domain.name = block->buf + block->offset + 1;
 
@@ -802,6 +808,8 @@ rr_end:
 			break;
         block->buf[block->offset] = parser->rr_domain.length;
         block->offset += parser->rr_domain.length + 1;
+
+
         block->buf[block->offset] = 0xA3;
         //mm_domain_end(parser);
 		s = $TYPE;
@@ -819,6 +827,8 @@ rr_end:
 			 * mark this type then move onto the RR contents */
 
             /* First, align the start of the buffer */
+            *(unsigned*)(&block->buf[block->offset]) = parser->src.line_number;
+            block->offset += 4;
             block->buf[block->offset++] = (unsigned char)(type>>8);
             block->buf[block->offset++] = (unsigned char)(type>>0);
             block->buf[block->offset++] = (unsigned char)(parser->block->ttl>>24);
@@ -884,7 +894,7 @@ rr_end:
 			parser->s2 = 0;
 			continue;
 		} else {
-			parse_err(parser, "unknown parser\n");
+			parse_err(parser, "unknown parser: %.10s\n", buf+i-1);
 			s = $PARSE_ERROR;
 		} 
 		continue;
@@ -1685,8 +1695,6 @@ zonefile_parser_init(void)
  ****************************************************************************/
 int zonefile_flush(struct ZoneFileParser *parser)
 {
-    struct ParsedBlock *block = parser->block;
-
     /* First, terminate processing of the current block */
     block_next_to_parse(parser);
 

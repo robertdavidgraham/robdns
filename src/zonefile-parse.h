@@ -8,6 +8,7 @@ extern "C" {
 #include <time.h>
 #include "source.h"
 #include "domainname.h"
+#include "success-failure.h"
 
 
 enum {
@@ -23,7 +24,7 @@ const char * name_of_type(unsigned type);
 
 
 
-typedef void (*RESOURCE_RECORD_CALLBACK)(
+typedef enum SuccessFailure (*RESOURCE_RECORD_CALLBACK)(
     struct DomainPointer domain,
     struct DomainPointer origin,
 	unsigned type,
@@ -31,7 +32,9 @@ typedef void (*RESOURCE_RECORD_CALLBACK)(
     unsigned rdlength,
     const unsigned char *rdata,
     uint64_t filesize,
-	void *userdata);
+	void *userdata,
+    const char *filename,
+    unsigned line_number);
 	
 /**
  * Call this before parsing a zone-file .

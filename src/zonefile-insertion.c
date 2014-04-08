@@ -20,11 +20,18 @@ insert_block_into_catalog(struct ParsedBlock *block, RESOURCE_RECORD_CALLBACK ca
         unsigned type;
         unsigned ttl;
         unsigned rdlength;
+        unsigned line_number =0;
+
+
 
         domain.length = buf[i];
         domain.name = &buf[i+1];
 
         i += domain.length + 1;
+
+        line_number = *(unsigned*)(&buf[i]);
+
+        i += 4;
 
         type = buf[i+0]<<8 | buf[i+1];
         ttl = buf[i+2]<<24 | buf[i+3]<<16 | buf[i+4]<<8 | buf[i+5];
@@ -43,7 +50,9 @@ insert_block_into_catalog(struct ParsedBlock *block, RESOURCE_RECORD_CALLBACK ca
             rdlength,
             rdata,
             filesize,
-            userdata);
+            userdata,
+            block->filename,
+            line_number);
     }
 
     block->offset = 0;
@@ -103,6 +112,7 @@ block_next_to_parse(struct ZoneFileParser *parser)
     block->origin.name = block->origin_buffer;
     block->origin.length = origin.length;
     block->ttl = ttl;
+    memcpy(block->filename, parser->src.filename, sizeof(block->filename));
 
     parser->block = block;
 
@@ -197,6 +207,9 @@ block_init(struct ZoneFileParser *parser,
     }
     if (ttl) {
         parser->block->ttl = ttl;
+    }
+    if (parser->src.filename) {
+        memcpy(parser->block->filename, parser->src.filename, sizeof(parser->block->filename));
     }
 
     /*
