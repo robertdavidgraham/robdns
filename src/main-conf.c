@@ -39,7 +39,7 @@ zonefile_benchmark(
  * such as when reading the .com file, we print status indicating how long
  * things are taking.
  ****************************************************************************/
-static enum Status
+static enum SuccessFailure
 parse_zone_file(struct Catalog *db, const char *filename, struct Core *conf)
 {
     struct ZoneFileParser *parser;

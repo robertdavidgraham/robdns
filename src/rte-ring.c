@@ -379,14 +379,14 @@ rte_ring_selftest(void)
 
 
     for (i=0; i<100; i++) {
-        uint64_t result;
+        unsigned long long result;
         struct Test test[1];
 
         x_test = test;
 
         result = run_test(test);
         if (result != 500500) {
-            printf("xring: selftest failed with %" PRIu64 "\n", result);
+            printf("xring: selftest failed with %llu\n", result);
             return 1;
         } else
             ;

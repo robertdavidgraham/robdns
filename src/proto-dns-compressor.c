@@ -7,18 +7,28 @@
 #include <string.h>
 
 
-/****************************************************************************
- ****************************************************************************/
+/******************************************************************************
+ * Tests if two labels are the same.
+ *
+ * Note: don't use a generic function here. This has very narrow requirements
+ * just for labels in this narrow case. Namely, it's doing a case-insensitive
+ * compare. As defined by the RFC (FIXME: reference needed), when compressing
+ * names, it can be done so in a case insensitive manner.
+ ******************************************************************************/
 static int
 is_equal(const unsigned char *lhs, const unsigned char *rhs)
 {
-    if (lhs[0] != rhs[0])
+    size_t lhs_len = lhs[0];
+    size_t rhs_len = rhs[0];
+    
+    if (lhs_len != rhs_len)
         return 0;
-    return memcasecmp(lhs+1, rhs+1, lhs[0]) == 0;
+    
+    return memcasecmp(lhs+1, rhs+1, lhs_len) == 0;
 }
 
-/****************************************************************************
- ****************************************************************************/
+/******************************************************************************
+ ******************************************************************************/
 static unsigned short
 compressor_new(struct Compressor *compressor, const unsigned char *label)
 {
