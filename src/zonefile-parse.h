@@ -81,6 +81,12 @@ int zonefile_end(struct ZoneFileParser *parser);
 /* Write any cached info into the catalog */
 int zonefile_flush(struct ZoneFileParser *parser);
 
+/**
+ * Insert resource-records immediately into the catalog/database instead 
+ * of as a batch. This is useful for debugging only, and shouldn't be used
+ * otherwise 
+ */
+void zonefile_set_singlestep(struct ZoneFileParser *parser);
 
 /* Parse a chunk of a zone-file */
 void zonefile_parse(

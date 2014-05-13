@@ -40,7 +40,11 @@ enum {
     SECTION_ADDITIONAL,
 };
 
-
-void dns_format_response(struct DNS_OutgoingResponse *response, struct Packet *pkt);
+/**
+ * Convert the internal representation of a response into the external
+ * form, formatting a DNS response packet
+ */
+void dns_format_response(struct DNS_OutgoingResponse *response, 
+                         struct Packet *pkt);
 
 #endif

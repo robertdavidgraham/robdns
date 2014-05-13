@@ -386,7 +386,7 @@ approximate geographical location by ZIP/postal code.
             break;
         }
 
-        if (buf[i] == '\n')
+        if (buf[i] == '\n' && !parser->is_multiline)
             break;
 	}
     

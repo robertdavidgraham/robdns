@@ -8,7 +8,10 @@
 /****************************************************************************
  ****************************************************************************/
 static void
-insert_block_into_catalog(struct ParsedBlock *block, RESOURCE_RECORD_CALLBACK callback, void *userdata, uint64_t filesize)
+insert_block_into_catalog(struct ParsedBlock *block, 
+                          RESOURCE_RECORD_CALLBACK callback, 
+                          void *userdata, 
+                          uint64_t filesize)
 {
     unsigned i;
     unsigned max = block->offset;
@@ -61,26 +64,59 @@ insert_block_into_catalog(struct ParsedBlock *block, RESOURCE_RECORD_CALLBACK ca
 
 
 
-/****************************************************************************
+/******************************************************************************
+ ******************************************************************************/
+void
+block_rr_finish(struct ParsedBlock *block)
+{
+    unsigned i = block->offset_start;
+    unsigned rdlength;
+    
+    /* skip domain name */
+    i += block->buf[i] + 1;
+    i += 4;
+    
+    rdlength = block->offset - i - 8;
+    block->buf[i+6] = (unsigned char)(rdlength>>8);
+    block->buf[i+7] = (unsigned char)(rdlength>>0);
+    block->offset_start = block->offset;
+}
+
+void
+block_rr_start(struct ParsedBlock *block)
+{
+    (void)block;
+}
+
+/******************************************************************************
  * BLOCKS: By grouping multiple RRs together in a "block", we can have
  * multiple threads updating the zone database without having to interact
  * much with each other.
- ****************************************************************************/
+ ******************************************************************************/
 struct ParsedBlock *
 block_next_to_parse(struct ZoneFileParser *parser)
 {
     struct DomainPointer origin;
+    struct DomainPointer domain;
     unsigned char origin_buffer[256];
+    unsigned char domain_buffer[256];
 	uint64_t ttl;
     struct ParsedBlock *block = parser->block;
     int err;
 
     /*
      * Copy the state from the existing block
+     * FIXME: shouldn't the source of the memcpy be block->origin.name
+     * instead of block->origin_buffer?
      */
     memcpy(origin_buffer, block->origin_buffer, 256);
     origin.name = origin_buffer;
     origin.length = block->origin.length;
+    
+    memcpy(domain_buffer, block->domain.name, 256);
+    domain.name = domain_buffer;
+    domain.length = block->domain.length;
+    
     ttl = block->ttl;
 
     /*
@@ -111,14 +147,21 @@ block_next_to_parse(struct ZoneFileParser *parser)
     memcpy(block->origin_buffer, origin_buffer, 256);
     block->origin.name = block->origin_buffer;
     block->origin.length = origin.length;
+    
+    memcpy(block->domain_buffer, domain_buffer, 256);
+    block->domain.name = block->domain_buffer;
+    block->domain.length = domain.length;
+    
     block->ttl = ttl;
+    
     memcpy(block->filename, parser->src.filename, sizeof(block->filename));
 
     parser->block = block;
 
     /*
      * If we are single threaded, then pull the block off the
-     * queue and process it
+     * queue and process it ourselves, because there are no other threads to
+     * do the job.
      */
     if (parser->additional_threads == 0) {
         for (err=1; err; ) {
@@ -133,8 +176,11 @@ block_next_to_parse(struct ZoneFileParser *parser)
                 pixie_usleep(100);
             }
         }
-        insert_block_into_catalog(block, parser->callback, parser->callbackdata, parser->filesize);
-        //printf("." "MAIN-THREAD: inserted block\n");
+        insert_block_into_catalog(block, 
+                                  parser->callback, 
+                                  parser->callbackdata, 
+                                  parser->filesize);
+        
         rte_ring_enqueue(parser->free_queue, block);
     }
 

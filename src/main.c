@@ -12,10 +12,10 @@
 
 int is_verbose;
 
-//int zonefile_parser_init();
-
-
-
+/* temporary
+ * These globals are for printing debug messages. They are global for now, but
+ * I'll get rid of them eventually
+ */
 uint64_t entry_bytes;
 uint64_t entry_count;
 uint64_t total_chain_length;
@@ -26,6 +26,7 @@ int listif(int argc, char *argv[]);
 int foreground(int argc, char *argv[]);
 int pcap2zone(int argc, char *argv[]);
 int selftest2(int argc, char *argv[]);
+int perftest(int argc, char *argv[]);
 
 /****************************************************************************
  ****************************************************************************/
@@ -36,6 +37,8 @@ struct {
 
     {"selftest", selftest},
     {"--selftest", selftest},
+    {"perftest", perftest},
+    {"--perftest", perftest},
     {"regress", selftest},
     {"--regress", selftest},
     {"selftest2", selftest2},
@@ -60,7 +63,10 @@ main(int argc, char *argv[])
      */
     zonefile_parser_init();
 
-
+    /*
+     * Once-per-process: this goes hunting for things like the PF_RING 
+     * library and initializes it
+     */
     rawsock_init();
     
     /*
@@ -86,7 +92,7 @@ main(int argc, char *argv[])
 
 
     /*
-     * Look for a specific "command". This runs the program in a special
+     * Look for a specific "command". This runs the program in a special way
      * that focuses on a particular area. For example, the "dig" command
      * behaves a lot like the BIND9 "dig" utility, but using our paradigm.
      */
@@ -102,34 +108,15 @@ main(int argc, char *argv[])
     }
 
 
+    /*
+     * If no specific command was given, then run in the default mode as
+     * a DNS server. This runs in the 'foreground' printing to stdout/stderr,
+     * some other tool is needed to launch this as a service.
+     */
     foreground(argc, argv);
 
     return 0;
 
-#if 0
-    int i;
-    struct Grind *grind;
-    grind = grind_create();
-
-
-
-    /*
-     * Parse command-line options
-     */
-    for (i=1; i<argc; i++) {
-        if (ends_with(argv[1], ".zone")) {
-            grind_load_zonefile(grind, argv[i], ROOT, 0);
-        } else if (strcmp(argv[i], "--load") == 0 && i+1 < argc)
-            grind_load_zonefile(grind, argv[++i], ROOT, 0);
-        else if (strcmp(argv[i], "--regression") == 0 && i+1 < argc) {
-            return regression_test(argv[++i]);
-        } else {
-            fprintf(stderr, "%s: unknown command line parameter\n", argv[i]);
-        }
-    }
-
-
-#endif
 
     /*
      * Temporary: check hash efficiency

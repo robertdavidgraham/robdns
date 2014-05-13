@@ -43,7 +43,7 @@ xdomain_is_equal(const struct DB_XDomain *lhs, const struct DomainPointer *rhs, 
 	for (i=max_labels; i>0; i--) {
 		const unsigned char *lhs_label = lhs->labels[i-1].name;
 	
-		if (memcasecmp(lhs_label, rhs_label, *lhs_label+1) != 0)
+		if (strncasecmp((char*)lhs_label, (char*)rhs_label, *lhs_label+1) != 0)
 			return 0;
 
 		rhs_label += *rhs_label + 1;
@@ -193,6 +193,8 @@ xdomain_reverse2(struct DB_XDomain *result, const unsigned char *name, unsigned 
     result->hash = hash;
 }
 
+/******************************************************************************
+ ******************************************************************************/
 void
 xdomain_reverse3(struct DB_XDomain *result, const struct DomainPointer *prefix, const struct DomainPointer *suffix)
 {
@@ -201,9 +203,7 @@ xdomain_reverse3(struct DB_XDomain *result, const struct DomainPointer *prefix, 
 
 	result->label_count = 0;
     if (suffix) {
-        if (prefix->length == 3 && memcmp("NS2" "\x0d" "WEBVERTSERVER" "\x03" "NET", prefix->name, 20) == 0)
-            printf(".");
-	    convert_domain(result, prefix->name, prefix->length, suffix->name, suffix->length, 0);
+        convert_domain(result, prefix->name, prefix->length, suffix->name, suffix->length, 0);
     } else
 	    convert_domain(result, prefix->name, prefix->length, 0, 0, 0);
 
@@ -216,8 +216,8 @@ xdomain_reverse3(struct DB_XDomain *result, const struct DomainPointer *prefix, 
     result->hash = hash;
 }
 
-/****************************************************************************
- ****************************************************************************/
+/******************************************************************************
+ ******************************************************************************/
 uint64_t
 xdomain_label_hash(const struct DB_XDomain *xdomain, unsigned index)
 {

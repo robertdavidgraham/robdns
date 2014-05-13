@@ -46,6 +46,7 @@ TYPE_ANY		= 255, //RFC 1035[1]	Text record	Originally for arbitrary human-readab
 
 TYPE_PERENS_OPEN     = 0x40000,
 TYPE_PERENS_CLOSE    = 0x40001,
+TYPE_COMMENT         = 0x40002,
 };
 
 

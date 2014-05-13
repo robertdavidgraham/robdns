@@ -7,6 +7,9 @@
 
 #define PACKET_SIZE 1514
 
+
+/******************************************************************************
+ ******************************************************************************/
 static struct Packet
 alloc_packet(struct Adapter *adapter, struct Thread *thread)
 {
@@ -22,6 +25,8 @@ alloc_packet(struct Adapter *adapter, struct Thread *thread)
 
 
 
+/******************************************************************************
+ ******************************************************************************/
 void main_thread(void *v)
 {
     struct ThreadParms *parms = (struct ThreadParms *)v;
@@ -67,9 +72,6 @@ void main_thread(void *v)
             usecs,
 			px,
             length);
-
-
     }
-
 }
 

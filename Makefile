@@ -55,7 +55,7 @@ endif
 CC = gcc
 
 DEFINES = 
-CFLAGS = -g -ggdb $(FLAGS2) $(INCLUDES) $(DEFINES) -Wall -O3 -Wno-format -fno-strict-aliasing
+CFLAGS = -pg -g -ggdb $(FLAGS2) $(INCLUDES) $(DEFINES) -Wall -O3 -Wno-format -fno-strict-aliasing
 .SUFFIXES: .c .cpp
 
 # just compile everything in the 'src' directory. Using this technique

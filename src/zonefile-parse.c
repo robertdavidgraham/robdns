@@ -71,6 +71,9 @@ static const struct {
 {"TSIG",	TYPE_TSIG}, /*	250	RFC 2845	Transaction Signature	Can be used to authenticate dynamic updates as coming from an approved client, or to authenticate responses as coming from an approved recursive name server[10] similar to DNSSEC. */
 {"TXT",		TYPE_TXT}, /* */
 
+{";",		TYPE_COMMENT}, /* */
+    
+
 {"IN",		0x10000 | CLASS_IN}, /* */
 {"CS",		0x10000 | CLASS_CS}, /* */
 {"CH",		0x10000 | CLASS_CH}, /* */
@@ -207,7 +210,10 @@ static void isdomainchar_init(void)
 /****************************************************************************
  ****************************************************************************/
 void
-x_parse_domain(struct ZoneFileParser *parser, const unsigned char *__restrict buf, unsigned *__restrict offset, unsigned length)
+x_parse_domain(struct ZoneFileParser *parser, 
+               const unsigned char *__restrict buf, 
+               unsigned *__restrict offset, 
+               unsigned length)
 {
     struct DomainBuilder *domain = &parser->rr_domain;
 	unsigned i;
@@ -697,30 +703,20 @@ x_parse(struct ZoneFileParser *parser, const unsigned char *buf, unsigned length
 		$RR_CNAME,
 		$RR_END,
 	};
-#if 0
-    register __m128i domain_endchar;
-        domain_endchar = _mm_loadu_si128((const __m128i*)"\r\n\t\x20.\\@\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
-#endif
+
 
 	for (i=0; i<length; i++) {
 	
 	switch (s) {
 	case $RR_END:
+        /* IMPORTANT! this is the state where we've finished reading a
+         * resource-record.  */
 rr_end:
         s = $RR_END;
-        {
-            unsigned i = block->offset_start;
-            unsigned rdlength;
-
-            /* skip domain name */
-            i += block->buf[i] + 1;
-            i += 4;
-
-            rdlength = block->offset - i - 8;
-            block->buf[i+6] = (unsigned char)(rdlength>>8);
-            block->buf[i+7] = (unsigned char)(rdlength>>0);
-            block->offset_start = block->offset;
-        }
+        block_rr_finish(block);
+        if (block->offset + 64*1024 > sizeof(block->buf)
+            || parser->is_singlestep)
+            block = block_next_to_parse(parser);
 		s = $UNTIL_EOL;
 
 	case $UNTIL_EOL:
@@ -738,13 +734,6 @@ rr_end:
 		s = $LINE_START;
 
 	case $LINE_START:
-        /* IMPORTANT: this is where we hand off a block of resource-reocrds
-         * to another thread to be inserted into the database. If yo uare 
-         * tracing the path how a record goes from the parser to the
-         * database, here is where it happens
-         */
-        if (block->offset + 64*1024 > sizeof(block->buf))
-            block = block_next_to_parse(parser);
 
 		switch (buf[i]) {
 		case ' ':
@@ -752,7 +741,14 @@ rr_end:
             /* If the line starts with a space, then that means we'll use the
              * the domain-name from the previous line, and just skip to the
              * next field */
+            block->buf[block->offset] = block->domain.length;
+            memcpy(&block->buf[block->offset]+1, block->domain.name, block->domain.length);
+            block->offset += block->domain.length + 1;
+            block->buf[block->offset] = 0xA3;
+
 			s = $TYPE;
+            parser->s2 = 0;
+               
 			continue;
 		case '\r':
 			s = $EOL;
@@ -768,51 +764,37 @@ rr_end:
 		case ';':
 			s = $COMMENT;
 			continue;
+        default:
+                s = $DOMAIN;
+                
+                /* Mark the start of the next resource record */
+                assert(block->offset_start == block->offset);
+                
+                parser->s2 = 0;
+                parser->rr_domain.name = block->buf + block->offset + 1;
+                
 		}
-		s = $DOMAIN;
-
-        /* Mark the start of the next resource record */
-        assert(block->offset_start == block->offset);
-
-        parser->s2 = 0;
-        parser->rr_domain.name = block->buf + block->offset + 1;
-
-        //mm_domain_start(parser);
-
-#if 0 && defined(EVIL_KLUDGES)
-        {
-            __m128i input;
-            unsigned len;
-            input =  _mm_loadu_si128((const __m128i*)(buf+i));
-            len = _mm_cmpistri(domain_endchar, input, _SIDD_CMP_EQUAL_ANY);
-
-            if (len && len < length-i) {
-                //printf("%.*s\n", len, buf+i);
-                parser->domain.label = 0;
-                parser->domain.name[0] = (unsigned char)len;
-                parser->domain.length = (unsigned char)(len + 1);
-                memcpy(parser->domain.name+1, buf+i, len);
-                parser->s2 = 1;
-                i += len;
-                if (buf[i] == ' ') {
-                    s = $TYPE;
-                    goto state_type;
-                }
-            }
-        }
-#endif
+        /*
+         * Drop down and start processing the next domain name
+         */
+        
 		
 	case $DOMAIN:
 		x_parse_domain(parser, buf, &i, length);
 		if (i >= length)
 			break;
+            
+        /* Save this domain name in case the next line starts with spaces */
+        block->domain.name = parser->rr_domain.name;
+        block->domain.length = parser->rr_domain.length;
+            
+        /* this is special logic done for domain-names that you wouldn't
+         * normally find when parsing domain-names within RRs */
         block->buf[block->offset] = parser->rr_domain.length;
         block->offset += parser->rr_domain.length + 1;
-
-
         block->buf[block->offset] = 0xA3;
-        //mm_domain_end(parser);
-		s = $TYPE;
+        
+        s = $TYPE;
 
 	case $TYPE:
 		parser->s2 = 0;
@@ -859,6 +841,9 @@ rr_end:
 			case TYPE_MX:			s = $RR_MX;			mm_integer_start(parser); continue;
 			case TYPE_PTR:		    s = $RR_PTR;		mm_domain_start(parser); continue;
 			case TYPE_CNAME:		s = $RR_CNAME;		mm_domain_start(parser); continue;
+                case TYPE_COMMENT:
+                    printf(".\n");
+                    break;
 			default:
 				parse_err(parser, "unknown type: %u\n", type);
 				s = $PARSE_ERROR;
@@ -874,11 +859,18 @@ rr_end:
 			/* reached end of buffer fragment without completing search,
 			 * so loop around and try again */
 			continue;
+        } else if (type == TYPE_COMMENT) {
+            s = $COMMENT;
+            /*KLUDGE: we've set the domain-name assuming we were copying
+             * the previous domain for an RR. Since ther'es no RR here just
+             * a comment, we need to reset this */
+            block->offset = block->offset_start;
+            continue;        
 		} else if (parser->s2 == 0) {
 			/* either comment or TTL */
 			if (buf[i] == ';') {
 				s = $COMMENT;
-				continue;
+                continue;
 			} else if ('0' <= buf[i] && buf[i] <= '9') {
 				parser->block->ttl = buf[i] - '0';
 				s = $TTL;
@@ -905,6 +897,9 @@ rr_end:
 		continue;
 
 	case $COMMENT:
+        /* Should only encounter this on blank-lines with comments. Otherwise,
+         * comments should normally be handled within the states for 
+         * individual records */
 		while (i<length && buf[i] != '\n')
 			i++;
 		if (i < length)
@@ -1548,8 +1543,7 @@ rr_end:
         /* We need to update both the 'parser' and the current 'block' with
          * the new origin info */
         parser->block->origin.length = parser->rr_domain.label;
-        printf("todo\n");
-
+        
 		i--;
 		s = $UNTIL_EOL;
 		continue;
@@ -1612,10 +1606,18 @@ zonefile_parse(
 	    );
 }
 
-/****************************************************************************
+/******************************************************************************
+ ******************************************************************************/
+void
+zonefile_set_singlestep(struct ZoneFileParser *parser)
+{
+    parser->is_singlestep = 1;
+}
+
+/******************************************************************************
  * Call this to create a parser for parsing a file.
  * @return an object suitable for parsing
- ****************************************************************************/
+ ******************************************************************************/
 struct ZoneFileParser *
 zonefile_begin(struct DomainPointer origin, uint64_t ttl, uint64_t filesize,
     const char *filename, RESOURCE_RECORD_CALLBACK callback, void *callbackdata,

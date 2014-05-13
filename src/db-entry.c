@@ -90,8 +90,23 @@ void R_next_rr(struct RRSETPARSER *r, unsigned *rdlength, unsigned *rdoffset)
     r->offset = *rdoffset + *rdlength;
 }
 
-/****************************************************************************
- ****************************************************************************/
+/******************************************************************************
+ * This is the "formater" function that appends a record-set onto the end
+ * of a DNS response packet.
+ *
+ * As per DNS spec, we don't append individual records, but record-sets. In
+ * other, if two IP addresses match the DNS query name, then both should
+ * always be returned in the response, or neither.
+ *
+ * Since we have a weird internal format in the catalog/database, we need to
+ * parse that internal format while appending to the packet.
+ *
+ * For almost all records we simply blindly append the opaque contents.
+ * However, for old record types containing names, we need to do name
+ * compression when generating responses.
+ * 
+ * FIXME: this function belongs in proto-dns-formatter.c
+ ******************************************************************************/
 unsigned
 rrset_packet_append(
         const struct DBrrset *rrset,
@@ -137,6 +152,7 @@ rrset_packet_append(
         R_next_rr(r, &rdlength, &rdoffset);
 
         compressor_append_name(compressor, pkt, owner, origin);
+        
         if (pkt->offset + 10 <= max) {
             px[pkt->offset++] = (unsigned char)(r->type>>8);
             px[pkt->offset++] = (unsigned char)(r->type>>0);
@@ -148,8 +164,15 @@ rrset_packet_append(
             px[pkt->offset++] = (unsigned char)(r->ttl>> 0);
             px[pkt->offset++] = (unsigned char)(rdlength>>8);
             px[pkt->offset++] = (unsigned char)(rdlength>>0);
+        } else {
+            pkt->offset += 10;
         }
         
+        /*
+         * Just copy the opaque RDATA -- except when there are names to
+         * compress.
+         * FIXME: add more types that need compression
+         */
         switch (r->type) {
         case TYPE_NS:
         case TYPE_CNAME:

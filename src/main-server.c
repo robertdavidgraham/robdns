@@ -39,14 +39,28 @@ static const struct DomainPointer root = {(const unsigned char*)"\0",1};
 #define SENDQ_SIZE 65536 * 8
 
 
-/****************************************************************************
- ****************************************************************************/
+/******************************************************************************
+ * This is the mail loop when running over sockets, receiving packets and
+ * sending responses.
+ ******************************************************************************/
 static void
 sockets_thread(struct Core *conf)
 {
     int err;
     SOCKET fd;
     struct sockaddr_in sin;
+
+    /*
+     * This software obtains its speed by bypassing the operating system
+     * stack. Thus, running on top of 'sockets' is going to be a lot 
+     * slower
+     */
+    fprintf(stderr, "WARNING: running in slow 'sockets' mode\n");
+    
+    
+    /*
+     * Legacy Windows is legacy.
+     */
 #if defined(WIN32)
     {WSADATA x; WSAStartup(0x201, &x);}
 #endif
@@ -57,24 +71,30 @@ sockets_thread(struct Core *conf)
         return;
     }
 
+
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = 0;
     sin.sin_port = htons(53);
-
     err = bind(fd, (struct sockaddr*)&sin, sizeof(sin));
     if (err) {
         LOG(0, "FAIL: couldn't bind to port 53: %u\n", WSAGetLastError());
         return;
     }
 
+    /*
+     * Sit in loop processing incoming UDP packets
+     */
     for (;;) {
         unsigned char buf[2048];
         int bytes_received;
         socklen_t sizeof_sin = sizeof(sin);
 
 
-        bytes_received = recvfrom(fd, (char*)buf, sizeof(buf), 0, (struct sockaddr*)&sin, &sizeof_sin);
+        bytes_received = recvfrom(fd, 
+                                  (char*)buf, sizeof(buf),
+                                  0, 
+                                  (struct sockaddr*)&sin, &sizeof_sin);
         if (bytes_received == 0)
             continue;
        
@@ -83,6 +103,9 @@ sockets_thread(struct Core *conf)
     }
 }
 
+
+/******************************************************************************
+ ******************************************************************************/
 static int
 is_numeric_index(const char *ifname)
 {
@@ -104,9 +127,10 @@ is_numeric_index(const char *ifname)
     return result;
 }
 
-/***************************************************************************
- ***************************************************************************/
-static char *adapter_from_index(unsigned index)
+/******************************************************************************
+ ******************************************************************************/
+static char *
+adapter_from_index(unsigned index)
 {
     pcap_if_t *alldevs;
     char errbuf[PCAP_ERRBUF_SIZE];
@@ -117,7 +141,8 @@ static char *adapter_from_index(unsigned index)
         pcap_if_t *d;
 
         if (alldevs == NULL) {
-            fprintf(stderr, "ERR:libpcap: no adapters found, are you sure you are root?\n");
+            fprintf(stderr, "ERR:libpcap:"
+                            "no adapters found, are you sure you are root?\n");
         }
         /* Print the list */
         for(d=alldevs; d; d=d->next)
@@ -383,6 +408,8 @@ rawsock_ignore_transmits(struct Adapter *adapter, const unsigned char *adapter_m
 }
 
 
+/******************************************************************************
+ ******************************************************************************/
 static int
 initialize_adapter(
     struct Core *conf,
@@ -510,8 +537,8 @@ initialize_adapter(
 
 
 
-/****************************************************************************
- ****************************************************************************/
+/******************************************************************************
+ ******************************************************************************/
 static void
 pcap_thread(struct Core *conf)
 {

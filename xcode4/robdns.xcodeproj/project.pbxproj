@@ -13,6 +13,7 @@
 		11623F78191F370C0075EEE6 /* zonefile-field-charstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F75191F370B0075EEE6 /* zonefile-field-charstring.c */; };
 		11623F79191F370C0075EEE6 /* zonefile-field-loc.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F76191F370C0075EEE6 /* zonefile-field-loc.c */; };
 		11623F7D191F371B0075EEE6 /* zonefile-insertion.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F7B191F371B0075EEE6 /* zonefile-insertion.c */; };
+		11AB6E8D191FEA1F0060F2C0 /* perftest.c in Sources */ = {isa = PBXBuildFile; fileRef = 11AB6E8C191FEA1F0060F2C0 /* perftest.c */; };
 		11C2FE4018D506D700061E8B /* adapter-pcapfile.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE118D506D700061E8B /* adapter-pcapfile.c */; };
 		11C2FE4118D506D700061E8B /* adapter-pcaplive.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE318D506D700061E8B /* adapter-pcaplive.c */; };
 		11C2FE4218D506D700061E8B /* adapter-recv.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE518D506D700061E8B /* adapter-recv.c */; };
@@ -87,6 +88,7 @@
 		11623F76191F370C0075EEE6 /* zonefile-field-loc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-field-loc.c"; path = "../src/zonefile-field-loc.c"; sourceTree = "<group>"; };
 		11623F7B191F371B0075EEE6 /* zonefile-insertion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-insertion.c"; path = "../src/zonefile-insertion.c"; sourceTree = "<group>"; };
 		11623F7C191F371B0075EEE6 /* zonefile-insertion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-insertion.h"; path = "../src/zonefile-insertion.h"; sourceTree = "<group>"; };
+		11AB6E8C191FEA1F0060F2C0 /* perftest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = perftest.c; path = ../src/perftest.c; sourceTree = "<group>"; };
 		11C2FDD318D506A300061E8B /* robdns */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = robdns; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C2FDE118D506D700061E8B /* adapter-pcapfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "adapter-pcapfile.c"; path = "../src/adapter-pcapfile.c"; sourceTree = "<group>"; };
 		11C2FDE218D506D700061E8B /* adapter-pcapfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "adapter-pcapfile.h"; path = "../src/adapter-pcapfile.h"; sourceTree = "<group>"; };
@@ -223,16 +225,6 @@
 		11C2FDE018D506BC00061E8B /* src */ = {
 			isa = PBXGroup;
 			children = (
-				11623F7B191F371B0075EEE6 /* zonefile-insertion.c */,
-				11623F7C191F371B0075EEE6 /* zonefile-insertion.h */,
-				11623F75191F370B0075EEE6 /* zonefile-field-charstring.c */,
-				11623F76191F370C0075EEE6 /* zonefile-field-loc.c */,
-				11623F72191F36B00075EEE6 /* rte-ring.c */,
-				11623F73191F36B00075EEE6 /* rte-ring.h */,
-				11623F6B191F368B0075EEE6 /* pixie-threads.c */,
-				11623F6C191F368B0075EEE6 /* pixie-threads.h */,
-				11623F6D191F368B0075EEE6 /* pixie-timer.c */,
-				11623F6E191F368B0075EEE6 /* pixie-timer.h */,
 				11C2FE8518D6772200061E8B /* zonefile */,
 				11C2FE8418D676EF00061E8B /* util */,
 				11C2FE8318D676DF00061E8B /* main */,
@@ -249,6 +241,7 @@
 				11C2FE2518D506D700061E8B /* selftest.c */,
 				11C2FE2618D506D700061E8B /* selftest.h */,
 				11C2FE2D18D506D700061E8B /* unusedparm.h */,
+				11AB6E8C191FEA1F0060F2C0 /* perftest.c */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -323,6 +316,12 @@
 		11C2FE8218D676BF00061E8B /* misc */ = {
 			isa = PBXGroup;
 			children = (
+				11623F72191F36B00075EEE6 /* rte-ring.c */,
+				11623F73191F36B00075EEE6 /* rte-ring.h */,
+				11623F6B191F368B0075EEE6 /* pixie-threads.c */,
+				11623F6C191F368B0075EEE6 /* pixie-threads.h */,
+				11623F6D191F368B0075EEE6 /* pixie-timer.c */,
+				11623F6E191F368B0075EEE6 /* pixie-timer.h */,
 				11C2FE0B18D506D700061E8B /* network.h */,
 				11C2FE0C18D506D700061E8B /* packet.h */,
 				11C2FE0D18D506D700061E8B /* pixie-nic.c */,
@@ -380,6 +379,10 @@
 		11C2FE8518D6772200061E8B /* zonefile */ = {
 			isa = PBXGroup;
 			children = (
+				11623F7B191F371B0075EEE6 /* zonefile-insertion.c */,
+				11623F7C191F371B0075EEE6 /* zonefile-insertion.h */,
+				11623F75191F370B0075EEE6 /* zonefile-field-charstring.c */,
+				11623F76191F370C0075EEE6 /* zonefile-field-loc.c */,
 				11C2FE3418D506D700061E8B /* zonefile-dfa.c */,
 				11C2FE3518D506D700061E8B /* zonefile-dfa.h */,
 				11C2FE3618D506D700061E8B /* zonefile-fields.c */,
@@ -501,6 +504,7 @@
 				11623F78191F370C0075EEE6 /* zonefile-field-charstring.c in Sources */,
 				11623F79191F370C0075EEE6 /* zonefile-field-loc.c in Sources */,
 				11623F7D191F371B0075EEE6 /* zonefile-insertion.c in Sources */,
+				11AB6E8D191FEA1F0060F2C0 /* perftest.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

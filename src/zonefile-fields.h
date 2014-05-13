@@ -32,6 +32,7 @@ struct ZoneFileParser
 	unsigned s;
 	unsigned s2;
 	unsigned substring_esc;
+    unsigned is_singlestep:1;
 	unsigned is_multiline:1;
     unsigned is_commenting:1;
     unsigned is_string:1;
