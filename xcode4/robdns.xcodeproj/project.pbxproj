@@ -88,6 +88,7 @@
 		11623F76191F370C0075EEE6 /* zonefile-field-loc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-field-loc.c"; path = "../src/zonefile-field-loc.c"; sourceTree = "<group>"; };
 		11623F7B191F371B0075EEE6 /* zonefile-insertion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-insertion.c"; path = "../src/zonefile-insertion.c"; sourceTree = "<group>"; };
 		11623F7C191F371B0075EEE6 /* zonefile-insertion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-insertion.h"; path = "../src/zonefile-insertion.h"; sourceTree = "<group>"; };
+		117970AF19228D25004FFC92 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		11AB6E8C191FEA1F0060F2C0 /* perftest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = perftest.c; path = ../src/perftest.c; sourceTree = "<group>"; };
 		11C2FDD318D506A300061E8B /* robdns */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = robdns; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C2FDE118D506D700061E8B /* adapter-pcapfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "adapter-pcapfile.c"; path = "../src/adapter-pcapfile.c"; sourceTree = "<group>"; };
@@ -225,6 +226,7 @@
 		11C2FDE018D506BC00061E8B /* src */ = {
 			isa = PBXGroup;
 			children = (
+				117970AF19228D25004FFC92 /* README.md */,
 				11C2FE8518D6772200061E8B /* zonefile */,
 				11C2FE8418D676EF00061E8B /* util */,
 				11C2FE8318D676DF00061E8B /* main */,
@@ -560,6 +562,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = ../bin;
 			};
 			name = Debug;
 		};
@@ -567,6 +570,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = ../bin;
 			};
 			name = Release;
 		};

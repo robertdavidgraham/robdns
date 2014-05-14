@@ -62,8 +62,9 @@ network_receive(struct Frame *frame,
 
     /*
      * PARSE FIRST THEN PROCESS REQ:[d7Unn4]
-     * We parse the entire packet though DNS first before we start
-     * any processing.
+     *
+     * This parses Ethernet, IP, UDP, and DNS.
+     *
      * TODO: this will change a bit once I add TCP handling
      */
     proto_ethernet_parse(frame, px, 0, length);
@@ -86,6 +87,9 @@ network_receive(struct Frame *frame,
         proto_icmp_process(frame, frame->icmp);
         break;
     case NET_DNS:
+        /* IMPORTANT! this is the interesting bit that you are looking for,
+         * taking a parsed DNS packet and interpretting it in order to 
+         * generate a response */
         proto_dns_process(frame, frame->dns);
         break;
     }

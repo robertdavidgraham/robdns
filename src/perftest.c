@@ -7,6 +7,8 @@
 #include "zonefile-parse.h"
 #include "zonefile-load.h"
 #include "thread.h"
+#include "pixie-timer.h"
+#include "pixie-threads.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -30,6 +32,7 @@ struct PerfTest
     struct Catalog *db;
     struct Thread thread[1];
     struct TestAdapter server;
+    unsigned loop_count;
 };
 
 /****************************************************************************
@@ -112,6 +115,30 @@ const char request_template[] =
 
 /******************************************************************************
  ******************************************************************************/
+unsigned threads_running = 0;
+void run_perf(struct PerfTest *perftest)
+{
+    unsigned i;
+    unsigned loop_count = perftest->loop_count;
+    
+    for (i=0; i<loop_count; i++) {
+        struct Frame frame[1];
+        
+        network_receive(
+                        frame,
+                        perftest->thread,
+                        perftest->server.adapter,
+                        0,
+                        0,
+                        (unsigned char*)request_template,
+                        sizeof(request_template)-1);
+    }
+    
+    __sync_fetch_and_sub(&threads_running, 1);
+}
+
+/******************************************************************************
+ ******************************************************************************/
 int
 perftest(int argc, char *argv[])
 {
@@ -121,6 +148,7 @@ perftest(int argc, char *argv[])
     size_t i;
     
     
+    perftest->loop_count = 1000000;
     
     /*
      * Create a pseudo-network subsystem for generating packets
@@ -153,31 +181,38 @@ perftest(int argc, char *argv[])
                             );
     zonefile_set_singlestep(parser);
     for (i=0; perftest_zone[i]; i++) {
-        //printf("%s", perftest_zone[i]);
         zonefile_parse(parser,
                        (const unsigned char*)perftest_zone[i],
                        strlen(perftest_zone[i])
                        );
-        //zonefile_flush(parser);
     }
     zonefile_end(parser);
     
     /*
-     * Send packets
+     * Send packets. This creates one thread per CPU processing requests.
      */
-    for (i=0; i<1000000; i++) {
-        struct Frame frame[1];
-
-        network_receive(
-                        frame,
-                        perftest->thread,
-                        perftest->server.adapter,
-                        0,
-                        0,
-                        (unsigned char*)request_template,
-                        sizeof(request_template)-1);
+    {
+        unsigned threads_desired = pixie_cpu_get_count();
+        uint64_t start, stop;
+        double requests_per_second;
+        
+        fprintf(stderr, "running %u threads\n", threads_desired);
+        
+        start = pixie_nanotime();
+        for (i=0; i<threads_desired; i++) {
+            __sync_fetch_and_add(&threads_running, 1);
+            pixie_begin_thread((void(*)(void*))run_perf, 0, perftest);
+        }
+        while (threads_running)
+            pixie_usleep(1000);
+        stop = pixie_nanotime();
+        
+        requests_per_second = 1000000000.0 
+                                * (threads_desired * perftest->loop_count)
+                                / (stop - start);
+        fprintf(stderr, "queries/second = %5.3f\n", requests_per_second);
     }
-
+    
     exit(1);
     return 0;
 }

@@ -316,6 +316,9 @@ proto_dns_process(struct Frame *frame, const struct DNS_Incoming *request)
         return;
     }
 
+    /*
+     * SPECIAL: CHAOS version.bind
+     */
     if (request->query_class == 3) {
             static const unsigned char xx[] = {
                 0x87, 0x31, 
@@ -365,7 +368,8 @@ proto_dns_process(struct Frame *frame, const struct DNS_Incoming *request)
      * doesn't create the response packet, but instead just "structures"
      * the response.
      */
-    resolver_init(response, request->query_name.name, request->query_name.length, request->query_type);
+    resolver_init(response, request->query_name.name, 
+                  request->query_name.length, request->query_type);
     response->id = request->id;
     response->opcode = request->opcode;
     resolver_algorithm(frame->thread->catalog, response, request);
@@ -378,6 +382,8 @@ proto_dns_process(struct Frame *frame, const struct DNS_Incoming *request)
 
     /*
      * format output
+     * This takes up a considerable amount of time, especially doing DNS
+     * name compression.
      */
     dns_format_response(response, &pkt);
 

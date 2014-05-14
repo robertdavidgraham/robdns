@@ -1,8 +1,8 @@
 # robdns: a fast DNS server
 
-This DNS server bypasses the kernel. It has it's own TCP/IP stack
-that interacts directly with the network adapter. It's designed
-to service DNS requests at rates of 10 million per second.
+This is the fastest authoritative DNS server, bypassing the kernel with it's 
+own TCP/IP stack. It handles about 1-million queries/second for each CPU
+core in a system.
 
 Currently it is in "prototype" stage. There is much that almost works,
 but will still take some effort to finish.
@@ -24,6 +24,7 @@ While Linux is the primary target platform, the code runs well on many other
 systems. Here's some additional build info:
 * Windows w/ Visual Studio: use the VS10 project
 * Windows w/ MingGW: just type `make`
+* Mac OS X: use the XCode project, or `make`
 
 
 # Usage
@@ -41,7 +42,7 @@ This causes some difficulties, because incoming packets will be sent both
 to the normal network stack and to this program. For best results, use
 a different network address not used by another machine on the local subnet.
 
-	# robdns example.con 192.168.1.222
+	# robdns example.zone 192.168.1.222
 
 To verify that it's working, use the `dig` tool from another machine:
 
