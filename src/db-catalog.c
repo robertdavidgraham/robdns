@@ -67,7 +67,7 @@ void catalog_destroy(struct Catalog *catalog)
 /****************************************************************************
  ****************************************************************************/
 struct DBZone *
-catalog_lookup_zone(struct Catalog *db, const struct DB_XDomain *xdomain)
+catalog_lookup_zone(const struct Catalog *db, const struct DB_XDomain *xdomain)
 {
 	int i;
     int min_labels;

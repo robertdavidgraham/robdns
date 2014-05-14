@@ -29,10 +29,21 @@ md5(const void *p, unsigned length, uint64_t secret)
     return *(uint64_t*)digest ^ *(uint64_t*)(digest + 8);
 }
 
-/****************************************************************************
- ****************************************************************************/
+
+/******************************************************************************
+ * A domain-name comparison function.
+ *
+ * Remember that we represent domain names in a number of different formats
+ * in the code. This compares names from two different formats.
+ *
+ * Called from the Zone lookup routine to find which zone the query name
+ * refers to.
+ *
+ * FIXME: this function takes up a lot of time. it needs to be optimized
+ ******************************************************************************/
 int
-xdomain_is_equal(const struct DB_XDomain *lhs, const struct DomainPointer *rhs, unsigned max_labels)
+xdomain_is_equal(const struct DB_XDomain *lhs, 
+                 const struct DomainPointer *rhs, unsigned max_labels)
 {
 	unsigned i;
 	const unsigned char *rhs_label = rhs->name;

@@ -16,21 +16,8 @@
 #include "main-thread.h"
 #include "unusedparm.h"
 #include "adapter-pcapfile.h"
+#include "main-server-socket.h"
 #include <ctype.h>
-
-#if defined(WIN32)
-#include <WinSock2.h>
-#if defined(_MSC_VER)
-#pragma comment(lib, "ws2_32.lib")
-#endif
-typedef int socklen_t;
-#else
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#define WSAGetLastError() (errno)
-#define SOCKET int
-#endif
 
 extern uint64_t entry_bytes;
 extern uint64_t entry_count;
@@ -39,72 +26,11 @@ static const struct DomainPointer root = {(const unsigned char*)"\0",1};
 #define SENDQ_SIZE 65536 * 8
 
 
-/******************************************************************************
- * This is the mail loop when running over sockets, receiving packets and
- * sending responses.
- ******************************************************************************/
-static void
-sockets_thread(struct Core *conf)
-{
-    int err;
-    SOCKET fd;
-    struct sockaddr_in sin;
-
-    /*
-     * This software obtains its speed by bypassing the operating system
-     * stack. Thus, running on top of 'sockets' is going to be a lot 
-     * slower
-     */
-    fprintf(stderr, "WARNING: running in slow 'sockets' mode\n");
-    
-    
-    /*
-     * Legacy Windows is legacy.
-     */
-#if defined(WIN32)
-    {WSADATA x; WSAStartup(0x201, &x);}
-#endif
-
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd <= 0) {
-        LOG(0, "FAIL: couldn't create socket %u\n", WSAGetLastError());
-        return;
-    }
-
-
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = 0;
-    sin.sin_port = htons(53);
-    err = bind(fd, (struct sockaddr*)&sin, sizeof(sin));
-    if (err) {
-        LOG(0, "FAIL: couldn't bind to port 53: %u\n", WSAGetLastError());
-        return;
-    }
-
-    /*
-     * Sit in loop processing incoming UDP packets
-     */
-    for (;;) {
-        unsigned char buf[2048];
-        int bytes_received;
-        socklen_t sizeof_sin = sizeof(sin);
-
-
-        bytes_received = recvfrom(fd, 
-                                  (char*)buf, sizeof(buf),
-                                  0, 
-                                  (struct sockaddr*)&sin, &sizeof_sin);
-        if (bytes_received == 0)
-            continue;
-       
-
-       
-    }
-}
-
 
 /******************************************************************************
+ * Whether a network interface/adapter name is actually a numeric index, in
+ * which case we need to look it up in a list of adapters to find the real
+ * one. This is used on WinXP which doesn't have friendly names for adapters
  ******************************************************************************/
 static int
 is_numeric_index(const char *ifname)
@@ -587,9 +513,10 @@ int server(int argc, char *argv[])
 
     verbosity = 10;
     memset(core, 0, sizeof(core));
-    core->nic_count = 1;
+    //core->nic_count = 1;
 
-    //getcwd(core->working_directory, sizeof(core->working_directory));
+    getcwd(core->working_directory, sizeof(core->working_directory));
+    LOG(0, "cwd=%s\n", core->working_directory);
 
     /*
      * Create an empty database

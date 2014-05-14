@@ -208,7 +208,6 @@ frame_create_response(struct Frame *frame, int protocol)
     
     pkt = frame->adapter->alloc_packet(frame->adapter, frame->thread);
 
-    //network_respond(frame, protocol, &pkt);
     adapter_create_ipv4(
         &pkt, protocol,
         frame->adapter->mac->address, frame->mac_src,

@@ -8,6 +8,8 @@ extern "C" {
 #include "packet.h"
 #include "proto-dns.h"
 
+struct Catalog;
+
 struct ARP_IncomingRequest
 {
     unsigned is_valid;
@@ -101,8 +103,9 @@ void proto_icmp_process(struct Frame *frame, const struct ICMP_IncomingRequest *
 
 void proto_udp_parse(struct Frame *frame, const unsigned char px[], unsigned offset, unsigned max);
 
-
-void proto_dns_process(struct Frame *frame, const struct DNS_Incoming *dns);
+void proto_dns_process(const struct DNS_Incoming *dns,
+                       const struct Catalog *catalog,
+                       struct Packet *pkt);
 
 
 void stack_send_ip(struct Frame *frame, const unsigned char px[], unsigned length, unsigned ip_dst);

@@ -13,6 +13,7 @@ struct DNS_ResponseRRset
 struct DNS_OutgoingResponse
 {
     unsigned id;
+    unsigned is_version_bind:1;
     unsigned aa:1;
     unsigned ra:1;
     unsigned tc:1;
@@ -30,9 +31,12 @@ struct DNS_OutgoingResponse
 };
 
 enum {
-    RCODE_OK=0,
-    RCODE_NXDOMAIN=3,
+    RCODE_OK        =   0,
+    RCODE_FORMERR   =   1,
+    RCODE_NXDOMAIN  =   3,
 };
+
+
 
 enum {
     SECTION_ANSWER=1,

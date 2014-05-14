@@ -5,7 +5,7 @@
 #include "proto-dns-compressor.h"
 #include "proto-dns-formatter.h"
 #include "proto-dns.h"
-#include <string.h>
+#include "string_s.h"
 #include <stddef.h>
 
 /****************************************************************************
@@ -118,12 +118,17 @@ resolver_init(
         struct DNS_OutgoingResponse *response, 
         const unsigned char *query_name,
         unsigned query_name_length,
-        int query_type)
+        int query_type,
+        unsigned id,
+        unsigned opcode)
 {
     memset(response, 0, offsetof(struct DNS_OutgoingResponse, query_type));
     response->query_name.name = query_name;
     response->query_name.length = query_name_length;
     response->query_type = query_type;
+    response->id = id;
+    response->opcode = opcode;
+    
 }
 
 /****************************************************************************
@@ -143,7 +148,7 @@ resolver_init(
  ****************************************************************************/
 void
 resolver_algorithm(
-        struct Catalog *catalog,
+        const struct Catalog *catalog,
         struct DNS_OutgoingResponse *response,
         const struct DNS_Incoming *request)
 {
@@ -155,6 +160,30 @@ resolver_algorithm(
     int query_type = request->query_type;
 
     
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     * handle format errors
+     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+    if (request->is_formerr) {
+        response->rcode = RCODE_FORMERR;
+        return;
+    }
+
+    
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     * handle version.bind requests
+     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+    if (request->query_class == 3 
+        && request->query_type == 16
+        && request->query_name.length == 13
+        && memcasecmp(request->query_name.name, 
+                       "\x07" "version" "\x04" "bind" "\x00", 13) == 0) {
+            response->is_version_bind = 1;
+            return;
+    } else {
+        response->is_version_bind = 0;
+    }
+
+
     xdomain_reverse2(query_name_x, query_name.name, query_name.length);
 
 

@@ -3,6 +3,34 @@
 #include "packet.h"
 #include "domainname.h"
 #include "db-rrset.h"
+#include <string.h>
+
+/**
+ * Hard-coded response packet to the "version.bind" query. Maybe in the future
+ * we'll make this more of a generic thing
+ */
+static const unsigned char version_bind_response[] = {
+    0x87, 0x31, 
+    0x85, 0x00, 
+    0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 
+    
+    0x07, 'v', 'e', 'r', 's', 'i', 'o', 'n', 0x04, 'b', 'i', 'n', 'd', 0x00, 
+    0x00, 0x10, 
+    0x00, 0x03, 
+    
+    0xc0, 0x0c, 
+    0x00, 0x10, 
+    0x00, 0x03, 
+    0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x09, 
+    0x08, 
+    'r', 'o', 'b', 'd', 'n', 's', '/', '1',
+    
+    0xc0, 0x0c,
+    0x00, 0x02, 
+    0x00, 0x03,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xc0, 0x0c,
+};
 
 /******************************************************************************
  * Creates the DNS response packet.
@@ -33,12 +61,50 @@ dns_format_response(struct DNS_OutgoingResponse *response,
     unsigned i;
     static const struct DomainPointer root = {0,0};
     struct Compressor compressor[1];
-    unsigned actual_ancount=0;
-    unsigned actual_nscount=0;
-    unsigned actual_arcount=0;
+    unsigned actual_ancount =0 ;
+    unsigned actual_nscount = 0;
+    unsigned actual_arcount = 0;
 
+    /* check for programming error */
     if (pkt->offset + 12 > pkt->max) {
-        pkt->offset = 0; /* mark packet as bad */
+        pkt->offset = 0;
+        return;
+    }
+    
+    /*
+     * Handle format error case with a hard-coded response
+     */
+format_error:
+    if (response->rcode == RCODE_FORMERR) {
+        static const char format_err[] = 
+            "\0\0" "\x80\1" "\0\0" "\0\0" "\0\0" "\0\0";
+
+        memcpy(&pkt->buf[pkt->offset], format_err, 12);
+        pkt->buf[pkt->offset+0] = (unsigned char)(response->id>>8);
+        pkt->buf[pkt->offset+1] = (unsigned char)(response->id>>0);
+        pkt->offset += 12;
+        pkt->max = pkt->offset;
+        return;
+    }
+    
+    /*
+     * Handle "version" request as a hard-coded special case
+     */
+    if (response->is_version_bind) {
+        if (pkt->offset + sizeof(version_bind_response) >= pkt->max) {
+            response->rcode = RCODE_FORMERR;
+            goto format_error;
+        }
+        
+        memcpy(&pkt->buf[pkt->offset], 
+               version_bind_response, 
+               sizeof(version_bind_response));
+        
+        pkt->buf[pkt->offset+0] = (unsigned char)(response->id>>8);
+        pkt->buf[pkt->offset+1] = (unsigned char)(response->id>>0);
+        
+        pkt->offset += sizeof(version_bind_response);
+        pkt->max = pkt->offset;
         return;
     }
     

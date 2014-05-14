@@ -55,7 +55,7 @@ catalog_create_zone2(struct Catalog *db, struct DomainPointer domain, struct Dom
 /* "longest suffix" search for best matching zone */
 struct DBZone *
 catalog_lookup_zone(
-    struct Catalog *db,
+    const struct Catalog *db,
     const struct DB_XDomain *xdomain
     );
 struct DBZone *
