@@ -168,8 +168,6 @@ sockets_thread(struct Core *conf)
                    (struct sockaddr*)&sin,
                    sizeof_sin);
         }
-        printf(".\n");
-        
     }
 }
 
