@@ -154,6 +154,7 @@ format_error:
         else
             actual_nscount += count;
 
+        /* check for truncation */
         if (pkt->offset > pkt->max) {
             /* oops, the response didn't fit, so we need to generate a 
              * "truncated" response */

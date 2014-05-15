@@ -205,7 +205,7 @@ resolver_algorithm(
   	zone = catalog_lookup_zone(catalog, query_name_x);
     if (zone == NULL) {
         response->aa = 0;
-        response->rcode = RCODE_NXDOMAIN;
+        response->rcode = RCODE_REFUSED;
         return;
     }
 
@@ -215,7 +215,7 @@ resolver_algorithm(
      * A pointer to another zone "hides" everything else after it.
      * Thus, if we have an NS enry for "a.example.com." and a entry
      * for "c.b.a.example.com." then the server can never find that
-     * entry, UNLESS it's part of glue. Thus, looking up
+     * entry, UNLESS it's part of glue.
      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
     entry = zone_lookup_delegation(zone, query_name_x);
     if (entry != NULL) {
@@ -242,7 +242,7 @@ resolver_algorithm(
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      * exact match
      *  RFC 1034 4.3.2. 3. b.
-     * Now try for an exact match, which takes precedence over wilcards.
+     * Now try for an exact match, which takes precedence over wildcards.
      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
     entry = zone_lookup_exact(zone, query_name_x);
     if (entry != NULL) {
@@ -302,6 +302,8 @@ soa:
         struct DomainPointer name;
         struct DomainPointer origin;
 
+        response->rcode = RCODE_NXDOMAIN;
+        
         zone_name_from_record(zone, 0, &name, &origin);
 
         rrset = zone_get_soa_rr(zone);

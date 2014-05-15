@@ -36,7 +36,6 @@
 		11C2FE5218D506D700061E8B /* main-pcap2zone.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0318D506D700061E8B /* main-pcap2zone.c */; };
 		11C2FE5318D506D700061E8B /* main-regression.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0418D506D700061E8B /* main-regression.c */; };
 		11C2FE5418D506D700061E8B /* main-server.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0618D506D700061E8B /* main-server.c */; };
-		11C2FE5518D506D700061E8B /* main-slowsockets.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0718D506D700061E8B /* main-slowsockets.c */; };
 		11C2FE5618D506D700061E8B /* main-thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0818D506D700061E8B /* main-thread.c */; };
 		11C2FE5718D506D700061E8B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0A18D506D700061E8B /* main.c */; };
 		11C2FE5818D506D700061E8B /* pixie-nic.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FE0D18D506D700061E8B /* pixie-nic.c */; };
@@ -132,7 +131,6 @@
 		11C2FE0418D506D700061E8B /* main-regression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-regression.c"; path = "../src/main-regression.c"; sourceTree = "<group>"; };
 		11C2FE0518D506D700061E8B /* main-regression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "main-regression.h"; path = "../src/main-regression.h"; sourceTree = "<group>"; };
 		11C2FE0618D506D700061E8B /* main-server.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-server.c"; path = "../src/main-server.c"; sourceTree = "<group>"; };
-		11C2FE0718D506D700061E8B /* main-slowsockets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-slowsockets.c"; path = "../src/main-slowsockets.c"; sourceTree = "<group>"; };
 		11C2FE0818D506D700061E8B /* main-thread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-thread.c"; path = "../src/main-thread.c"; sourceTree = "<group>"; };
 		11C2FE0918D506D700061E8B /* main-thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "main-thread.h"; path = "../src/main-thread.h"; sourceTree = "<group>"; };
 		11C2FE0A18D506D700061E8B /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../src/main.c; sourceTree = "<group>"; };
@@ -361,7 +359,6 @@
 				11C2FE0418D506D700061E8B /* main-regression.c */,
 				11C2FE0518D506D700061E8B /* main-regression.h */,
 				11C2FE0618D506D700061E8B /* main-server.c */,
-				11C2FE0718D506D700061E8B /* main-slowsockets.c */,
 				11C2FE0818D506D700061E8B /* main-thread.c */,
 				11C2FE0918D506D700061E8B /* main-thread.h */,
 				11C2FE0A18D506D700061E8B /* main.c */,
@@ -477,7 +474,6 @@
 				11C2FE5218D506D700061E8B /* main-pcap2zone.c in Sources */,
 				11C2FE5318D506D700061E8B /* main-regression.c in Sources */,
 				11C2FE5418D506D700061E8B /* main-server.c in Sources */,
-				11C2FE5518D506D700061E8B /* main-slowsockets.c in Sources */,
 				11C2FE5618D506D700061E8B /* main-thread.c in Sources */,
 				11C2FE5718D506D700061E8B /* main.c in Sources */,
 				11C2FE5818D506D700061E8B /* pixie-nic.c in Sources */,

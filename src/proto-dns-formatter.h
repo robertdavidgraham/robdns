@@ -34,6 +34,7 @@ enum {
     RCODE_OK        =   0,
     RCODE_FORMERR   =   1,
     RCODE_NXDOMAIN  =   3,
+    RCODE_REFUSED   =   5,
 };
 
 

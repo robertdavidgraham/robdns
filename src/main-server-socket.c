@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <errno.h>
 #include "string_s.h"
+#include "proto-dns-compressor.h"
+#include "proto-dns-formatter.h"
+#include "resolver.h"
 
 #if defined(WIN32)
 #include <WinSock2.h>
@@ -100,6 +103,8 @@ sockets_thread(struct Core *conf)
                     WSAGetLastError());
         }
         exit(1);
+    } else {
+        fprintf(stderr, "bound to port %u\n", port);
     }
     
     /*
@@ -109,10 +114,13 @@ sockets_thread(struct Core *conf)
         unsigned char buf[2048];
         int bytes_received;
         socklen_t sizeof_sin = sizeof(sin);
-        struct DNS_Incoming request;
+        struct DNS_Incoming request[1];
+        struct DNS_OutgoingResponse response[1];
+        struct Packet pkt;
+        unsigned char buf2[2048];
         
         /*
-         * 1. receive packet
+         * 1. receive 'packet'
          */
         bytes_received = recvfrom(fd, 
                                   (char*)buf, sizeof(buf),
@@ -123,19 +131,43 @@ sockets_thread(struct Core *conf)
 
         
         /*
-         * 2. parse request
+         * 2. parse 'packet' into a 'request'
          */
-        proto_dns_parse(&request, buf, 0, bytes_received);
+        proto_dns_parse(request, buf, 0, bytes_received);
+        if (!request->is_valid)
+            continue;
+
 
         /*
-         * 3. resolve request
+         * 3. resolve 'request' into a 'repsonse'
          */
-        
-        
+        resolver_init(response, 
+                      request->query_name.name, 
+                      request->query_name.length, 
+                      request->query_type,
+                      request->id,
+                      request->opcode);
+            
+        resolver_algorithm(conf->db, response, request);
+            
+
         /*
-         * 4. format response
+         * 4. format the 'response' into a 'packet'
          */
-        
+        pkt.buf = buf2;
+        pkt.max = sizeof(buf2);
+        pkt.offset = 0;
+        dns_format_response(response, &pkt);
+            
+        /*
+         * 5. Transmit the 'packet'
+         */
+        if (pkt.offset < pkt.max) {
+            sendto(fd, 
+                   pkt.buf, pkt.offset, 0,
+                   (struct sockaddr*)&sin,
+                   sizeof_sin);
+        }
         printf(".\n");
         
     }

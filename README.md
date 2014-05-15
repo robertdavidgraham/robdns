@@ -1,30 +1,18 @@
-# robdns: a fast DNS server
+# robdns: an infrastructure-class DNS server
 
-This is the fastest authoritative DNS server, bypassing the kernel with it's 
-own TCP/IP stack. It handles about 1-million queries/second for each CPU
-core in a system.
+This is a fast, fully-featured DNS server. It can handle over one million
+queries-per-second per CPU core. It is designed to be exposed to the Internet,
+where even servers that have light loads of only 100,000 queries-per-second
+must nonetheless be attacked with millions of queries-per-second.
 
-Currently it is in "prototype" stage. There is much that almost works,
-but will still take some effort to finish.
+Currently, it is in "prototype" stage. Most of the major functionality is
+supported, but it still needs more unit tests written.
+
 
 # Building
 
-On Debian/Ubuntu, it goes something like this:
-
-	$ git clone https://github.com/robertdavidgraham/robdns
-	$ cd robdns
-	$ make
-	$ make regress
-
-This puts the program in the `robdns/bin` subdirectory. You'll have to
-manually copy it to something like `/usr/local/bin` if you want to
-install it elsewhere on the system.
-
-While Linux is the primary target platform, the code runs well on many other
-systems. Here's some additional build info:
-* Windows w/ Visual Studio: use the VS10 project
-* Windows w/ MingGW: just type `make`
-* Mac OS X: use the XCode project, or `make`
+Just type `make` to build the software. This works on Windows (MinGW) and
+Mac, too, although you may optionally use the VS10 and XCode projects instead.
 
 
 # Usage
@@ -34,32 +22,30 @@ with one or more DNS zone-files:
 
 	# robdns example.zone
 
-The zone file is assumed to be in standard BIND9 format starting with an
-SOA record, and containing only records/glue within the zone.
+Zone-files are in standard format, and must start with an SOA record. Most all
+record formats are supported. This example will start responding to DNS
+requests on port 53 for the indicated zones. You can test that it's working
+by doing something like
 
-By default, this will use the IP address of the primary network adapter.
-This causes some difficulties, because incoming packets will be sent both
-to the normal network stack and to this program. For best results, use
-a different network address not used by another machine on the local subnet.
+	$ dig chaos txt version.bind @localhost +short
+    
+You should get back the version string of `robdns/1`.
 
-	# robdns example.zone 192.168.1.222
+However, this is not the correct way to run the software. The primary feature
+of the software is that it contains its own network stack. The real way to
+run this is:
 
-To verify that it's working, use the `dig` tool from another machine:
+    # robdns example.zone dna0 192.168.1.222
 
-	$ dig chaos txt version.bind @192.168.1.122
+In this example, the software will use the PF_RING drivers to bypass the 
+operating system, and respond to queries at rates of millions-per-second
+(depending upon number of CPUs and other factors).
 
-This should return a record with the value of `robdns/1`. Then, try normal
-DNS requests, such as:
 
-	$ dig ns1.example.com @192.168.1.122
+# Feature status
 
-There is a sample `example.zone` file to test with in the top directory. Or,
-consider getting a copy of the `com.zone` file (8-gigabytes) to test with.
+Most RRs are now parsed.
 
-# Features
-
-This server has no particular features at this time, other than bypassing
-the kernel.
 
 # Authors
 
