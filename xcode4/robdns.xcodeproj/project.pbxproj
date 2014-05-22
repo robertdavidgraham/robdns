@@ -14,6 +14,7 @@
 		11623F79191F370C0075EEE6 /* zonefile-field-loc.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F76191F370C0075EEE6 /* zonefile-field-loc.c */; };
 		11623F7D191F371B0075EEE6 /* zonefile-insertion.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F7B191F371B0075EEE6 /* zonefile-insertion.c */; };
 		118E22E71923278500883BCC /* main-server-socket.c in Sources */ = {isa = PBXBuildFile; fileRef = 118E22E61923278500883BCC /* main-server-socket.c */; };
+		118E22EB19247AE600883BCC /* conf-read.c in Sources */ = {isa = PBXBuildFile; fileRef = 118E22EA19247AE600883BCC /* conf-read.c */; };
 		11AB6E8D191FEA1F0060F2C0 /* perftest.c in Sources */ = {isa = PBXBuildFile; fileRef = 11AB6E8C191FEA1F0060F2C0 /* perftest.c */; };
 		11C2FE4018D506D700061E8B /* adapter-pcapfile.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE118D506D700061E8B /* adapter-pcapfile.c */; };
 		11C2FE4118D506D700061E8B /* adapter-pcaplive.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE318D506D700061E8B /* adapter-pcaplive.c */; };
@@ -91,6 +92,7 @@
 		117970AF19228D25004FFC92 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		118E22E61923278500883BCC /* main-server-socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-server-socket.c"; path = "../src/main-server-socket.c"; sourceTree = "<group>"; };
 		118E22E81923289100883BCC /* main-server-socket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "main-server-socket.h"; path = "../src/main-server-socket.h"; sourceTree = "<group>"; };
+		118E22EA19247AE600883BCC /* conf-read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-read.c"; path = "../src/conf-read.c"; sourceTree = "<group>"; };
 		11AB6E8C191FEA1F0060F2C0 /* perftest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = perftest.c; path = ../src/perftest.c; sourceTree = "<group>"; };
 		11C2FDD318D506A300061E8B /* robdns */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = robdns; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C2FDE118D506D700061E8B /* adapter-pcapfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "adapter-pcapfile.c"; path = "../src/adapter-pcapfile.c"; sourceTree = "<group>"; };
@@ -200,6 +202,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		118E22E919247AC900883BCC /* conf */ = {
+			isa = PBXGroup;
+			children = (
+				118E22EA19247AE600883BCC /* conf-read.c */,
+			);
+			name = conf;
+			sourceTree = "<group>";
+		};
 		11C2FDC818D506A300061E8B = {
 			isa = PBXGroup;
 			children = (
@@ -228,6 +238,7 @@
 		11C2FDE018D506BC00061E8B /* src */ = {
 			isa = PBXGroup;
 			children = (
+				118E22E919247AC900883BCC /* conf */,
 				117970AF19228D25004FFC92 /* README.md */,
 				11C2FE8518D6772200061E8B /* zonefile */,
 				11C2FE8418D676EF00061E8B /* util */,
@@ -509,6 +520,7 @@
 				11623F7D191F371B0075EEE6 /* zonefile-insertion.c in Sources */,
 				11AB6E8D191FEA1F0060F2C0 /* perftest.c in Sources */,
 				118E22E71923278500883BCC /* main-server-socket.c in Sources */,
+				118E22EB19247AE600883BCC /* conf-read.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
