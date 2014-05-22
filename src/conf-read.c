@@ -46,6 +46,7 @@ struct Conf_Zone
     struct String name;
     struct String file;
     enum Conf_ZoneType type;
+    bool is_notify;
 };
 struct Conf_ZoneList
 {
@@ -381,16 +382,16 @@ parse_zone(struct Config *conf, struct ConfText *t)
     
     while (t->offset < t->length && t->buf[t->offset] != '}') {
         struct Keyword kw = next_keyword(t);
-
+        
         if (kw_is_equals(kw, "type")) {
             kw = next_keyword(t);
             if (kw_is_equals(kw, "master"))
                 zone->type = Type_Master;
             else if (kw_is_equals(kw, "slave"))
                 zone->type = Type_Slave;
-            else {
+            else 
                 return CONF_ERROR(t, "zone type unknown\n");
-            }
+            
         } else if (kw_is_equals(kw, "file")) {
             zone->file = parse_string(t);
             if (t->is_error)
@@ -401,26 +402,10 @@ parse_zone(struct Config *conf, struct ConfText *t)
                 zone->is_notify = true;
             else if (kw_is_equals(kw, "no"))
                 zone->is_notify = false;
-            else {
+            else
                 return CONF_ERROR(t, "zone notify unknown\n");
-            }
-        }
-            case KW_FILE:
-            {
-            }
-            case KW_NOTIFY:
-                kw = grab_keword(t);
-                switch (kw) {
-                    case KW_YES: zone->is_notify = true; break;
-                    case KW_NO: zone->is_notify = false; break;
-                    default: return CONF_ERROR(t, "unknown zone notify\n");
-                }
-                beak;
-            default:
-                fprintf(stderr, "%s:%u: unknown statement\n",
-                    t->filename, t->line_number);
-                return -1;
-                break;
+        } else {
+            return CONF_ERROR(t, "zone unknown statement\n");
         }
         
         skip_whitespace(t);
@@ -446,35 +431,21 @@ conf_parse(struct Config *conf, const char *filename, const char *buf, size_t le
     t->filename = filename;
     
     
-    while (t->offset < t->length) {
-        int kw;
-        const char *kw_str;
-        size_t kw_length;
+    while (t->offset < t->length && !t->is_error) {
+        struct Keyword kw = next_keyword(t);
         
-        skip_whitespace(t);
-        
-        parse_keyword(t, &kw_str, &kw_length);
-        
-        kw = lookup_statement(kw_str, kw_length);
-        if (kw == 0) {
-            fprintf(stderr, "%s:%u: unknown statement\n",
-                    t->filename, t->line_number);
-            return -1;
-        }
-
-        skip_whitespace(t);
-
-        switch (kw) {
-            case STMT_ZONE: parse_zone(conf, t); break;
-            default:
-                fprintf(stderr, "%s:%u: unimplemented statement: %.*s\n",
-                        t->filename, t->line_number,
-                        (int)kw_length, kw_str);
+        if (kw_is_equals(kw, "zone"))
+            parse_zone(conf, t);
+        else {
+            return CONF_ERROR(t, "zone unknown statement\n");
         }
         
     }
     
-    return 0;
+    if (t->is_error)
+        return -1;
+    else 
+        return 0;
 }
 
 
@@ -488,7 +459,10 @@ conf_read(struct Config *conf, const char *filename)
     struct stat s;
     size_t bytes_read;
     
-    conf_add_filename(conf, filename);
+    /* Remember this filename so that when we are told to reload the
+     * the configuration that we can check on the status. Also, we
+     * use this to prevent an infinite loop */
+    conf_filename_add(conf, filename);
     
     /* open the next configuration file */
     fp = fopen(filename, "rb");
