@@ -24,6 +24,11 @@
     <ClCompile Include="..\src\adapter-recv.c" />
     <ClCompile Include="..\src\adapter-xmit.c" />
     <ClCompile Include="..\src\adapter.c" />
+    <ClCompile Include="..\src\conf-addr-match.c" />
+    <ClCompile Include="..\src\conf-parse.c" />
+    <ClCompile Include="..\src\conf-read.c" />
+    <ClCompile Include="..\src\conf-zone-masters.c" />
+    <ClCompile Include="..\src\conf-zone.c" />
     <ClCompile Include="..\src\crypto-md5.c" />
     <ClCompile Include="..\src\crypto-murmur3.c" />
     <ClCompile Include="..\src\crypto-siphash.c" />
@@ -39,10 +44,11 @@
     <ClCompile Include="..\src\main-listif.c" />
     <ClCompile Include="..\src\main-pcap2zone.c" />
     <ClCompile Include="..\src\main-regression.c" />
+    <ClCompile Include="..\src\main-server-socket.c" />
     <ClCompile Include="..\src\main-server.c" />
-    <ClCompile Include="..\src\main-slowsockets.c" />
     <ClCompile Include="..\src\main-thread.c" />
     <ClCompile Include="..\src\main.c" />
+    <ClCompile Include="..\src\perftest.c" />
     <ClCompile Include="..\src\pixie-nic.c" />
     <ClCompile Include="..\src\pixie-threads.c" />
     <ClCompile Include="..\src\pixie-timer.c" />
@@ -79,6 +85,8 @@
     <ClInclude Include="..\src\adapter-pcapfile.h" />
     <ClInclude Include="..\src\adapter-pcaplive.h" />
     <ClInclude Include="..\src\adapter.h" />
+    <ClInclude Include="..\src\conf-addr-match.h" />
+    <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\crypto-md5.h" />
     <ClInclude Include="..\src\crypto-murmur3.h" />
     <ClInclude Include="..\src\crypto-siphash.h" />
@@ -93,9 +101,11 @@
     <ClInclude Include="..\src\logger.h" />
     <ClInclude Include="..\src\main-conf.h" />
     <ClInclude Include="..\src\main-regression.h" />
+    <ClInclude Include="..\src\main-server-socket.h" />
     <ClInclude Include="..\src\main-thread.h" />
     <ClInclude Include="..\src\network.h" />
     <ClInclude Include="..\src\packet.h" />
+    <ClInclude Include="..\src\pixie-atomic.h" />
     <ClInclude Include="..\src\pixie-nic.h" />
     <ClInclude Include="..\src\pixie-threads.h" />
     <ClInclude Include="..\src\pixie-timer.h" />

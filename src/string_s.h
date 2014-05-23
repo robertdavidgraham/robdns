@@ -61,6 +61,8 @@ const char *strerror_x(int x);
 # include <string.h>
 # define strcasecmp     _stricmp
 # define memcasecmp     _memicmp
+# define strncasecmp    _strnicmp
+
 # ifndef PRIu64
 #  define PRIu64 "llu"
 #  define PRId64 "lld"

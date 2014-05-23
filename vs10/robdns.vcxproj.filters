@@ -34,6 +34,9 @@
     <Filter Include="Source Files\misc">
       <UniqueIdentifier>{6a6cb21b-442f-4d8d-96d1-cc8c0b93cf0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\config">
+      <UniqueIdentifier>{b71da1b9-cdc9-416e-b0a7-c37844356397}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\adapter-pcapfile.c">
@@ -91,9 +94,6 @@
       <Filter>Source Files\main</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main-server.c">
-      <Filter>Source Files\main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\main-slowsockets.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main-thread.c">
@@ -200,6 +200,27 @@
     </ClCompile>
     <ClCompile Include="..\src\zonefile-field-charstring.c">
       <Filter>Source Files\zonefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-server-socket.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-read.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\perftest.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-addr-match.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-parse.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-zone.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-zone-masters.c">
+      <Filter>Source Files\config</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -352,6 +373,18 @@
     </ClInclude>
     <ClInclude Include="..\src\zonefile-insertion.h">
       <Filter>Source Files\zonefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\main-server-socket.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pixie-atomic.h">
+      <Filter>Source Files\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\conf-addr-match.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\config.h">
+      <Filter>Source Files\config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

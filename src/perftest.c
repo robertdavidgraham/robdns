@@ -9,10 +9,11 @@
 #include "thread.h"
 #include "pixie-timer.h"
 #include "pixie-threads.h"
-
+#include "pixie-atomic.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+
 
 /******************************************************************************
  ******************************************************************************/
@@ -148,7 +149,7 @@ perftest(int argc, char *argv[])
     size_t i;
     
     
-    perftest->loop_count = 1000000;
+    perftest->loop_count = 10000000;
     
     /*
      * Create a pseudo-network subsystem for generating packets

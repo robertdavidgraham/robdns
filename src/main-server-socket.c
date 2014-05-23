@@ -12,6 +12,7 @@
 
 #if defined(WIN32)
 #include <WinSock2.h>
+#include <WS2tcpip.h>
 #if defined(_MSC_VER)
 #pragma comment(lib, "ws2_32.lib")
 #define WSA(err) WSA##err
