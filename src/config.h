@@ -1,6 +1,7 @@
 #ifndef XXCONFIG_H
 #define XXCONFIG_H
 #include <stdint.h>
+#include <stdio.h>
 
 #if defined(WIN32)
 typedef int bool;
@@ -11,6 +12,7 @@ enum { false, true };
 
 /******************************************************************************
  ******************************************************************************/
+struct Config;
 struct Conf_AddressMatchList;
 
 /******************************************************************************

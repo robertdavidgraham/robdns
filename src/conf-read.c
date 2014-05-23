@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include "string_s.h"
 
 #if defined(WIN32)
 #define strdup _strdup

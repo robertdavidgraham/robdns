@@ -78,6 +78,9 @@ clean:
 regress: bin/robdns
 	bin/robdns --selftest
 
+test: regress
+
+
 install: bin/robdns
 	echo "No install, binary is bin/robdns"
 	

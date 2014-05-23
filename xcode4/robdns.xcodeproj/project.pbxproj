@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1146F2DF192FEA8C007BCB3D /* conf-addr-match.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DA192FEA8C007BCB3D /* conf-addr-match.c */; };
+		1146F2E0192FEA8C007BCB3D /* conf-parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DC192FEA8C007BCB3D /* conf-parse.c */; };
+		1146F2E1192FEA8C007BCB3D /* conf-zone.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DD192FEA8C007BCB3D /* conf-zone.c */; };
 		11623F6F191F368B0075EEE6 /* pixie-threads.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F6B191F368B0075EEE6 /* pixie-threads.c */; };
 		11623F70191F368B0075EEE6 /* pixie-timer.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F6D191F368B0075EEE6 /* pixie-timer.c */; };
 		11623F74191F36B00075EEE6 /* rte-ring.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F72191F36B00075EEE6 /* rte-ring.c */; };
@@ -79,6 +82,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1146F2DA192FEA8C007BCB3D /* conf-addr-match.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-addr-match.c"; path = "../src/conf-addr-match.c"; sourceTree = "<group>"; };
+		1146F2DB192FEA8C007BCB3D /* conf-addr-match.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-addr-match.h"; path = "../src/conf-addr-match.h"; sourceTree = "<group>"; };
+		1146F2DC192FEA8C007BCB3D /* conf-parse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-parse.c"; path = "../src/conf-parse.c"; sourceTree = "<group>"; };
+		1146F2DD192FEA8C007BCB3D /* conf-zone.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-zone.c"; path = "../src/conf-zone.c"; sourceTree = "<group>"; };
+		1146F2DE192FEA8C007BCB3D /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../src/config.h; sourceTree = "<group>"; };
 		11623F6B191F368B0075EEE6 /* pixie-threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "pixie-threads.c"; path = "../src/pixie-threads.c"; sourceTree = "<group>"; };
 		11623F6C191F368B0075EEE6 /* pixie-threads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "pixie-threads.h"; path = "../src/pixie-threads.h"; sourceTree = "<group>"; };
 		11623F6D191F368B0075EEE6 /* pixie-timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "pixie-timer.c"; path = "../src/pixie-timer.c"; sourceTree = "<group>"; };
@@ -205,6 +213,11 @@
 		118E22E919247AC900883BCC /* conf */ = {
 			isa = PBXGroup;
 			children = (
+				1146F2DA192FEA8C007BCB3D /* conf-addr-match.c */,
+				1146F2DB192FEA8C007BCB3D /* conf-addr-match.h */,
+				1146F2DC192FEA8C007BCB3D /* conf-parse.c */,
+				1146F2DD192FEA8C007BCB3D /* conf-zone.c */,
+				1146F2DE192FEA8C007BCB3D /* config.h */,
 				118E22EA19247AE600883BCC /* conf-read.c */,
 			);
 			name = conf;
@@ -521,6 +534,9 @@
 				11AB6E8D191FEA1F0060F2C0 /* perftest.c in Sources */,
 				118E22E71923278500883BCC /* main-server-socket.c in Sources */,
 				118E22EB19247AE600883BCC /* conf-read.c in Sources */,
+				1146F2DF192FEA8C007BCB3D /* conf-addr-match.c in Sources */,
+				1146F2E0192FEA8C007BCB3D /* conf-parse.c in Sources */,
+				1146F2E1192FEA8C007BCB3D /* conf-zone.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -327,7 +327,7 @@ bool
 c__is_ipv4(const struct ConfText *t)
 {
     unsigned x;
-    const unsigned char *px = t->buf + t->offset;
+    const unsigned char *px = (const unsigned char*)t->buf + t->offset;
     size_t length = t->length - t->offset;
     size_t offset = 0;
     unsigned i;
@@ -382,7 +382,7 @@ bool
 c__next_ipv4(struct ConfText *t, unsigned *address, unsigned *prefix)
 {
     unsigned x;
-    const unsigned char *px = t->buf + t->offset;
+    const unsigned char *px = (const unsigned char *)t->buf + t->offset;
     size_t length = t->length - t->offset;
     size_t offset = 0;
     unsigned i;
@@ -445,7 +445,7 @@ bool
 c__next_ipv6(struct ConfText *t, unsigned *address, unsigned *prefix)
 {
     unsigned x;
-    const unsigned char *px = t->buf + t->offset;
+    const unsigned char *px = (const unsigned char *)t->buf + t->offset;
     size_t length = t->length - t->offset;
     size_t offset = 0;
     unsigned i;
@@ -507,7 +507,7 @@ c__next_ipv6(struct ConfText *t, unsigned *address, unsigned *prefix)
 bool
 c__next_uint32(struct ConfText *t, unsigned *number)
 {
-    const unsigned char *px = t->buf + t->offset;
+    const unsigned char *px = (const unsigned char *)t->buf + t->offset;
     size_t length = t->length - t->offset;
     size_t offset = 0;
 

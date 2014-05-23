@@ -86,8 +86,6 @@ conf_zone_masters_parse(struct Config *conf, struct Conf_Zone *zone, struct Conf
         if (c__is_ipv4(t)) {
             unsigned address;
             unsigned prefix = 32;
-            unsigned this_port = default_port;
-            unsigned this_dscp = default_dscp;
             struct Conf_ZoneMaster *master;
             
             c__next_ipv4(t, &address, &prefix);
@@ -106,7 +104,7 @@ conf_zone_masters_parse(struct Config *conf, struct Conf_Zone *zone, struct Conf
                 c__next_keyword(t);
                 if (!c__next_uint32(t, &master->port) || master->port >= 65536) {
                     CONF_ERROR(t, "corrupt port number\n");
-                    return 0;
+                    return result;
                 }
                 goto again2;
             }
@@ -114,13 +112,14 @@ conf_zone_masters_parse(struct Config *conf, struct Conf_Zone *zone, struct Conf
                 c__next_keyword(t);
                 if (!c__next_uint32(t, &master->dscp) || master->dscp >= 64) {
                     CONF_ERROR(t, "corrupt dscp number\n");
-                    return 0;
+                    return result;
                 }
                 goto again2;
             }
 
         } else {
-            struct Keyword kw = c__next_keyword(t);
+            CONF_ERROR(t, "master unknown\n");
+            return result;
         }
 
         c__skip_semicolon(t);
