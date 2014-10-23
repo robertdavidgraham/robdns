@@ -25,9 +25,9 @@
     <ClCompile Include="..\src\adapter-xmit.c" />
     <ClCompile Include="..\src\adapter.c" />
     <ClCompile Include="..\src\conf-addr-match.c" />
+    <ClCompile Include="..\src\conf-options.c" />
     <ClCompile Include="..\src\conf-parse.c" />
     <ClCompile Include="..\src\conf-read.c" />
-    <ClCompile Include="..\src\conf-zone-masters.c" />
     <ClCompile Include="..\src\conf-zone.c" />
     <ClCompile Include="..\src\crypto-md5.c" />
     <ClCompile Include="..\src\crypto-murmur3.c" />

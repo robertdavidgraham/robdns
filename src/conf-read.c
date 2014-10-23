@@ -66,6 +66,8 @@ conf_parse(struct Config *conf, const char *filename, const char *buf, size_t le
         
         if (kw_is_equals(kw, "zone"))
             conf_zone_parse(conf, t);
+        else if (kw_is_equals(kw, "options"))
+            conf_options_parse(conf, t);
         else {
             return CONF_ERROR(t, "zone unknown statement\n");
         }

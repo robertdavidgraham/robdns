@@ -80,8 +80,9 @@ struct Conf_ZoneList
     size_t capacity;
 };
 
-int
-conf_zone_parse(struct Config *conf, struct ConfText *t);
+int conf_zone_parse(struct Config *conf, struct ConfText *t);
+int conf_options_parse(struct Config *conf, struct ConfText *t);
+
 struct Conf_AddressMatchList *
 parse_addr_match_list(struct Config *conf, struct ConfText *t, bool is_not);
 
@@ -89,6 +90,55 @@ parse_addr_match_list(struct Config *conf, struct ConfText *t, bool is_not);
  ******************************************************************************/
 struct Config
 {
+    /**
+     * Working directory fo the server. Non-absolute pathnames in config
+     * files are relative to this directory. Default location for most
+     * output files are in this directory. Typical examples are 
+     * "/var/robdns".
+     */
+    struct String working_directory;
+
+    /**
+     * Where the server writes it's process ID. Used by other processes to
+     * send signals to this process. Defaults to "none".
+     */
+    struct String pid_filename;
+
+    /**
+     * Where the server appends statistics when instructed to do so while
+     * running.
+     */
+    struct String statistics_filename;
+
+    /**
+     * The default port to listen on. This is normally 53, but for testing
+     * purposes, it can be useful to set to a different port.
+     */
+    unsigned listen_port;
+
+    /**
+     * If set, then optional glue records won't be set in responses
+     */
+    unsigned is_minimal_responses:1;
+
+    unsigned is_notify:1;
+    unsigned is_notify_masters_only:1;
+    unsigned is_notify_explicit:1;
+    unsigned is_notify_soa:1;
+    unsigned is_allow_update_forwarding:1;
+
+    /* recursion isn't supported, but many will try to set it anyway
+     * so we parse it and notfiy people of the problem */
+    unsigned is_recursion:1;
+
+    /**
+     * These servers are allowed to notify us of zone changes.
+     */
+    struct Conf_AddressMatchList *allow_notify;
+    
+    struct Conf_AddressMatchList *allow_update;
+
+
     struct Filenames filenames;
     struct Conf_ZoneList zones;
 };

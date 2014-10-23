@@ -1,18 +1,24 @@
 # robdns: infrastructure DNS server
 
-This is a fast, full-featured, authoritative DNS server. It can handle over one million
-queries-per-second per CPU core. It is designed to be exposed to the Internet,
-where even servers that have light loads of only 100,000 queries-per-second
-may nonetheless be attacked with millions of queries-per-second.
+This is a fast super-slave DNS server, designed to be constantly attacked
+on the public Internet. The intent is to shield master servers that are
+hidden behind firewalls. The key feature is a built-in custom TCP/IP stack
+capable of handling millions of DNS queries-per-second per CPU core.
 
-Currently, it is in "prototype" stage. Most of the major functionality is
-supported, but it still needs more unit tests written.
+Currently, this tool is in a prototype stage. It parses records and
+responds to queries on port 53, but it's missing key features such
+as dynamic updates.
 
 
 # Building
 
-Just type `make` to build the software. This works on Windows (MinGW) and
-Mac, too, although you may optionally use the VS10 and XCode projects instead.
+The only dependency is `libpcap-dev` (or `WinPcap`).
+
+Just type `make` to build the software on Linux, Mac OS X, and Windows 
+(MinGW).
+
+The included XCode4 and VS10 projects should also work on Mac and 
+Windows respectively.
 
 
 # Running

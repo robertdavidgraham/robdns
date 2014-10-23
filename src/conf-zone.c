@@ -201,9 +201,7 @@ conf_zone_parse(struct Config *conf, struct ConfText *t)
             addrs = parse_addr_match_list(conf, t, 0);
             zone->allow_transfer = addrs;
         } else if (kw_is_equals(kw, "also-notify")) {
-            struct Conf_AddressMatchList *addrs;
-            addrs = parse_addr_match_list(conf, t, 0);
-            zone->also_notify = addrs;
+            zone->also_notify = parse_addr_match_list(conf, t, 0);
         } else if (kw_is_equals(kw, "masters")) {
             zone->masters = conf_zone_masters_parse(conf, zone, t);
         } else {

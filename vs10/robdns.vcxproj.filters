@@ -219,7 +219,7 @@
     <ClCompile Include="..\src\conf-zone.c">
       <Filter>Source Files\config</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\conf-zone-masters.c">
+    <ClCompile Include="..\src\conf-options.c">
       <Filter>Source Files\config</Filter>
     </ClCompile>
   </ItemGroup>

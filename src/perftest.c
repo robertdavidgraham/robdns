@@ -209,7 +209,7 @@ perftest(int argc, char *argv[])
         stop = pixie_nanotime();
         
         requests_per_second = 1000000000.0 
-                                * (threads_desired * perftest->loop_count)
+                                * (1.0 * threads_desired * perftest->loop_count)
                                 / (stop - start);
         fprintf(stderr, "queries/second = %5.3f\n", requests_per_second);
     }
