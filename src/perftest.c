@@ -199,18 +199,20 @@ perftest(int argc, char *argv[])
         
         fprintf(stderr, "running %u threads\n", threads_desired);
         
-        start = pixie_nanotime();
+        start = pixie_gettime();
         for (i=0; i<threads_desired; i++) {
             __sync_fetch_and_add(&threads_running, 1);
             pixie_begin_thread((void(*)(void*))run_perf, 0, perftest);
         }
         while (threads_running)
             pixie_usleep(1000);
-        stop = pixie_nanotime();
+        stop = pixie_gettime();
         
-        requests_per_second = 1000000000.0 
+        requests_per_second = 1000000.0 
                                 * (1.0 * threads_desired * perftest->loop_count)
                                 / (stop - start);
+	fprintf(stderr, "queries = %u\n", (unsigned)(threads_desired * perftest->loop_count));
+	fprintf(stderr, "seconds = %5.3f\n", (stop - start)/1000000.0);
         fprintf(stderr, "queries/second = %5.3f\n", requests_per_second);
     }
     
