@@ -1682,7 +1682,6 @@ zonefile_end(struct ZoneFileParser *parser)
 {
     int result;
     
-    LOG(1, "zonefile_end\n");
 
     /*
      * Wait for all threads to finish inserting data

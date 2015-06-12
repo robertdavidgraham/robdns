@@ -86,8 +86,7 @@ conf_zonefile_addname(struct Core *core,
     size_t *filenames_length = &core->zonefiles.length;
     size_t *filenames_max = &core->zonefiles.max;
     char *filenames = core->zonefiles.names;
-    size_t original_offset = core->zonefiles.length;
-
+    
     /* expand filename storage if needed */
     filename_length = strlen(filename);
     while (*filenames_length + dirname_length + filename_length + 2 > *filenames_max) {
@@ -116,8 +115,6 @@ conf_zonefile_addname(struct Core *core,
     filenames[*filenames_length] = '\0'; /* double nul terminate list */
 
     core->zonefiles.total_files++;
-
-    LOG(1, "added: %s\n", core->zonefiles.names + original_offset);
 }
 
 /****************************************************************************
@@ -218,14 +215,12 @@ conf_zonefiles_parse_thread(void *v)
     static const struct DomainPointer root = {(const unsigned char*)"\0",1};
     const char *filename;
 
-    LOG(1, "thread: %s begin\n", p->filename);
     fflush(stderr);
     fflush(stdout);
 
     /*
      * Start the parsing
      */
-    LOG(1, "thread: zonefile begin\n");
     parser = zonefile_begin(
                 root, 
                 60, 128,
@@ -234,7 +229,6 @@ conf_zonefiles_parse_thread(void *v)
                 db,
                 conf->insertion_threads
                 );
-    LOG(1, "thread: zonefile began\n");
 
     
     /*
@@ -254,7 +248,6 @@ conf_zonefiles_parse_thread(void *v)
         /*
          * Open the file
          */
-        LOG(1, "thread: opening %s\n", filename);
         fflush(stdout);
         fflush(stderr);
         err = fopen_s(&fp, filename, "rb");
@@ -263,7 +256,6 @@ conf_zonefiles_parse_thread(void *v)
             p->status = Failure;
             return;
         }
-        LOG(1, "thread: opened %s\n", filename);
 
 
         /*
@@ -277,13 +269,11 @@ conf_zonefiles_parse_thread(void *v)
             continue;
         }
         p->total_bytes += filesize;
-        LOG(1, "thread: %s is %u bytes\n", filename, (unsigned)filesize);
-
+        
 
         /*
          * Set parameters
          */
-        LOG(1, "thread: resetting parser\n");
         zonefile_begin_again(
             parser,
             root,   /* . domain origin */
@@ -295,7 +285,6 @@ conf_zonefiles_parse_thread(void *v)
          * Continue parsing the file until end, reporting progress as we
          * go along
          */
-        LOG(1, "thread: parsing\n");
         for (;;) {
             unsigned char buf[65536];
             size_t bytes_read;
@@ -312,8 +301,7 @@ conf_zonefiles_parse_thread(void *v)
 
         }
         fclose(fp);
-        LOG(1, "thread: parsed\n");
-
+        
         //fprintf(stderr, ".");
         //fflush(stderr);
     }
@@ -325,7 +313,6 @@ conf_zonefiles_parse_thread(void *v)
         fprintf(stderr, "%s: failure\n", filename);
         p->status = Failure;
     }
-    LOG(1, "thread: end\n");
 }
 
 /****************************************************************************
@@ -341,7 +328,7 @@ conf_zonefiles_parse(   struct Catalog *db,
     const char *names;
     enum SuccessFailure status = Success;
 
-    LOG(1, "loading %llu zonefiles\n", conf->zonefiles.total_files);
+    //LOG(2, "loading %llu zonefiles\n", conf->zonefiles.total_files);
 
     /*
      * Make sure we have some zonefiles to parse
@@ -379,7 +366,6 @@ conf_zonefiles_parse(   struct Catalog *db,
             thread_count = i;
             break;
         }
-        LOG(1, "loading: starting thread #%u\n", (unsigned)i);
 
         /*
          * Figure out the end of this chunk 
@@ -398,7 +384,6 @@ conf_zonefiles_parse(   struct Catalog *db,
 
         if (thread_count > 1) {
             p[i].thread_handle = pixie_begin_thread(conf_zonefiles_parse_thread, 0, &p[i]);
-            LOG(1, "pthread_t: %u\n", (unsigned)p[i].thread_handle);
         } else {
             p[i].thread_handle = 0;
             conf_zonefiles_parse_thread(p);
@@ -409,14 +394,12 @@ conf_zonefiles_parse(   struct Catalog *db,
     /*
      * Wait for them all to end
      */
-    LOG(1, "loading: waiting for threads to end\n");
     for (i=0; i<thread_count; i++) {
         pixie_join(p[i].thread_handle, &exit_code);
         conf->zonefiles.total_bytes += p[i].total_bytes;
         if (p[i].status != Success)
             status = Failure;
     }
-    LOG(1, "loading: threads done\n");
 
     return status;
 }
