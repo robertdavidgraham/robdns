@@ -84,12 +84,12 @@ parse_addr_match_list(struct Config *conf, struct ConfText *t, bool is_not)
         if (!c__skip_brace(t))
             return result;
         while (!c__is_endbrace(t)) {
-            bool tmp_is_not = is_not;
+            //bool tmp_is_not = is_not;
             struct Conf_AddressMatchList *p;
 
             if (c__is_exclamation(t)) {
                 c__skip_exclamation(t);
-                tmp_is_not = !is_not;
+                //tmp_is_not = !is_not;
             }
 
             p = parse_addr_match_element(conf, t, is_not);

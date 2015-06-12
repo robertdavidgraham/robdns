@@ -57,6 +57,8 @@ main(int argc, char *argv[])
 {
     int i;
 
+  	fprintf(stderr, "--- Rob's DNS server v0.2 ----\n");
+
     /*
      * Once-per-process: initialize some data structures in the zone-file
      * parsing module. 
@@ -139,7 +141,6 @@ main(int argc, char *argv[])
 	grind->ip_address = 0x0a141e0f;
 	memcpy(grind->mac_address, "\x00\x11\x11\x22\x22\x22", 6);
 	
-	fprintf(stderr, "--- Rob's DNS server v1.0 ----\n");
 	fprintf(stderr, "IP: %u.%u.%u.%u\n", 
 		(unsigned char)(grind->ip_address>>24),
 		(unsigned char)(grind->ip_address>>16),

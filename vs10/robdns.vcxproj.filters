@@ -183,9 +183,6 @@
     <ClCompile Include="..\src\resolver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\pixie-timer.c">
-      <Filter>Source Files\misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\rte-ring.c">
       <Filter>Source Files\util</Filter>
     </ClCompile>
@@ -221,6 +218,9 @@
     </ClCompile>
     <ClCompile Include="..\src\conf-options.c">
       <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pixie-timer.c">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -362,9 +362,6 @@
     <ClInclude Include="..\src\robdns.h">
       <Filter>Source Files\main</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\pixie-timer.h">
-      <Filter>Source Files\misc</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\rte-ring.h">
       <Filter>Source Files\util</Filter>
     </ClInclude>
@@ -385,6 +382,9 @@
     </ClInclude>
     <ClInclude Include="..\src\config.h">
       <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pixie-timer.h">
+      <Filter>Source Files\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -44,9 +44,11 @@ void pixie_close_library(void *library_handle);
 PIXIE_FUNCTION pixie_get_proc_symbol(void *library, const char *symbol);
 
 void pixie_sleep(unsigned milliseconds);
+
+#if 0
 void pixie_close_thread(ptrdiff_t thread_handle);
 void pixie_end_thread(void);
-ptrdiff_t pixie_begin_thread(void (*worker_thread)(void*), unsigned flags, void *worker_data);
+
 void *pixie_initialize_critical_section();
 void pixie_delete_critical_section(void *cs);
 void pixie_leave_critical_section(void *cs);
@@ -56,6 +58,7 @@ void pixie_raise_thread_priority(void);
 uint64_t pixie_microseconds(void);
 
 void pixie_cpu_set_affinity(unsigned processor);
+#endif
 
 /**
  * Get the number CPUs in the system. This does not get CPU geomtry,
@@ -81,12 +84,12 @@ unsigned pixie_get_mac_address(unsigned char macaddr[6]);
  */
 unsigned pixie_get_host_name(char *name, unsigned name_size);
 
-unsigned pixie_locked_xadd_u32(unsigned *lhs, unsigned rhs);
+//unsigned pixie_locked_xadd_u32(unsigned *lhs, unsigned rhs);
 
-void pixie_locked_add_u32(volatile unsigned *lhs, unsigned rhs);
-void pixie_locked_subtract_u32(unsigned *lhs, unsigned rhs); 
-bool pixie_locked_CAS32(volatile unsigned *dst, unsigned src, unsigned expected);
-bool pixie_locked_CAS64(volatile uint64_t *dst, uint64_t src, uint64_t expected);
+//void pixie_locked_add_u32(volatile unsigned *lhs, unsigned rhs);
+//void pixie_locked_subtract_u32(unsigned *lhs, unsigned rhs); 
+//bool pixie_locked_CAS32(volatile unsigned *dst, unsigned src, unsigned expected);
+//bool pixie_locked_CAS64(volatile uint64_t *dst, uint64_t src, uint64_t expected);
 //bool pixie_locked_CAS128(volatile void *dst, unsigned src, unsigned expected);
 
 #if defined(_MSC_VER)
@@ -109,13 +112,13 @@ pixie_get_memory_size(uint64_t *available, uint64_t *total_physical);
  * that the main thread is handling signals, or that you've started a 
  * special signals-only thread.
  */
-void pixie_thread_ignore_signals();
+//void pixie_thread_ignore_signals();
 
 
 /**
  * Thread "barriers"
  */
-#if defined(WIN32)
+/*#if defined(WIN32)
 typedef struct pixie_barrier_t {
 	int count;
 	int total;
@@ -128,6 +131,7 @@ typedef struct pixie_barrier_t {
 #elif defined(__GNUC__)
 #define pixie_barrier_t pthread_barrier_t
 #endif
+*/
 
 #ifdef __cplusplus
 }

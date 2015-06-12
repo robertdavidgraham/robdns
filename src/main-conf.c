@@ -8,9 +8,11 @@
 #include "pixie.h"
 #include "pixie-nic.h"
 #include "pixie-timer.h"
+#include "pixie-threads.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdint.h>
+#include <sys/stat.h>
 
 /****************************************************************************
  * This function parses the zone-file. Since parsing can take a long time,
@@ -33,124 +35,392 @@ zonefile_benchmark(
     return Success;
 }
 
+/****************************************************************************
+ * Look for suffixes to strings, especially looking for file types like
+ * ".conf" or ".zone" or ".pcap".
+ * @return 1 if the string has that suffix, or 0 otherwise.
+ ****************************************************************************/
+static int
+ends_with(const char *string, const char *suffix)
+{
+    size_t string_length = strlen(string);
+    size_t suffix_length = strlen(suffix);
+
+    if (suffix_length > string_length)
+        return 0;
+
+    return memcmp(string+string_length-suffix_length, suffix, suffix_length) == 0;
+}
 
 /****************************************************************************
- * This function parses the zone-file. Since parsing can take a long time,
- * such as when reading the .com file, we print status indicating how long
- * things are taking.
  ****************************************************************************/
-static enum SuccessFailure
-parse_zone_file(struct Catalog *db, const char *filename, struct Core *conf)
+static char *
+combine_filename(const char *dirname, const char *filename)
 {
+    size_t dirname_len = strlen(dirname);
+    size_t filename_len = strlen(filename);
+    char *xfilename = malloc(dirname_len + filename_len + 2);
+
+    memcpy(xfilename, dirname, dirname_len);
+
+    while (dirname_len && (xfilename[dirname_len-1] == '/' || xfilename[dirname_len-1] == '\\'))
+        dirname_len--;
+
+    xfilename[dirname_len++] = '/';
+    memcpy(xfilename + dirname_len, filename, filename_len);
+    xfilename[dirname_len + filename_len] = '\0';
+
+    return xfilename;
+}
+
+
+
+/****************************************************************************
+ ****************************************************************************/
+static void
+conf_zonefile_addname(struct Core *core, 
+        const char *dirname, size_t dirname_length, 
+        const char *filename)
+{
+    size_t filename_length;
+    size_t *filenames_length = &core->zonefiles.length;
+    size_t *filenames_max = &core->zonefiles.max;
+    char *filenames = core->zonefiles.names;
+    size_t original_offset = core->zonefiles.length;
+
+    /* expand filename storage if needed */
+    filename_length = strlen(filename);
+    while (*filenames_length + dirname_length + filename_length + 2 > *filenames_max) {
+        *filenames_max *= 2 + 1;
+        filenames = realloc(filenames, *filenames_max + 2);
+        core->zonefiles.names = filenames;
+    }
+
+    /* Append filenames -- even if we aren't going to use it.
+        * We may decide below we on't want it and revert back */
+    memcpy(filenames + *filenames_length,
+            dirname,
+            dirname_length);
+    *filenames_length += dirname_length;
+        
+    filenames[*filenames_length] = '/';
+    (*filenames_length)++;
+
+    memcpy(filenames + *filenames_length,
+            filename,
+            filename_length);
+    *filenames_length += filename_length;
+
+    filenames[*filenames_length] = '\0';
+    (*filenames_length)++;
+    filenames[*filenames_length] = '\0'; /* double nul terminate list */
+
+    core->zonefiles.total_files++;
+
+    LOG(1, "added: %s\n", core->zonefiles.names + original_offset);
+}
+
+/****************************************************************************
+ * Recursively descened a file directory tree and create a list of 
+ * all filenames ending in ".zone".
+ ****************************************************************************/
+void
+directory_to_zonefile_list(struct Core *core, const char *in_dirname)
+{
+    void *x;
+    size_t dirname_length = strlen(in_dirname);
+    char *dirname;
+    
+    dirname = malloc(dirname_length + 1);
+    memcpy(dirname, in_dirname, dirname_length + 1);
+
+    /* strip trailing slashes, if there are any */
+    while (dirname_length && (dirname[dirname_length-1] == '/' || dirname[dirname_length-1] == '\\')) {
+        dirname_length--;
+    }
+
+    /*
+     * Start directory enumeration
+     */
+    x = pixie_opendir(dirname);
+    if (x == NULL) {
+        perror(dirname);
+        free(dirname);
+        return; /* no content */
+    }
+
+    /*
+     * 'for all zonefiles in this directory...'
+     */
+    for (;;) {
+        const char *filename;
+        size_t original_length;
+
+        /* Get next filename */
+        filename = pixie_readdir(x);
+        if (filename == NULL)
+            break;
+        if (strcmp(filename, ".") == 0 || strcmp(filename, "..") == 0)
+            continue;
+
+        /* Add the filename */
+        original_length = core->zonefiles.length;
+        conf_zonefile_addname(core, dirname, dirname_length, filename);
+
+        /* If not ends with '.zone', ignore it */
+        if (ends_with(filename, ".zone")) {
+            continue;
+        } else {
+            core->zonefiles.length = original_length;
+            core->zonefiles.total_files--;
+        }
+
+
+
+        /* if directory, recursively descend */
+        {
+            struct stat s;
+            char *xfilename = &core->zonefiles.names[original_length];
+
+            if (stat(xfilename, &s) == 0 && s.st_mode & S_IFDIR) {
+                directory_to_zonefile_list(core, xfilename);
+            }
+        }
+
+
+
+    }
+    pixie_closedir(x);
+
+    free(dirname);
+}
+
+/****************************************************************************
+ ****************************************************************************/
+struct XParseThread {
+    struct Core *conf;
+    const char *filename;
+    const char *end;
+    enum SuccessFailure status;
+    size_t thread_handle;
+    uint64_t total_bytes;
+};
+
+/****************************************************************************
+ ****************************************************************************/
+static void
+conf_zonefiles_parse_thread(void *v)
+{
+    struct XParseThread *p = (struct XParseThread *)v;
+    struct Core *conf = p->conf;
+    struct Catalog *db = p->conf->db;
     struct ZoneFileParser *parser;
-    FILE *fp;
-    int err;
-    uint64_t filesize;
-    uint64_t total_read = 0;
-    uint64_t last_printed = 0;
     static const struct DomainPointer root = {(const unsigned char*)"\0",1};
-    uint64_t start, stop;
+    const char *filename;
 
-
-
-    /*
-     * Open the file
-     */
-    err = fopen_s(&fp, filename, "rb");
-    if (err || fp == NULL) {
-        perror(filename);
-        return Failure;
-    }
-
-    /*
-     * Get the size of the file
-     * TODO: there is a TOCTOU race condition here
-     */
-    filesize = pixie_get_filesize(filename);
-    if (filesize == 0) {
-        LOG(0, "%s: file is empty\n", filename);
-        fclose(fp);
-        return Failure;
-    }
+    LOG(1, "thread: %s begin\n", p->filename);
+    fflush(stderr);
+    fflush(stdout);
 
     /*
      * Start the parsing
      */
-    if (conf->is_zonefile_benchmark) {
-        fprintf(stderr, "benchmarking...\n");
-        parser = zonefile_begin(
+    LOG(1, "thread: zonefile begin\n");
+    parser = zonefile_begin(
                 root, 
-                60, filesize,             
-                filename, 
-                zonefile_benchmark,
-                db,
-                0
-                );
-    } else {
-        parser = zonefile_begin(
-                root, 
-                60, filesize,             
-                filename, 
+                60, 128,
+                conf->working_directory,
                 zonefile_load, 
                 db,
                 conf->insertion_threads
                 );
-    }
+    LOG(1, "thread: zonefile began\n");
 
+    
     /*
-     * Continue parsing the file until end, reporting progress as we
-     * go along
+     * 'for all zonefiles in this directory...'
      */
-    start = pixie_gettime();
-    for (;;) {
-        unsigned char buf[65536];
-        size_t bytes_read;
+    for (filename = p->filename; 
+        filename < p->end; 
+        filename += strlen(filename)+1) {
+        
+        FILE *fp;
+        int err;
+        uint64_t filesize;
 
-        bytes_read = fread((char*)buf, 1, sizeof(buf), fp);
-        if (bytes_read == 0)
+        if (filename[0] == '\0')
             break;
 
-        zonefile_parse(
-            parser,
-            buf,
-            bytes_read
-            );
-
-        total_read += bytes_read;
-        if (total_read > last_printed + 400*1000*1000) {
-            double percent_done = (total_read*100.0)/filesize;
-            fprintf(stderr, "%2.1f%% done, %12llu mbytes read\r", percent_done, total_read/(1024ULL*1024ULL));
-            last_printed = total_read;
+        /*
+         * Open the file
+         */
+        LOG(1, "thread: opening %s\n", filename);
+        fflush(stdout);
+        fflush(stderr);
+        err = fopen_s(&fp, filename, "rb");
+        if (err || fp == NULL) {
+            perror(filename);
+            p->status = Failure;
+            return;
         }
+        LOG(1, "thread: opened %s\n", filename);
+
+
+        /*
+         * Get the size of the file
+         * TODO: there is a TOCTOU race condition here
+         */
+        filesize = pixie_get_filesize(filename);
+        if (filesize == 0) {
+            LOG(0, "%s: file is empty\n", filename);
+            fclose(fp);
+            continue;
+        }
+        p->total_bytes += filesize;
+        LOG(1, "thread: %s is %u bytes\n", filename, (unsigned)filesize);
+
+
+        /*
+         * Set parameters
+         */
+        LOG(1, "thread: resetting parser\n");
+        zonefile_begin_again(
+            parser,
+            root,   /* . domain origin */
+            60,     /* one minute ttl */
+            filesize, 
+            filename);
+
+        /*
+         * Continue parsing the file until end, reporting progress as we
+         * go along
+         */
+        LOG(1, "thread: parsing\n");
+        for (;;) {
+            unsigned char buf[65536];
+            size_t bytes_read;
+
+            bytes_read = fread((char*)buf, 1, sizeof(buf), fp);
+            if (bytes_read == 0)
+                break;
+
+            zonefile_parse(
+                parser,
+                buf,
+                bytes_read
+                );
+
+        }
+        fclose(fp);
+        LOG(1, "thread: parsed\n");
+
+        //fprintf(stderr, ".");
+        //fflush(stderr);
     }
-    stop = pixie_gettime();
-    fclose(fp);
-
-    /*
-     * If benchmarking
-     */
-    {
-        double rate = ((1.0*total_read)/(stop-start))*1.0;
-        printf("elapsed: %02u:%02u (minutes:seconds)\n",
-            (unsigned)((stop-start)/(60*1000000)),
-            (unsigned)(((stop-start)/(1000000))%60)
-            );
-
-        printf("parse-speed: %5.3f-megabytes/second\n", rate);
-        if (conf->is_zonefile_benchmark) 
-            exit(0);
-    }
-
 
     if (zonefile_end(parser) == Success) {
-        fprintf(stderr, "%s: success\n", filename);
-        return Success;
+        //fprintf(stderr, "%s: success\n", filename);
+        p->status = Success;
     } else {
         fprintf(stderr, "%s: failure\n", filename);
-        return Failure;
+        p->status = Failure;
+    }
+    LOG(1, "thread: end\n");
+}
+
+/****************************************************************************
+ ****************************************************************************/
+enum SuccessFailure
+conf_zonefiles_parse(   struct Catalog *db, 
+                        struct Core *conf)
+{
+    struct XParseThread p[16];
+    size_t exit_code;
+    size_t thread_count = 4;
+    size_t i;
+    const char *names;
+    enum SuccessFailure status = Success;
+
+    LOG(1, "loading %llu zonefiles\n", conf->zonefiles.total_files);
+
+    /*
+     * Make sure we have some zonefiles to parse
+     */
+    if (conf->zonefiles.length == 0)
+        return Failure; /* none found */
+
+    /* The parser threads are heavy-weight, so therefore
+     * we shouldn't have a lot of them unless we have
+     * a lot of files to parse */
+    if (conf->zonefiles.total_files < 10)
+        thread_count = 1;
+    else if (conf->zonefiles.total_files < 5000)
+        thread_count = 2;
+    else
+        thread_count = 4;
+    
+
+    /*
+     * Divide the list of names into equal sized chunks,
+     * and launch a parsing thread for each one. The primary 
+     * optimization that's happening here is that that each
+     * of the threads will stall waiting for file I/O, during
+     * which time other threads can be active. Each individual
+     * file can be parsed with only a single thread, of course,
+     * because zonefiles are stateful. However, two unrelated
+     * files can be parsed at the same time.
+     */
+    names = conf->zonefiles.names;
+    for (i=0; i<thread_count; i++) {
+        const char *end;
+
+
+        if (names[0] == '\0') {
+            thread_count = i;
+            break;
+        }
+        LOG(1, "loading: starting thread #%u\n", (unsigned)i);
+
+        /*
+         * Figure out the end of this chunk 
+         */
+        end = names + conf->zonefiles.length/thread_count;
+        if (end > conf->zonefiles.length + conf->zonefiles.names)
+            end = conf->zonefiles.length + conf->zonefiles.names - 2;
+        while (*end)
+            end++;
+        end++;
+
+        p[i].conf = conf;
+        p[i].total_bytes = 0;
+        p[i].filename = names;
+        p[i].end = end;
+
+        if (thread_count > 1) {
+            p[i].thread_handle = pixie_begin_thread(conf_zonefiles_parse_thread, 0, &p[i]);
+            LOG(1, "pthread_t: %u\n", (unsigned)p[i].thread_handle);
+        } else {
+            p[i].thread_handle = 0;
+            conf_zonefiles_parse_thread(p);
+        }
+        names = end;
     }
 
+    /*
+     * Wait for them all to end
+     */
+    LOG(1, "loading: waiting for threads to end\n");
+    for (i=0; i<thread_count; i++) {
+        pixie_join(p[i].thread_handle, &exit_code);
+        conf->zonefiles.total_bytes += p[i].total_bytes;
+        if (p[i].status != Success)
+            status = Failure;
+    }
+    LOG(1, "loading: threads done\n");
+
+    return status;
 }
+
 
 /***************************************************************************
  ***************************************************************************/
@@ -480,23 +750,69 @@ conf_help()
     exit(1);
 }
 
-
-/****************************************************************************
- * Look for suffixes to strings, especially looking for file types like
- * ".conf" or ".zone" or ".pcap".
- * @return 1 if the string has that suffix, or 0 otherwise.
- ****************************************************************************/
+/***************************************************************************
+ * Tests if the command-line option is a directory, in which case, we
+ * need to read configuration files and zone-files from that directory
+ ***************************************************************************/
 static int
-ends_with(const char *string, const char *suffix)
+is_directory(const char *filename)
 {
-    size_t string_length = strlen(string);
-    size_t suffix_length = strlen(suffix);
+    struct stat s;
 
-    if (suffix_length > string_length)
-        return 0;
+    if (stat(filename, &s) != 0)
+        return 0; /* bad filenames not directories */
 
-    return memcmp(string+string_length-suffix_length, suffix, suffix_length) == 0;
+    return (s.st_mode & S_IFDIR) > 0;
 }
+
+
+
+
+/***************************************************************************
+ ***************************************************************************/
+static int
+has_configuration(const char *dirname)
+{
+    void *x;
+    int is_found = 0;
+
+    x = pixie_opendir(dirname);
+    if (x == NULL)
+        return 0; /* no content */
+
+    for (;;) {
+        const char *filename;
+        
+        filename = pixie_readdir(x);
+        if (filename == NULL)
+            break;
+
+        if (strcmp(filename, ".") == 0 || strcmp(filename, "..") == 0)
+            continue;
+
+        if (ends_with(filename, ".zone") || ends_with(filename, ".conf")) {
+            is_found = 1;
+            break;
+        }
+
+        {
+            char *xdirname = combine_filename(dirname, filename);
+
+            if (is_directory(xdirname))
+                is_found = has_configuration(xdirname);
+
+            free(xdirname);
+
+            if (is_found)
+                break;
+        }
+    }
+
+
+    pixie_closedir(x);
+    return is_found;
+}
+
 
 /***************************************************************************
  * Read the configuration from the command-line.
@@ -569,6 +885,9 @@ conf_command_line(struct Core *conf, int argc, char *argv[])
             case '?':
                 conf_usage();
                 break;
+            case 'v':
+                verbosity++;
+                break;
             default:
                 LOG(0, "FAIL: unknown option: -%s\n", argv[i]);
                 LOG(0, " [hint] try \"--help\"\n");
@@ -578,11 +897,13 @@ conf_command_line(struct Core *conf, int argc, char *argv[])
             continue;
         }
         else if (ends_with(argv[i], ".zone"))
-            parse_zone_file(conf->db, argv[i], conf);
+            conf_zonefile_addname(conf, conf->working_directory, strlen(conf->working_directory), argv[i]);
         else if (parse_ip_address(argv[i], 0, 0, &ipaddr)) {
             conf_set_parameter(conf, "adapter-ip", argv[i]);
         } else if (pixie_nic_exists(argv[i])) {
             strcpy_s(conf->nic[0].ifname, sizeof(conf->nic[0].ifname), argv[i]);
+        } else if (is_directory(argv[i]) && has_configuration(argv[i])) {
+            directory_to_zonefile_list(conf, argv[i]);
         } else {
             LOG(0, "%s: unknown command-line parameter\n", argv[i]);
         }
@@ -640,3 +961,26 @@ conf_read_config_file(struct Core *conf, const char *filename)
 
     fclose(fp);
 }
+
+/***************************************************************************
+ ***************************************************************************/
+void 
+conf_init(struct Core *core)
+{
+    memset(core, 0, sizeof(*core));
+
+    /* Get the current working directory, because on various debuggers,
+     * like XCode and VisualStudio, I get confused where the current
+     * directory is located */
+    getcwd(core->working_directory, sizeof(core->working_directory));
+    LOG(0, "cwd: %s\n", core->working_directory);
+
+    /* Initialize the list of zonefiles. In a "hosting" environment, this
+     * can get up to a million files.
+     * CODE NOTE: we set it to 2 bytes, which is always insufficient, so
+     * that the codepath that auto-extends it is forced to be executed
+     * in all cases, rather than just a test case. */
+    core->zonefiles.max = 2;
+    core->zonefiles.names = malloc(core->zonefiles.max + 2);
+}
+

@@ -7,7 +7,7 @@
 #include <stdarg.h>
 #include "string_s.h"
 
-#if defined(WIN32)
+#if defined(_MSC_VER)
 #define strdup _strdup
 #define fileno _fileno
 #endif

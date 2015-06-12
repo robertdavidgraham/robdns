@@ -13,9 +13,9 @@
 #if defined(WIN32)
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#define WSA(err) WSA##err
 #if defined(_MSC_VER)
 #pragma comment(lib, "ws2_32.lib")
-#define WSA(err) WSA##err
 #endif
 typedef int socklen_t;
 #else
@@ -165,7 +165,7 @@ sockets_thread(struct Core *conf)
          */
         if (pkt.offset < pkt.max) {
             sendto(fd, 
-                   pkt.buf, pkt.offset, 0,
+                   (char*)pkt.buf, pkt.offset, 0,
                    (struct sockaddr*)&sin,
                    sizeof_sin);
         }

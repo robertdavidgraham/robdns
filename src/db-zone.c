@@ -3,6 +3,7 @@
 #include "db-rrset.h"
 #include "zonefile-rr.h"
 #include "domainname.h"
+#include "pixie-threads.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +37,15 @@ struct DBZone
 };
 
 
+uint64_t zone_hash(const struct DBZone *zone)
+{
+    return zone->hash;
+}
+
+struct DBZone *zone_next(struct DBZone *zone)
+{
+    return zone->next;
+}
 
 /****************************************************************************
  ****************************************************************************/
@@ -264,8 +274,10 @@ zone_get_soa_rr(const struct DBZone *zone)
 
 
 /****************************************************************************
+ * nearest power of 2 greater than the given number
  ****************************************************************************/
-uint64_t pow2(uint64_t x)
+static uint64_t 
+pow2(uint64_t x)
 {
     uint64_t result = 1;
 
@@ -275,12 +287,34 @@ uint64_t pow2(uint64_t x)
     return result;
 }
 
+
+void
+zone_insert_self(struct DBZone *zone, volatile struct DBZone **location)
+{
+    for (;;) {
+        zone->next = (struct DBZone *)*location;
+    
+#if SIZE_MAX == 0xffffffff
+        /* 32-bit architectures */
+        if (!pixie_locked_CAS32(location, (unsigned)zone, (unsigned)zone->next))
+            printf("\nerr %u %u\n", *location, zone);
+        else
+            break;
+#else
+        /* 64-bit architectures */
+        if (!pixie_locked_CAS64(location, (size_t)zone, (size_t)zone->next))
+            printf("\nerr %llu %llu\n", *location, zone);
+        else
+            break;
+#endif
+    }
+}
+
 /****************************************************************************
  ****************************************************************************/
 struct DBZone *
 zone_create_self(
     const struct DB_XDomain *xdomain,
-    struct DBZone *next,
     uint64_t filesize)
 {
 	struct DBZone *zone;
@@ -300,7 +334,7 @@ zone_create_self(
     /* Allocate space for records */
     zone->entry_count = (unsigned)pow2(filesize/64);
     //fprintf(stderr, "%u zone entry count\n", zone->entry_count);
-    xdomain_err(xdomain, ": initial entries %u\n", zone->entry_count);
+    //xdomain_err(xdomain, ": initial entries %u\n", zone->entry_count);
     zone->entry_mask = zone->entry_count - 1;
     zone->records = (struct DBEntry **)malloc(zone->entry_count * sizeof(zone->records[0]));
     if (zone->records == NULL) {
@@ -309,8 +343,6 @@ zone_create_self(
     }
     memset(zone->records, 0, zone->entry_count * sizeof(zone->records[0]));
     
-    /* Insert into our hash table */
-    zone->next = next;
     zone->label_count = domain_count_labels(&zone->domain);
 
     return zone;

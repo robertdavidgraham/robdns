@@ -4,14 +4,24 @@
 extern "C" {
 #endif
 #include <stdint.h>
+#include <stdlib.h>
+#include <stddef.h>
 #include "domainname.h"
 struct Source;
 struct Catalog;
 
 /**
- * Create a new/empty DNS database with no zones or names
+ * Create a new/empty DNS database with no zones or names.
  */
 struct Catalog *catalog_create();
+
+/**
+ * Reset the hashtable for the zones, in case we are holding
+ * thousands instead of hundreds
+ */
+void
+catalog_reset_zonecount(struct Catalog *db, unsigned new_count);
+
 
 /**
  * Free all the memory used in the DNS database, including

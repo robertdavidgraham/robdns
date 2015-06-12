@@ -1,5 +1,7 @@
 #define _GNU_SOURCE
 #include "pixie-threads.h"
+#include <stdlib.h>
+#include <string.h>
 
 #if defined(WIN32)
 #include <Windows.h>
@@ -180,13 +182,90 @@ pixie_begin_thread(
 
     typedef void *(*PTHREADFUNC)(void*);
     pthread_t thread_id;
-    return (size_t)pthread_create(
+    pthread_create(
                           &thread_id,
                           NULL,
                           (PTHREADFUNC)worker_thread,
                           worker_data);
-
+    return thread_id;
 #else
 #error pixie_begin_thread undefined
 #endif
 }
+
+void
+pixie_join(size_t thread_handle, size_t *exit_code)
+{
+#if defined(WIN32)
+    DWORD r;
+    
+    WaitForSingleObject((HANDLE)thread_handle, INFINITE);
+    GetExitCodeThread((HANDLE)thread_handle, &r);
+    if (exit_code)
+        *exit_code = r;
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+    size_t x;
+    void **p = &x;
+    pthread_join(thread_handle, p);
+    if (exit_code)
+        *exit_code = (size_t)*p;
+#else
+#error pixie_join undefined
+#endif
+}
+
+void *
+pixie_mutex_create(void)
+{
+#if defined(WIN32)
+    CRITICAL_SECTION *mutex = (CRITICAL_SECTION*)malloc(sizeof(*mutex));
+    if (mutex == NULL)
+        return NULL;
+    InitializeCriticalSection(mutex);
+    return mutex;
+#else
+    int err;
+    pthread_mutex_t *mutex = (pthread_mutex_t*)malloc(sizeof(*mutex));
+    if (mutex == NULL)
+        return NULL;
+    err = pthread_mutex_init(mutex, 0);
+    if (err != 0) {
+        fprintf(stderr, "mutex: %s\n", strerror(err));
+        free(mutex);
+        return NULL;
+    }
+    return mutex;
+#endif
+}
+
+void pixie_mutex_destroy(void *mutex)
+{
+#if defined(WIN32)
+    if (mutex) {
+        DeleteCriticalSection((CRITICAL_SECTION*)mutex);
+        free(mutex);
+    }
+#else
+    if (mutex) {
+        pthread_mutex_destroy(mutex);
+        free(mutex);
+    }
+#endif
+}
+void pixie_mutex_lock(void *mutex)
+{
+#if defined(WIN32)
+    EnterCriticalSection((CRITICAL_SECTION*)mutex);
+#else
+    pthread_mutex_lock(mutex);
+#endif
+}
+void pixie_mutex_unlock(void *mutex)
+{
+#if defined(WIN32)
+    LeaveCriticalSection((CRITICAL_SECTION*)mutex);
+#else
+    pthread_mutex_unlock(mutex);
+#endif
+}
+

@@ -32,6 +32,7 @@ struct ParsedBlock
      * for the same label produces an error on insertion into the database.
      */
     char filename[256];
+    uint64_t filesize;
 
     /* The buffer containing parsed resource-records. We append onto this
      * buffer as we parse the file. Later, we hand the whole block over to

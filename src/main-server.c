@@ -8,6 +8,8 @@
 #include "util-ipaddr.h"
 #include "pixie-nic.h"
 #include "pixie.h"
+#include "pixie-timer.h"
+#include "pixie-threads.h"
 #include "string_s.h"
 #include "logger.h"
 #include "adapter-pcaplive.h"
@@ -510,13 +512,16 @@ pcap_thread(struct Core *conf)
 int server(int argc, char *argv[])
 {
     struct Core core[1];
+    uint64_t start, stop;
+
+    start = pixie_gettime();
 
     verbosity = 10;
-    memset(core, 0, sizeof(core));
-    //core->nic_count = 1;
-
-    getcwd(core->working_directory, sizeof(core->working_directory));
-    LOG(0, "cwd=%s\n", core->working_directory);
+    
+    /*
+     * Initialie configuration structure
+     */
+    conf_init(core);
 
     /*
      * Create an empty database
@@ -529,12 +534,42 @@ int server(int argc, char *argv[])
     conf_command_line(core, argc, argv);
 
     /*
+     * If we have lots of zones, then reset the count
+     */
+    if (core->zonefiles.total_files > 200) {
+        catalog_reset_zonecount(core->db, (unsigned)core->zonefiles.total_files * 2);
+    }
+
+    /*
+     * Load the zonefiles
+     */
+    conf_zonefiles_parse(core->db, core);
+
+    /*
      * If we don't have a zone-file, then error out
      */
     if (catalog_zone_count(core->db) == 0) {
         LOG(0, "FAIL: no zones specified\n");
         exit(1);
     }
+
+    /*
+     * Benchmark
+     */
+    stop = pixie_gettime();
+    {
+        double elapsed = (stop - start) * 1.0;
+        double rate = (1.0*core->zonefiles.total_bytes)/elapsed;
+
+        printf("elapsed: %u.%02u seconds\n",
+            (unsigned)(((stop-start)/(1000000))),
+            (unsigned)(((stop-start)/(10000))%100)
+            );
+        printf("zone size: %llu bytes\n", core->zonefiles.total_bytes);
+        printf("zone files: %llu files\n", core->zonefiles.total_files);
+        printf("speed: %5.3f-megabytes/second parsing zonefile\n", rate);
+    }
+
 
     /*
      * Now start the network interface

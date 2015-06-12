@@ -385,6 +385,7 @@ parse_ipv6_address(const char *px, unsigned *offset, size_t length, struct Parse
 			if (px[i] == ':')
 				break; /* early exit due to leading nuls */
 			if (!isxdigit(px[i]&0xFF)) {
+                return RETURN_ERR(false);
 				break; /* error */
 			}
 

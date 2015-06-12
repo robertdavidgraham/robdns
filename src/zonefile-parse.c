@@ -1646,6 +1646,34 @@ zonefile_begin(struct DomainPointer origin, uint64_t ttl, uint64_t filesize,
     return parser;
 }
 
+/******************************************************************************
+ * Call this to re-use the parser to parse multiple files
+ ******************************************************************************/
+void
+zonefile_begin_again(
+    struct ZoneFileParser *parser,
+    struct DomainPointer origin, uint64_t ttl, uint64_t filesize,
+    const char *filename)
+{
+    struct ParsedBlock *block;
+
+    /* remember filesize as a hint when creating the zone hash table */
+    parser->filesize = filesize;
+    parser->src.filename = filename;
+
+    /* move to a new block */
+    block = block_next_to_parse(parser);
+    if (block->filesize != filesize) {
+        memcpy(block->filename, parser->src.filename, sizeof(block->filename));
+        block->filesize = parser->filesize;
+    }
+
+
+    block->ttl = ttl;
+    block->origin.name = origin.name;
+    block->origin.length = origin.length;
+}
+
 /****************************************************************************
  ****************************************************************************/
 int
@@ -1653,6 +1681,8 @@ zonefile_end(struct ZoneFileParser *parser)
 {
     int result;
     
+    LOG(1, "zonefile_end\n");
+
     /*
      * Wait for all threads to finish inserting data
      */

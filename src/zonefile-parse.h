@@ -74,6 +74,11 @@ zonefile_begin(struct DomainPointer origin, uint64_t ttl,
                uint64_t filesize, const char *filename, 
                RESOURCE_RECORD_CALLBACK callback, void *callbackdata,
                unsigned extra_threads);
+void
+zonefile_begin_again(
+    struct ZoneFileParser *parser,
+    struct DomainPointer origin, uint64_t ttl, uint64_t filesize,
+    const char *filename);
 
 /* Call this when done, check return code for success(1) or failure(0) */
 int zonefile_end(struct ZoneFileParser *parser);

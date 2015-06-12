@@ -104,6 +104,10 @@ block_next_to_parse(struct ZoneFileParser *parser)
     struct ParsedBlock *block = parser->block;
     int err;
 
+
+    if (block->offset == 0)
+        return block;
+
     /*
      * Copy the state from the existing block
      * FIXME: shouldn't the source of the memcpy be block->origin.name
@@ -155,6 +159,7 @@ block_next_to_parse(struct ZoneFileParser *parser)
     block->ttl = ttl;
     
     memcpy(block->filename, parser->src.filename, sizeof(block->filename));
+    block->filesize = parser->filesize;
 
     parser->block = block;
 
@@ -202,7 +207,7 @@ insertion_thread(void *v)
      * just sit in a loop grabbing work units as they arrive 
      */
     while (parser->is_running) {
-        struct ParsedBlock *block;
+        struct ParsedBlock *block = 0;
         int err;
 
         for (err=1; err && parser->is_running; ) {
@@ -217,7 +222,7 @@ insertion_thread(void *v)
                 pixie_usleep(100);
             }
         }
-        insert_block_into_catalog(block, parser->callback, parser->callbackdata, parser->filesize);
+        insert_block_into_catalog(block, parser->callback, parser->callbackdata, block->filesize);
         //printf("." "INSERTION-THREAD: inserted block\n");
         rte_ring_enqueue(parser->free_queue, block);
 
