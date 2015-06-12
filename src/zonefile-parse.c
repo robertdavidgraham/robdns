@@ -4,6 +4,7 @@
 #include "zonefile-rr.h"
 #include "zonefile-fields.h"
 #include "string_s.h"
+#include "logger.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>

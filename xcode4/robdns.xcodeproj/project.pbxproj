@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		110A96A41B28C46400F51866 /* conf-options.c in Sources */ = {isa = PBXBuildFile; fileRef = 110A96A31B28C46400F51866 /* conf-options.c */; };
 		1146F2DF192FEA8C007BCB3D /* conf-addr-match.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DA192FEA8C007BCB3D /* conf-addr-match.c */; };
 		1146F2E0192FEA8C007BCB3D /* conf-parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DC192FEA8C007BCB3D /* conf-parse.c */; };
 		1146F2E1192FEA8C007BCB3D /* conf-zone.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DD192FEA8C007BCB3D /* conf-zone.c */; };
@@ -82,6 +83,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		110A96A11B28C44B00F51866 /* pixie-atomic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "pixie-atomic.h"; path = "../src/pixie-atomic.h"; sourceTree = "<group>"; };
+		110A96A31B28C46400F51866 /* conf-options.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-options.c"; path = "../src/conf-options.c"; sourceTree = "<group>"; };
 		1146F2DA192FEA8C007BCB3D /* conf-addr-match.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-addr-match.c"; path = "../src/conf-addr-match.c"; sourceTree = "<group>"; };
 		1146F2DB192FEA8C007BCB3D /* conf-addr-match.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-addr-match.h"; path = "../src/conf-addr-match.h"; sourceTree = "<group>"; };
 		1146F2DC192FEA8C007BCB3D /* conf-parse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-parse.c"; path = "../src/conf-parse.c"; sourceTree = "<group>"; };
@@ -251,6 +254,8 @@
 		11C2FDE018D506BC00061E8B /* src */ = {
 			isa = PBXGroup;
 			children = (
+				110A96A31B28C46400F51866 /* conf-options.c */,
+				110A96A11B28C44B00F51866 /* pixie-atomic.h */,
 				118E22E919247AC900883BCC /* conf */,
 				117970AF19228D25004FFC92 /* README.md */,
 				11C2FE8518D6772200061E8B /* zonefile */,
@@ -537,6 +542,7 @@
 				1146F2DF192FEA8C007BCB3D /* conf-addr-match.c in Sources */,
 				1146F2E0192FEA8C007BCB3D /* conf-parse.c in Sources */,
 				1146F2E1192FEA8C007BCB3D /* conf-zone.c in Sources */,
+				110A96A41B28C46400F51866 /* conf-options.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

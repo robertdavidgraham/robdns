@@ -303,7 +303,7 @@ zone_insert_self(struct DBZone *zone, volatile struct DBZone **location)
 #else
         /* 64-bit architectures */
         if (!pixie_locked_CAS64(location, (size_t)zone, (size_t)zone->next))
-            printf("\nerr %llu %llu\n", *location, zone);
+            printf("\nerr %llu %llu\n", (unsigned long long)*location, (unsigned long long)zone); /* fixme */
         else
             break;
 #endif

@@ -187,7 +187,7 @@ pixie_begin_thread(
                           NULL,
                           (PTHREADFUNC)worker_thread,
                           worker_data);
-    return thread_id;
+    return (size_t)thread_id;
 #else
 #error pixie_begin_thread undefined
 #endif
@@ -205,10 +205,10 @@ pixie_join(size_t thread_handle, size_t *exit_code)
         *exit_code = r;
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
     size_t x;
-    void **p = &x;
-    pthread_join(thread_handle, p);
+    void **p = (void**)&x;
+    pthread_join((pthread_t)thread_handle, p);
     if (exit_code)
-        *exit_code = (size_t)*p;
+        *exit_code = *(size_t*)p;
 #else
 #error pixie_join undefined
 #endif
