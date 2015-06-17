@@ -30,6 +30,7 @@ uint64_t xdomain_label_hash(const struct DB_XDomain *xdomain, unsigned label_cou
 void xdomain_reverse3(struct DB_XDomain *result, const struct DomainPointer *prefix, const struct DomainPointer *suffix);
 
 
+
 #ifdef __cplusplus
 }
 #endif

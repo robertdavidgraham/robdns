@@ -76,6 +76,19 @@ sockets_thread(struct Core *conf)
             exit(1); 
         }
     }
+
+    /*
+     * Enable both IPv4 and IPv6 to be used on the same sockets. This appears to
+     * be needed for Windows, but not needed for Mac OS X.
+     */
+    {
+        int on = 0;
+        err = setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&on, sizeof(on)); 
+        if (err < 0) {
+            perror("setsockopt(IPV6_V6ONLY) failed");
+            exit(1); 
+        }
+    }
     
     
     /*
@@ -105,7 +118,7 @@ sockets_thread(struct Core *conf)
         }
         exit(1);
     } else {
-        fprintf(stderr, "bound to port %u\n", port);
+        fprintf(stderr, "UDP port: %u\n", port);
     }
     
     /*

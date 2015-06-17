@@ -24,11 +24,6 @@
     <ClCompile Include="..\src\adapter-recv.c" />
     <ClCompile Include="..\src\adapter-xmit.c" />
     <ClCompile Include="..\src\adapter.c" />
-    <ClCompile Include="..\src\conf-addr-match.c" />
-    <ClCompile Include="..\src\conf-options.c" />
-    <ClCompile Include="..\src\conf-parse.c" />
-    <ClCompile Include="..\src\conf-read.c" />
-    <ClCompile Include="..\src\conf-zone.c" />
     <ClCompile Include="..\src\crypto-md5.c" />
     <ClCompile Include="..\src\crypto-murmur3.c" />
     <ClCompile Include="..\src\crypto-siphash.c" />
@@ -85,8 +80,6 @@
     <ClInclude Include="..\src\adapter-pcapfile.h" />
     <ClInclude Include="..\src\adapter-pcaplive.h" />
     <ClInclude Include="..\src\adapter.h" />
-    <ClInclude Include="..\src\conf-addr-match.h" />
-    <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\crypto-md5.h" />
     <ClInclude Include="..\src\crypto-murmur3.h" />
     <ClInclude Include="..\src\crypto-siphash.h" />

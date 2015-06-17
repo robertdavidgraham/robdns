@@ -1544,6 +1544,7 @@ rr_end:
         /* We need to update both the 'parser' and the current 'block' with
          * the new origin info */
         parser->block->origin.length = parser->rr_domain.label;
+        parser->block->origin.name = parser->block->origin_buffer;
         
 		i--;
 		s = $UNTIL_EOL;

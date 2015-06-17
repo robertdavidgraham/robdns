@@ -3,6 +3,7 @@
 #include "db-xdomain.h"
 #include "zonefile-rr.h"
 #include "pixie-threads.h"
+#include "logger.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -217,6 +218,9 @@ catalog_create_zone(
                         filesize
                         );
     zone_insert_self(zone, (volatile struct DBZone **)location);
+
+    if (verbosity > 3)
+        xdomain_err(domain, ": create zone\n");
 
     if (catalog->min_labels >= domain->label_count)
         catalog->min_labels = domain->label_count;

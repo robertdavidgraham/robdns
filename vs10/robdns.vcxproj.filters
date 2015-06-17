@@ -201,23 +201,8 @@
     <ClCompile Include="..\src\main-server-socket.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\conf-read.c">
-      <Filter>Source Files\config</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\perftest.c">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\conf-addr-match.c">
-      <Filter>Source Files\config</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\conf-parse.c">
-      <Filter>Source Files\config</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\conf-zone.c">
-      <Filter>Source Files\config</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\conf-options.c">
-      <Filter>Source Files\config</Filter>
     </ClCompile>
     <ClCompile Include="..\src\pixie-timer.c">
       <Filter>Source Files\util</Filter>
@@ -376,12 +361,6 @@
     </ClInclude>
     <ClInclude Include="..\src\pixie-atomic.h">
       <Filter>Source Files\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\conf-addr-match.h">
-      <Filter>Source Files\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\config.h">
-      <Filter>Source Files\config</Filter>
     </ClInclude>
     <ClInclude Include="..\src\pixie-timer.h">
       <Filter>Source Files\util</Filter>

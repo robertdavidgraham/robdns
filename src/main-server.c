@@ -516,8 +516,6 @@ int server(int argc, char *argv[])
 
     start = pixie_gettime();
 
-    verbosity = 10;
-    
     /*
      * Initialie configuration structure
      */

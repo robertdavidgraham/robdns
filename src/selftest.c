@@ -679,7 +679,7 @@ QUERY(
     return Success;
 }
 
-extern int conf_selftest(void);
+
 
 /****************************************************************************
  * [1] test "zonefile" parser
@@ -709,13 +709,6 @@ selftest(int argc, char *argv[])
     UNUSEDPARM(argc);
     UNUSEDPARM(argv);
     
-    /*
-     * CONFIGURATION selftest
-     */
-    if (conf_selftest() != 0) {
-        fprintf(stderr, "conf: selftest failed\n");
-        return Failure;
-    }
 
     /*
      * RING selftest
