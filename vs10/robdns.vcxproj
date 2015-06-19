@@ -24,6 +24,14 @@
     <ClCompile Include="..\src\adapter-recv.c" />
     <ClCompile Include="..\src\adapter-xmit.c" />
     <ClCompile Include="..\src\adapter.c" />
+    <ClCompile Include="..\src\conf-addrlist.c" />
+    <ClCompile Include="..\src\conf-keys.c" />
+    <ClCompile Include="..\src\conf-load.c" />
+    <ClCompile Include="..\src\conf-parse.c" />
+    <ClCompile Include="..\src\conf-selftest.c" />
+    <ClCompile Include="..\src\conf-zone.c" />
+    <ClCompile Include="..\src\configuration.c" />
+    <ClCompile Include="..\src\crypto-base64.c" />
     <ClCompile Include="..\src\crypto-md5.c" />
     <ClCompile Include="..\src\crypto-murmur3.c" />
     <ClCompile Include="..\src\crypto-siphash.c" />
@@ -34,6 +42,7 @@
     <ClCompile Include="..\src\grind-config.c" />
     <ClCompile Include="..\src\grind.c" />
     <ClCompile Include="..\src\logger.c" />
+    <ClCompile Include="..\src\main-checkconf.c" />
     <ClCompile Include="..\src\main-checkzone.c" />
     <ClCompile Include="..\src\main-conf.c" />
     <ClCompile Include="..\src\main-listif.c" />
@@ -62,6 +71,8 @@
     <ClCompile Include="..\src\rte-ring.c" />
     <ClCompile Include="..\src\selftest-parsefast.c" />
     <ClCompile Include="..\src\selftest.c" />
+    <ClCompile Include="..\src\smack1.c" />
+    <ClCompile Include="..\src\smackqueue.c" />
     <ClCompile Include="..\src\string_s.c" />
     <ClCompile Include="..\src\util-filename.c" />
     <ClCompile Include="..\src\util-ipaddr.c" />
@@ -80,6 +91,14 @@
     <ClInclude Include="..\src\adapter-pcapfile.h" />
     <ClInclude Include="..\src\adapter-pcaplive.h" />
     <ClInclude Include="..\src\adapter.h" />
+    <ClInclude Include="..\src\conf-addrlist.h" />
+    <ClInclude Include="..\src\conf-error.h" />
+    <ClInclude Include="..\src\conf-keys.h" />
+    <ClInclude Include="..\src\conf-load.h" />
+    <ClInclude Include="..\src\conf-parse.h" />
+    <ClInclude Include="..\src\conf-zone.h" />
+    <ClInclude Include="..\src\configuration.h" />
+    <ClInclude Include="..\src\crypto-base64.h" />
     <ClInclude Include="..\src\crypto-md5.h" />
     <ClInclude Include="..\src\crypto-murmur3.h" />
     <ClInclude Include="..\src\crypto-siphash.h" />
@@ -113,6 +132,8 @@
     <ClInclude Include="..\src\robdns.h" />
     <ClInclude Include="..\src\rte-ring.h" />
     <ClInclude Include="..\src\selftest.h" />
+    <ClInclude Include="..\src\smack.h" />
+    <ClInclude Include="..\src\smackqueue.h" />
     <ClInclude Include="..\src\source.h" />
     <ClInclude Include="..\src\string_s.h" />
     <ClInclude Include="..\src\success-failure.h" />
@@ -132,8 +153,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\example.zone" />
+    <None Include="..\examples\master.conf" />
     <None Include="..\Makefile" />
     <None Include="..\README.md" />
+    <None Include="..\src\examples\keys.conf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C41F4EA3-3D4E-41B1-BB5D-5E5ED191F32B}</ProjectGuid>

@@ -78,9 +78,6 @@
     <ClCompile Include="..\src\main-checkzone.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\main.c">
-      <Filter>Source Files\main</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\main-conf.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
@@ -206,6 +203,42 @@
     </ClCompile>
     <ClCompile Include="..\src\pixie-timer.c">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-keys.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-load.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-parse.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-selftest.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-zone.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\crypto-base64.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\smack1.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\smackqueue.c">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\configuration.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-addrlist.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main-checkconf.c">
+      <Filter>Source Files\main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -365,6 +398,36 @@
     <ClInclude Include="..\src\pixie-timer.h">
       <Filter>Source Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\conf-keys.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\conf-load.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\conf-parse.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\conf-zone.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\crypto-base64.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\smack.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\smackqueue.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\configuration.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\conf-addrlist.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\conf-error.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile">
@@ -374,6 +437,10 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\example.zone">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\examples\master.conf" />
+    <None Include="..\src\examples\keys.conf">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

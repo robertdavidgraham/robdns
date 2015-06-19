@@ -47,6 +47,11 @@ struct ParsedIpAddress {
 int
 parse_ip_address(const char *px, unsigned *offset, size_t length, struct ParsedIpAddress *ip);
 
+void
+format_ip_address(	char *buf, size_t sizeof_buf, 
+				const void *v_addr, unsigned version, 
+				unsigned prefix_length);
+
 
 /**
  * Does a quick unit test of the address parser. Returns '0' if everything is ok, and

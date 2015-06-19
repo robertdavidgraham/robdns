@@ -186,6 +186,7 @@ keyword_get_file_prefix(const char *filename, unsigned *r_offset, unsigned lengt
 {
 	struct Keyword result = {0,0};
 
+#if WIN32
 	/*
 	 * if Windows style c:\
 	 */
@@ -202,6 +203,7 @@ keyword_get_file_prefix(const char *filename, unsigned *r_offset, unsigned lengt
 			(*r_offset)++;
 		return result;
 	}
+#endif
 
 	/*
 	 * if Windows style //

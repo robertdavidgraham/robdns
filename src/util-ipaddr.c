@@ -189,11 +189,15 @@ format_address(	char *buf, size_t sizeof_buf,
 	if (sizeof_addr == 4) {
 		format_ipv4_address(buf, sizeof_buf, v_addr);
 		if (prefix_length != ~0 && prefix_length > 32)
-			prefix_length = 32;
+			prefix_length = ~0;
+        if (prefix_length == 32)
+            prefix_length = ~0;
 	} else if (sizeof_addr == 16) {
 		format_ipv6_address(buf, sizeof_buf, v_addr);
 		if (prefix_length != ~0 && prefix_length > 128)
-			prefix_length = 128;
+			prefix_length = ~0;
+        if (prefix_length >= 128)
+            prefix_length = ~0;
 	} else if (sizeof_buf > 0)
 		buf[0] = '\0';
 
@@ -233,6 +237,15 @@ format_address(	char *buf, size_t sizeof_buf,
 			buf[sizeof_buf-1] = '\0';
 	}
 }
+
+void
+format_ip_address(	char *buf, size_t sizeof_buf, 
+				const void *v_addr, unsigned version, 
+				unsigned prefix_length)
+{
+    format_address(buf, sizeof_buf, v_addr, 4?4:16, prefix_length);
+}
+
 
 /****************************************************************************
  * Attempts to parse an IPv4 address out of the input stream.

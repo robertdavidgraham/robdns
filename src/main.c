@@ -4,6 +4,7 @@
 #include "adapter-pcaplive.h"
 #include "zonefile-parse.h"
 #include "rawsock.h"
+#include "configuration.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -11,6 +12,8 @@
 
 
 int is_verbose;
+
+const char *version = "robdns/0.2";
 
 /* temporary
  * These globals are for printing debug messages. They are global for now, but
@@ -21,6 +24,7 @@ uint64_t entry_count;
 uint64_t total_chain_length;
 
 
+int checkconf(int argc, char *argv[]);
 int checkzone(int argc, char *argv[]);
 int listif(int argc, char *argv[]);
 int foreground(int argc, char *argv[]);
@@ -43,6 +47,9 @@ struct {
     {"--regress", selftest},
     {"selftest2", selftest2},
     {"checkzone", checkzone},
+    {"--checkzone", checkzone},
+    {"checkconf", checkconf},
+    {"--checkconf", checkconf},
     {"listif", listif},
     {"foreground", foreground},
     {"pcap2zone", pcap2zone},
@@ -60,15 +67,10 @@ main(int argc, char *argv[])
   	fprintf(stderr, "--- Rob's DNS server v0.2 ----\n");
 
     /*
-     * Once-per-process: initialize some data structures in the zone-file
-     * parsing module. 
+     * Initialize various things that are process-wide.
      */
     zonefile_parser_init();
-
-    /*
-     * Once-per-process: this goes hunting for things like the PF_RING 
-     * library and initializes it
-     */
+    cfg_parser_init();
     rawsock_init();
     
     /*
