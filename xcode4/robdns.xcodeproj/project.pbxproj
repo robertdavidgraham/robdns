@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		110A96A41B28C46400F51866 /* conf-options.c in Sources */ = {isa = PBXBuildFile; fileRef = 110A96A31B28C46400F51866 /* conf-options.c */; };
-		1146F2DF192FEA8C007BCB3D /* conf-addr-match.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DA192FEA8C007BCB3D /* conf-addr-match.c */; };
 		1146F2E0192FEA8C007BCB3D /* conf-parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DC192FEA8C007BCB3D /* conf-parse.c */; };
 		1146F2E1192FEA8C007BCB3D /* conf-zone.c in Sources */ = {isa = PBXBuildFile; fileRef = 1146F2DD192FEA8C007BCB3D /* conf-zone.c */; };
 		11623F6F191F368B0075EEE6 /* pixie-threads.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F6B191F368B0075EEE6 /* pixie-threads.c */; };
@@ -17,8 +15,17 @@
 		11623F78191F370C0075EEE6 /* zonefile-field-charstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F75191F370B0075EEE6 /* zonefile-field-charstring.c */; };
 		11623F79191F370C0075EEE6 /* zonefile-field-loc.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F76191F370C0075EEE6 /* zonefile-field-loc.c */; };
 		11623F7D191F371B0075EEE6 /* zonefile-insertion.c in Sources */ = {isa = PBXBuildFile; fileRef = 11623F7B191F371B0075EEE6 /* zonefile-insertion.c */; };
+		1182CF7D1B35DD7E00E72CFB /* smack1.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF7C1B35DD7E00E72CFB /* smack1.c */; };
+		1182CF921B35DDAF00E72CFB /* util-ranges.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF7E1B35DDAF00E72CFB /* util-ranges.c */; };
+		1182CF931B35DDAF00E72CFB /* conf-load.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF7F1B35DDAF00E72CFB /* conf-load.c */; };
+		1182CF941B35DDAF00E72CFB /* conf-addrlist.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF801B35DDAF00E72CFB /* conf-addrlist.c */; };
+		1182CF951B35DDAF00E72CFB /* crypto-base64.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF811B35DDAF00E72CFB /* crypto-base64.c */; };
+		1182CF961B35DDAF00E72CFB /* conf-keys.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF851B35DDAF00E72CFB /* conf-keys.c */; };
+		1182CF971B35DDAF00E72CFB /* conf-selftest.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF861B35DDAF00E72CFB /* conf-selftest.c */; };
+		1182CF981B35DDAF00E72CFB /* smackqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF881B35DDAF00E72CFB /* smackqueue.c */; };
+		1182CF991B35DDAF00E72CFB /* main-checkconf.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF891B35DDAF00E72CFB /* main-checkconf.c */; };
+		1182CF9A1B35DDAF00E72CFB /* configuration.c in Sources */ = {isa = PBXBuildFile; fileRef = 1182CF8A1B35DDAF00E72CFB /* configuration.c */; };
 		118E22E71923278500883BCC /* main-server-socket.c in Sources */ = {isa = PBXBuildFile; fileRef = 118E22E61923278500883BCC /* main-server-socket.c */; };
-		118E22EB19247AE600883BCC /* conf-read.c in Sources */ = {isa = PBXBuildFile; fileRef = 118E22EA19247AE600883BCC /* conf-read.c */; };
 		11AB6E8D191FEA1F0060F2C0 /* perftest.c in Sources */ = {isa = PBXBuildFile; fileRef = 11AB6E8C191FEA1F0060F2C0 /* perftest.c */; };
 		11C2FE4018D506D700061E8B /* adapter-pcapfile.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE118D506D700061E8B /* adapter-pcapfile.c */; };
 		11C2FE4118D506D700061E8B /* adapter-pcaplive.c in Sources */ = {isa = PBXBuildFile; fileRef = 11C2FDE318D506D700061E8B /* adapter-pcaplive.c */; };
@@ -84,12 +91,8 @@
 
 /* Begin PBXFileReference section */
 		110A96A11B28C44B00F51866 /* pixie-atomic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "pixie-atomic.h"; path = "../src/pixie-atomic.h"; sourceTree = "<group>"; };
-		110A96A31B28C46400F51866 /* conf-options.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-options.c"; path = "../src/conf-options.c"; sourceTree = "<group>"; };
-		1146F2DA192FEA8C007BCB3D /* conf-addr-match.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-addr-match.c"; path = "../src/conf-addr-match.c"; sourceTree = "<group>"; };
-		1146F2DB192FEA8C007BCB3D /* conf-addr-match.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-addr-match.h"; path = "../src/conf-addr-match.h"; sourceTree = "<group>"; };
 		1146F2DC192FEA8C007BCB3D /* conf-parse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-parse.c"; path = "../src/conf-parse.c"; sourceTree = "<group>"; };
 		1146F2DD192FEA8C007BCB3D /* conf-zone.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-zone.c"; path = "../src/conf-zone.c"; sourceTree = "<group>"; };
-		1146F2DE192FEA8C007BCB3D /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../src/config.h; sourceTree = "<group>"; };
 		11623F6B191F368B0075EEE6 /* pixie-threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "pixie-threads.c"; path = "../src/pixie-threads.c"; sourceTree = "<group>"; };
 		11623F6C191F368B0075EEE6 /* pixie-threads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "pixie-threads.h"; path = "../src/pixie-threads.h"; sourceTree = "<group>"; };
 		11623F6D191F368B0075EEE6 /* pixie-timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "pixie-timer.c"; path = "../src/pixie-timer.c"; sourceTree = "<group>"; };
@@ -101,9 +104,29 @@
 		11623F7B191F371B0075EEE6 /* zonefile-insertion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zonefile-insertion.c"; path = "../src/zonefile-insertion.c"; sourceTree = "<group>"; };
 		11623F7C191F371B0075EEE6 /* zonefile-insertion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zonefile-insertion.h"; path = "../src/zonefile-insertion.h"; sourceTree = "<group>"; };
 		117970AF19228D25004FFC92 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		1182CF7C1B35DD7E00E72CFB /* smack1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smack1.c; path = ../src/smack1.c; sourceTree = "<group>"; };
+		1182CF7E1B35DDAF00E72CFB /* util-ranges.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "util-ranges.c"; path = "../src/util-ranges.c"; sourceTree = "<group>"; };
+		1182CF7F1B35DDAF00E72CFB /* conf-load.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-load.c"; path = "../src/conf-load.c"; sourceTree = "<group>"; };
+		1182CF801B35DDAF00E72CFB /* conf-addrlist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-addrlist.c"; path = "../src/conf-addrlist.c"; sourceTree = "<group>"; };
+		1182CF811B35DDAF00E72CFB /* crypto-base64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "crypto-base64.c"; path = "../src/crypto-base64.c"; sourceTree = "<group>"; };
+		1182CF821B35DDAF00E72CFB /* util-ranges.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "util-ranges.h"; path = "../src/util-ranges.h"; sourceTree = "<group>"; };
+		1182CF831B35DDAF00E72CFB /* configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = configuration.h; path = ../src/configuration.h; sourceTree = "<group>"; };
+		1182CF841B35DDAF00E72CFB /* smack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = smack.h; path = ../src/smack.h; sourceTree = "<group>"; };
+		1182CF851B35DDAF00E72CFB /* conf-keys.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-keys.c"; path = "../src/conf-keys.c"; sourceTree = "<group>"; };
+		1182CF861B35DDAF00E72CFB /* conf-selftest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-selftest.c"; path = "../src/conf-selftest.c"; sourceTree = "<group>"; };
+		1182CF871B35DDAF00E72CFB /* conf-parse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-parse.h"; path = "../src/conf-parse.h"; sourceTree = "<group>"; };
+		1182CF881B35DDAF00E72CFB /* smackqueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smackqueue.c; path = ../src/smackqueue.c; sourceTree = "<group>"; };
+		1182CF891B35DDAF00E72CFB /* main-checkconf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-checkconf.c"; path = "../src/main-checkconf.c"; sourceTree = "<group>"; };
+		1182CF8A1B35DDAF00E72CFB /* configuration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = configuration.c; path = ../src/configuration.c; sourceTree = "<group>"; };
+		1182CF8B1B35DDAF00E72CFB /* conf-load.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-load.h"; path = "../src/conf-load.h"; sourceTree = "<group>"; };
+		1182CF8C1B35DDAF00E72CFB /* conf-error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-error.h"; path = "../src/conf-error.h"; sourceTree = "<group>"; };
+		1182CF8D1B35DDAF00E72CFB /* conf-addrlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-addrlist.h"; path = "../src/conf-addrlist.h"; sourceTree = "<group>"; };
+		1182CF8E1B35DDAF00E72CFB /* crypto-base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "crypto-base64.h"; path = "../src/crypto-base64.h"; sourceTree = "<group>"; };
+		1182CF8F1B35DDAF00E72CFB /* smackqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = smackqueue.h; path = ../src/smackqueue.h; sourceTree = "<group>"; };
+		1182CF901B35DDAF00E72CFB /* conf-zone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-zone.h"; path = "../src/conf-zone.h"; sourceTree = "<group>"; };
+		1182CF911B35DDAF00E72CFB /* conf-keys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "conf-keys.h"; path = "../src/conf-keys.h"; sourceTree = "<group>"; };
 		118E22E61923278500883BCC /* main-server-socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "main-server-socket.c"; path = "../src/main-server-socket.c"; sourceTree = "<group>"; };
 		118E22E81923289100883BCC /* main-server-socket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "main-server-socket.h"; path = "../src/main-server-socket.h"; sourceTree = "<group>"; };
-		118E22EA19247AE600883BCC /* conf-read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "conf-read.c"; path = "../src/conf-read.c"; sourceTree = "<group>"; };
 		11AB6E8C191FEA1F0060F2C0 /* perftest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = perftest.c; path = ../src/perftest.c; sourceTree = "<group>"; };
 		11C2FDD318D506A300061E8B /* robdns */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = robdns; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C2FDE118D506D700061E8B /* adapter-pcapfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "adapter-pcapfile.c"; path = "../src/adapter-pcapfile.c"; sourceTree = "<group>"; };
@@ -216,12 +239,29 @@
 		118E22E919247AC900883BCC /* conf */ = {
 			isa = PBXGroup;
 			children = (
-				1146F2DA192FEA8C007BCB3D /* conf-addr-match.c */,
-				1146F2DB192FEA8C007BCB3D /* conf-addr-match.h */,
+				1182CF7E1B35DDAF00E72CFB /* util-ranges.c */,
+				1182CF7F1B35DDAF00E72CFB /* conf-load.c */,
+				1182CF801B35DDAF00E72CFB /* conf-addrlist.c */,
+				1182CF811B35DDAF00E72CFB /* crypto-base64.c */,
+				1182CF821B35DDAF00E72CFB /* util-ranges.h */,
+				1182CF831B35DDAF00E72CFB /* configuration.h */,
+				1182CF841B35DDAF00E72CFB /* smack.h */,
+				1182CF851B35DDAF00E72CFB /* conf-keys.c */,
+				1182CF861B35DDAF00E72CFB /* conf-selftest.c */,
+				1182CF871B35DDAF00E72CFB /* conf-parse.h */,
+				1182CF881B35DDAF00E72CFB /* smackqueue.c */,
+				1182CF891B35DDAF00E72CFB /* main-checkconf.c */,
+				1182CF8A1B35DDAF00E72CFB /* configuration.c */,
+				1182CF8B1B35DDAF00E72CFB /* conf-load.h */,
+				1182CF8C1B35DDAF00E72CFB /* conf-error.h */,
+				1182CF8D1B35DDAF00E72CFB /* conf-addrlist.h */,
+				1182CF8E1B35DDAF00E72CFB /* crypto-base64.h */,
+				1182CF8F1B35DDAF00E72CFB /* smackqueue.h */,
+				1182CF901B35DDAF00E72CFB /* conf-zone.h */,
+				1182CF911B35DDAF00E72CFB /* conf-keys.h */,
+				1182CF7C1B35DD7E00E72CFB /* smack1.c */,
 				1146F2DC192FEA8C007BCB3D /* conf-parse.c */,
 				1146F2DD192FEA8C007BCB3D /* conf-zone.c */,
-				1146F2DE192FEA8C007BCB3D /* config.h */,
-				118E22EA19247AE600883BCC /* conf-read.c */,
 			);
 			name = conf;
 			sourceTree = "<group>";
@@ -254,7 +294,6 @@
 		11C2FDE018D506BC00061E8B /* src */ = {
 			isa = PBXGroup;
 			children = (
-				110A96A31B28C46400F51866 /* conf-options.c */,
 				110A96A11B28C44B00F51866 /* pixie-atomic.h */,
 				118E22E919247AC900883BCC /* conf */,
 				117970AF19228D25004FFC92 /* README.md */,
@@ -538,11 +577,18 @@
 				11623F7D191F371B0075EEE6 /* zonefile-insertion.c in Sources */,
 				11AB6E8D191FEA1F0060F2C0 /* perftest.c in Sources */,
 				118E22E71923278500883BCC /* main-server-socket.c in Sources */,
-				118E22EB19247AE600883BCC /* conf-read.c in Sources */,
-				1146F2DF192FEA8C007BCB3D /* conf-addr-match.c in Sources */,
 				1146F2E0192FEA8C007BCB3D /* conf-parse.c in Sources */,
 				1146F2E1192FEA8C007BCB3D /* conf-zone.c in Sources */,
-				110A96A41B28C46400F51866 /* conf-options.c in Sources */,
+				1182CF7D1B35DD7E00E72CFB /* smack1.c in Sources */,
+				1182CF921B35DDAF00E72CFB /* util-ranges.c in Sources */,
+				1182CF931B35DDAF00E72CFB /* conf-load.c in Sources */,
+				1182CF941B35DDAF00E72CFB /* conf-addrlist.c in Sources */,
+				1182CF951B35DDAF00E72CFB /* crypto-base64.c in Sources */,
+				1182CF961B35DDAF00E72CFB /* conf-keys.c in Sources */,
+				1182CF971B35DDAF00E72CFB /* conf-selftest.c in Sources */,
+				1182CF981B35DDAF00E72CFB /* smackqueue.c in Sources */,
+				1182CF991B35DDAF00E72CFB /* main-checkconf.c in Sources */,
+				1182CF9A1B35DDAF00E72CFB /* configuration.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

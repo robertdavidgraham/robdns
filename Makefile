@@ -52,7 +52,7 @@ FLAGS2 =
 endif
 
 # this works on llvm or real gcc
-CC = gcc
+CC = clang
 
 DEFINES = 
 CFLAGS = -g -ggdb $(FLAGS2) $(INCLUDES) $(DEFINES) -Wall -O3 -Wno-format -fno-strict-aliasing

@@ -1,5 +1,7 @@
 #ifndef CONF_ERROR_H
 #define CONF_ERROR_H
+struct ConfParse;
+struct CF_Token;
 
 //void WARNING(struct CF_Token token, const char *fmt, ...);
 

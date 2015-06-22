@@ -35,7 +35,7 @@ struct Cfg_Key
     /* This is the (binary) secret used for TSIG authentication of
      * packets. While the original field is specified in base64, it's
      * stored here as the binary */
-    char *secret;
+    unsigned char *secret;
     size_t secret_length;
 
     /* Each key has an algorithm. If that algorithm is non specified,

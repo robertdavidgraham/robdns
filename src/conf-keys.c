@@ -24,7 +24,6 @@ cfg_key_lookup(const struct Configuration *cfg, const char *name)
 void
 conf_load_key(struct Configuration *cfg, const struct ConfParse *parse, const struct CF_Child *parent)
 {
-    struct ConfigurationOptions *options = &cfg->options;
     struct CF_Token value = confparse_node_gettoken(parse, parent, 1);
     struct Cfg_Key *key;
     size_t i;

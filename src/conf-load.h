@@ -2,6 +2,11 @@
 #define CONF_LOAD_H
 #include <stddef.h>
 
+struct CF_Token;
+struct ConfParse;
+struct CF_Child;
+struct Configuration;
+
 void confload_configuration(struct Configuration *cfg, const char *filename, const struct CF_Token *token);
 
 int confload_toplevel(struct ConfParse *parse, void *data, const struct CF_Child *node);

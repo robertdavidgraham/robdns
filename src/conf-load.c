@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>
 
 #ifdef WIN32
@@ -22,7 +23,7 @@
 #include <unistd.h> /* getcwd, gethostname */
 #endif
 
-void parse_configuration(struct Core *core, const char *filename);
+//void parse_configuration(struct Core *core, const char *filename);
 
 struct Token2Identifier {
     const char *name;
@@ -244,7 +245,6 @@ to_number(const struct CF_Token *token)
 static void
 load_acl(struct Configuration *cfg, const struct ConfParse *parse, const struct CF_Child *parent)
 {
-    struct ConfigurationOptions *options = &cfg->options;
     struct CF_Token value = confparse_node_gettoken(parse, parent, 1);
     struct Cfg_AddrMatchList *acl;
 

@@ -41,7 +41,6 @@ conf_load_zone_item( struct Configuration *cfg,
                 struct Cfg_Zone *zone
                 )
 {
-    struct ConfigurationOptions *options = &cfg->options;
     struct CF_Token token = confparse_node_gettoken(parse, parent, 0);
     struct CF_Token value = confparse_node_gettoken(parse, parent, 1);
 
@@ -110,7 +109,6 @@ conf_load_zone( struct Configuration *cfg,
                 const struct ConfParse *parse, 
                 const struct CF_Child *parent)
 {
-    struct ConfigurationOptions *options = &cfg->options;
     struct CF_Token value = confparse_node_gettoken(parse, parent, 1);
     struct Cfg_Zone *zone;
     size_t i;
