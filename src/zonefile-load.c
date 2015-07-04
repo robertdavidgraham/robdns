@@ -3,49 +3,57 @@
 #include "zonefile-load.h"
 #include <string.h>
 
+/******************************************************************************
+ ******************************************************************************/
+static void
+format_domain(char *dst, size_t sizeof_dst, 
+              struct DomainPointer domain, 
+              struct DomainPointer origin)
+{
+    unsigned i;
+    unsigned d = 0;
+    
+    for (i=0; i<domain.length; i++) {
+        unsigned j;
+        unsigned len = domain.name[i];
+        const unsigned char *p = domain.name+1;
+        for (j=0; j<len && d+1<sizeof_dst; j++)
+            dst[d++] = p[j];
+        if (d+1<sizeof_dst)
+            dst[d++] = '.';
+    }
+    
+    for (i=0; i<origin.length; i++) {
+        unsigned j;
+        unsigned len = origin.name[i];
+        const unsigned char *p = origin.name+1;
+        for (j=0; j<len && d+1<sizeof_dst; j++)
+            dst[d++] = p[j];
+        if (d+1<sizeof_dst)
+            dst[d++] = '.';
+    }
+    
+    if (d+1<sizeof_dst)
+        dst[d] = '\0';
+    else {
+        dst[d-4] = '*';
+        dst[d-3] = '*';
+        dst[d-2] = '*';
+        dst[d-1] = '\0';
+    }
+}
+
 /*****************************************************************************
  *****************************************************************************/
 void
 ERROR_zone_not_found(const char *filename, unsigned line_number, struct DomainPointer domain, struct DomainPointer origin)
 {
-    struct Offset {
-        unsigned length;
-        const unsigned char *pointer;
-    } offsets[256];
-    unsigned o = 0;
-    unsigned i;
+    char name[300];
 
-    memset(&offsets, 0, sizeof(offsets));
+    format_domain(name, sizeof(name), domain, origin);
 
-    for (i=0; i<domain.length; i++) {
-        offsets[o].length = domain.name[i];
-        offsets[o].pointer = domain.name+1;
-        i += offsets[o].length;
-        o++;
-    }
-
-    for (i=0; i<origin.length; i++) {
-        offsets[o].length = origin.name[i];
-        offsets[o].pointer = origin.name+1;
-        i += offsets[o].length;
-        o++;
-    }
-
-    fprintf(stderr, "%s: %u: zone not found: "
-            "%*s%s" "%*s%s" "%*s%s" "%*s%s" "%*s%s" "%*s%s" "%*s%s" "%*s%s",
-            filename, line_number,
-            offsets[0].length, offsets[0].pointer, offsets[0].length?".":"",
-            offsets[1].length, offsets[1].pointer, offsets[1].length?".":"",
-            offsets[2].length, offsets[2].pointer, offsets[2].length?".":"",
-            offsets[3].length, offsets[3].pointer, offsets[3].length?".":"",
-            offsets[4].length, offsets[4].pointer, offsets[4].length?".":"",
-            offsets[5].length, offsets[5].pointer, offsets[5].length?".":"",
-            offsets[6].length, offsets[6].pointer, offsets[6].length?".":"",
-            offsets[7].length, offsets[7].pointer, offsets[7].length?".":""
-            );
-            
-
-
+    fprintf(stderr, "%s: %u: zone not found: %s\n",
+            filename, line_number, name);
 }
 
 /*****************************************************************************

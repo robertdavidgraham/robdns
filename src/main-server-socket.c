@@ -37,7 +37,7 @@ sockets_thread(struct Core *conf)
     int err;
     SOCKET fd;
     struct sockaddr_in6 sin;
-    static const unsigned port = 5333;
+    static const unsigned port = 53;
     
     /*
      * This software obtains its speed by bypassing the operating system

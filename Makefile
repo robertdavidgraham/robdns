@@ -17,8 +17,8 @@ endif
 # my regularly regression-test environment. That means at any point
 # in time, something might be minorly broken in Mac OS X.
 ifneq (, $(findstring darwin, $(SYS)))
-LIBS = -lpcap -lm -rdynamic
-INCLUDES = -I.
+LIBS = -lpcap -lm 
+INCLUDES =
 FLAGS2 = 
 endif
 
@@ -55,7 +55,7 @@ endif
 CC = clang
 
 DEFINES = 
-CFLAGS = -g -ggdb $(FLAGS2) $(INCLUDES) $(DEFINES) -Wall -O3 -Wno-format -fno-strict-aliasing
+CFLAGS = -g $(FLAGS2) $(INCLUDES) $(DEFINES) -Wall -O3
 .SUFFIXES: .c .cpp
 
 # just compile everything in the 'src' directory. Using this technique
