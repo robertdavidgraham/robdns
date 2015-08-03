@@ -10,7 +10,7 @@ struct ThreadParms
     unsigned char adapter_mac[6];
     struct Adapter *adapter;
 
-    struct Catalog *catalog;
+    struct Catalog *catalog_run;
 };
 
 #endif

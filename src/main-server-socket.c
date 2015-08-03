@@ -2,37 +2,22 @@
 #include "db.h"
 #include "logger.h"
 #include "main-server-socket.h"
-#include "proto-dns.h"
 #include <stdio.h>
 #include <errno.h>
 #include "string_s.h"
+#include "proto-dns.h"
 #include "proto-dns-compressor.h"
 #include "proto-dns-formatter.h"
 #include "resolver.h"
 
-#if defined(WIN32)
-#include <WinSock2.h>
-#include <WS2tcpip.h>
-#define WSA(err) WSA##err
-#if defined(_MSC_VER)
-#pragma comment(lib, "ws2_32.lib")
-#endif
-typedef int socklen_t;
-#else
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#define WSAGetLastError() (errno)
-#define SOCKET int
-#define WSA(err) (err)
-#endif
+#include "pixie-sockets.h"
 
 /******************************************************************************
  * This is the mail loop when running over sockets, receiving packets and
  * sending responses.
  ******************************************************************************/
 void
-sockets_thread(struct Core *conf)
+sockets_thread(struct Core *core)
 {
     int err;
     SOCKET fd;
@@ -60,7 +45,7 @@ sockets_thread(struct Core *conf)
      */
     fd = socket(AF_INET6, SOCK_DGRAM, 0);
     if (fd <= 0) {
-        LOG(0, "FAIL: couldn't create socket %u\n", WSAGetLastError());
+        LOG_ERR(C_NETWORK, "FAIL: couldn't create socket %u\n", WSAGetLastError());
         return;
     }
     
@@ -102,23 +87,23 @@ sockets_thread(struct Core *conf)
     if (err) {
         switch (WSAGetLastError()) {
             case WSA(EACCES):
-                LOG(0, "FAIL: couldn't bind to port %u: %s\n", port, 
+                LOG_ERR(C_NETWORK, "FAIL: couldn't bind to port %u: %s\n", port, 
                     "access denied");
                 if (port <= 1024)
-                    LOG(0, "  hint... need to be root for ports below 1024\n");
+                    LOG_ERR(C_NETWORK, "  hint... need to be root for ports below 1024\n");
                 break;
             case WSA(EADDRINUSE):
-                LOG(0, "FAIL: couldn't bind to port %u: %s\n", port, 
+                LOG_ERR(C_NETWORK, "FAIL: couldn't bind to port %u: %s\n", port, 
                     "address in use");
-                LOG(0, "  hint... some other server is running on that port\n");
+                LOG_ERR(C_NETWORK, "  hint... some other server is running on that port\n");
                 break;
             default:
-                LOG(0, "FAIL: couldn't bind to port %u: %u\n", port,
+                LOG_ERR(C_NETWORK, "FAIL: couldn't bind to port %u: %u\n", port,
                     WSAGetLastError());
         }
         exit(1);
     } else {
-        fprintf(stderr, "UDP port: %u\n", port);
+        LOG_INFO(C_NETWORK, "UDP port: %u\n", port);
     }
     
     /*
@@ -162,7 +147,7 @@ sockets_thread(struct Core *conf)
                       request->id,
                       request->opcode);
             
-        resolver_algorithm(conf->db, response, request);
+        resolver_algorithm(core->db_run, response, request);
             
 
         /*

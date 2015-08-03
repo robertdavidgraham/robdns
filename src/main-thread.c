@@ -40,7 +40,7 @@ void main_thread(void *v)
      * thread
      */
     memset(thread, 0, sizeof(thread[0]));
-    thread->catalog = parms->catalog;
+    thread->catalog_run = parms->catalog_run;
     thread->userdata = (char*)malloc(PACKET_SIZE);
 
     adapter->alloc_packet = alloc_packet;

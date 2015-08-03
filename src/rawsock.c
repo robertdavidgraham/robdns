@@ -36,7 +36,7 @@ rawsock_send_packet(struct Adapter *adapter,
             err = PFRING.send(adapter->ring, packet, length, (unsigned char)flush);
         }
         if (err < 0)
-            LOG(1, "pfring:xmit: ERROR %d\n", err);
+            LOG_ERR(C_NETWORK, "pfring:xmit: ERROR %d\n", err);
         return;
     }
 

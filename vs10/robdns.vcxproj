@@ -29,7 +29,9 @@
     <ClCompile Include="..\src\conf-load.c" />
     <ClCompile Include="..\src\conf-parse.c" />
     <ClCompile Include="..\src\conf-selftest.c" />
+    <ClCompile Include="..\src\conf-trackfile.c" />
     <ClCompile Include="..\src\conf-zone.c" />
+    <ClCompile Include="..\src\conf-zonedir.c" />
     <ClCompile Include="..\src\configuration.c" />
     <ClCompile Include="..\src\crypto-base64.c" />
     <ClCompile Include="..\src\crypto-md5.c" />
@@ -74,6 +76,7 @@
     <ClCompile Include="..\src\smack1.c" />
     <ClCompile Include="..\src\smackqueue.c" />
     <ClCompile Include="..\src\string_s.c" />
+    <ClCompile Include="..\src\thread-worker.c" />
     <ClCompile Include="..\src\util-filename.c" />
     <ClCompile Include="..\src\util-ipaddr.c" />
     <ClCompile Include="..\src\util-keyword.c" />
@@ -96,6 +99,7 @@
     <ClInclude Include="..\src\conf-keys.h" />
     <ClInclude Include="..\src\conf-load.h" />
     <ClInclude Include="..\src\conf-parse.h" />
+    <ClInclude Include="..\src\conf-trackfile.h" />
     <ClInclude Include="..\src\conf-zone.h" />
     <ClInclude Include="..\src\configuration.h" />
     <ClInclude Include="..\src\crypto-base64.h" />
@@ -119,6 +123,7 @@
     <ClInclude Include="..\src\packet.h" />
     <ClInclude Include="..\src\pixie-atomic.h" />
     <ClInclude Include="..\src\pixie-nic.h" />
+    <ClInclude Include="..\src\pixie-sockets.h" />
     <ClInclude Include="..\src\pixie-threads.h" />
     <ClInclude Include="..\src\pixie-timer.h" />
     <ClInclude Include="..\src\pixie.h" />

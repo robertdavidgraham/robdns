@@ -1,4 +1,6 @@
 #include "main-conf.h"
+#include "conf-trackfile.h"
+#include "configuration.h"
 #include "db.h"
 #include "domainname.h"
 #include "zonefile-parse.h"
@@ -128,11 +130,8 @@ is_pfring_dna(const char *name)
 /***************************************************************************
  ***************************************************************************/
 struct Adapter *
-rawsock_init_adapter(const char *adapter_name, 
-                     unsigned is_pfring, 
-                     unsigned is_sendq,
-                     unsigned is_packet_trace,
-                     unsigned is_offline)
+rawsock_init_adapter(const char *adapter_name,
+                    const struct RawFlags *flags)
 {
     struct Adapter *adapter;
     char errbuf[PCAP_ERRBUF_SIZE];
@@ -140,7 +139,7 @@ rawsock_init_adapter(const char *adapter_name,
     adapter = (struct Adapter *)malloc(sizeof(*adapter));
     memset(adapter, 0, sizeof(*adapter));
     
-    if (is_offline)
+    if (flags->is_offline)
         return adapter;
 
     /*----------------------------------------------------------------
@@ -166,7 +165,7 @@ rawsock_init_adapter(const char *adapter_name,
      *  Since a lot of things can go wrong, we do a lot of extra
      *  logging here.
      *----------------------------------------------------------------*/
-    if (is_pfring || is_pfring_dna(adapter_name)) {
+    if (flags->is_pfring || is_pfring_dna(adapter_name)) {
         int err;
         unsigned version;
 
@@ -180,49 +179,49 @@ rawsock_init_adapter(const char *adapter_name,
          * NOTE: I don't think it needs the "re-entrant" flag, because it
          * transmit and receive are separate functions?
          */
-        LOG(2, "pfring:'%s': opening...\n", adapter_name);
+        LOG_INFO(C_NETWORK, "pfring:'%s': opening...\n", adapter_name);
         adapter->ring = PFRING.open(adapter_name, 1500, 0);//PF_RING_REENTRANT);
         adapter->pcap = (struct pcap_t*)adapter->ring;
         if (adapter->ring == NULL) {
-            LOG(0, "pfring:'%s': OPEN ERROR: %s\n", 
+            LOG_ERR(C_NETWORK, "pfring:'%s': OPEN ERROR: %s\n", 
                 adapter_name, strerror_x(errno));
             return 0;
         } else
-            LOG(1, "pfring:'%s': successfully opened\n", adapter_name);
+            LOG_INFO(C_NETWORK, "pfring:'%s': successfully opened\n", adapter_name);
 
         /*
          * Housekeeping
          */
         PFRING.set_application_name(adapter->ring, "masscan");
         PFRING.version(adapter->ring, &version);
-        LOG(1, "pfring: version %d.%d.%d\n",
+        LOG_INFO(C_NETWORK, "pfring: version %d.%d.%d\n",
                 (version >> 16) & 0xFFFF,
                 (version >> 8) & 0xFF,
                 (version >> 0) & 0xFF);
 
-        LOG(2, "pfring:'%s': setting direction\n", adapter_name);
+        LOG_INFO(C_NETWORK, "pfring:'%s': setting direction\n", adapter_name);
         err = PFRING.set_direction(adapter->ring, rx_only_direction);
         if (err) {
-            fprintf(stderr, "pfring:'%s': setdirection = %d\n", 
+            LOG_ERR(C_NETWORK, "pfring:'%s': setdirection = %d\n", 
                     adapter_name, err);
         } else
-            LOG(2, "pfring:'%s': direction success\n", adapter_name);
+            LOG_INFO(C_NETWORK, "pfring:'%s': direction success\n", adapter_name);
 
         /*
          * Activate
          *
          * PF_RING requires a separate activation step.
          */
-        LOG(2, "pfring:'%s': activating\n", adapter_name);
+        LOG_INFO(C_NETWORK, "pfring:'%s': activating\n", adapter_name);
         err = PFRING.enable_ring(adapter->ring);
         if (err != 0) {
-                LOG(0, "pfring: '%s': ENABLE ERROR: %s\n", 
+                LOG_ERR(C_NETWORK, "pfring: '%s': ENABLE ERROR: %s\n", 
                     adapter_name, strerror_x(errno));
                 PFRING.close(adapter->ring);
                 adapter->ring = 0;
                 return 0;
         } else
-            LOG(1, "pfring:'%s': succesfully eenabled\n", adapter_name);
+            LOG_INFO(C_NETWORK, "pfring:'%s': succesfully eenabled\n", adapter_name);
 
         return adapter;
     }
@@ -233,8 +232,8 @@ rawsock_init_adapter(const char *adapter_name,
      * This is the stanard that should work everywhere.
      *----------------------------------------------------------------*/
     {
-        LOG(1, "pcap: %s\n", pcap.lib_version());
-        LOG(2, "pcap:'%s': opening...\n", adapter_name);
+        LOG_INFO(C_NETWORK, "pcap: %s\n", pcap.lib_version());
+        LOG_INFO(C_NETWORK, "pcap:'%s': opening...\n", adapter_name);
         adapter->pcap = pcap.open_live(
                     adapter_name,           /* interface name */
                     65536,                  /* max packet size */
@@ -242,15 +241,15 @@ rawsock_init_adapter(const char *adapter_name,
                     1000,                   /* read timeout in milliseconds */
                     errbuf);
         if (adapter->pcap == NULL) {
-            LOG(0, "FAIL: %s\n", errbuf);
+            LOG_ERR(C_NETWORK, "FAIL: %s\n", errbuf);
             if (strstr(errbuf, "perm")) {
-                LOG(0, " [hint] need to sudo or run as root or something\n");
-                LOG(0, " [hint] I've got some local priv escalation "
+                LOG_ERR(C_NETWORK, " [hint] need to sudo or run as root or something\n");
+                LOG_ERR(C_NETWORK, " [hint] I've got some local priv escalation "
                         "0days that might work\n");
             }
             return 0;
         } else
-            LOG(1, "pcap:'%s': successfully opened\n", adapter_name);
+            LOG_INFO(C_NETWORK, "pcap:'%s': successfully opened\n", adapter_name);
     }
 
     /*----------------------------------------------------------------
@@ -262,7 +261,7 @@ rawsock_init_adapter(const char *adapter_name,
      *----------------------------------------------------------------*/
     adapter->sendq = 0;
 #if defined(WIN32)
-    if (is_sendq)
+    if (flags->is_sendq)
         adapter->sendq = pcap.sendqueue_alloc(SENDQ_SIZE);
 #endif
 
@@ -338,18 +337,21 @@ rawsock_ignore_transmits(struct Adapter *adapter, const unsigned char *adapter_m
 
 /******************************************************************************
  ******************************************************************************/
-static int
+static struct Adapter *
 initialize_adapter(
-    struct Core *conf,
-    unsigned index,
+    //struct Core *conf,
+    const char *in_ifname,
+    //unsigned index,
     unsigned *r_adapter_ip,
-    unsigned char *adapter_mac
+    unsigned char *adapter_mac,
+    const struct RawFlags *flags
     )
 {
     char *ifname;
     char ifname2[256];
+    struct Adapter *raw_adapter;
 
-    LOG(1, "initializing adapter\n");
+    LOG_ERR(C_NETWORK, "initializing adapter\n");
 
     /*
      * ADAPTER/NETWORK-INTERFACE
@@ -358,8 +360,8 @@ initialize_adapter(
      * the best Interface to use. We do this by choosing the first
      * interface with a "default route" (aka. "gateway") defined
      */
-    if (conf->nic[index].ifname && conf->nic[index].ifname[0])
-        ifname = conf->nic[index].ifname;
+    if (in_ifname && in_ifname[0])
+        ifname = _strdup(in_ifname);
     else {
         /* no adapter specified, so find a default one */
         int err;
@@ -368,9 +370,9 @@ initialize_adapter(
         if (err || ifname2[0] == '\0') {
             fprintf(stderr, "FAIL: could not determine default interface\n");
             fprintf(stderr, "FAIL:... try \"--interface ethX\"\n");
-            return -1;
+            return 0;
         } else {
-            LOG(2, "auto-detected: interface=%s\n", ifname2);
+            LOG_INFO(C_NETWORK, "auto-detected: interface=%s\n", ifname2);
         }
         ifname = ifname2;
 
@@ -383,10 +385,9 @@ initialize_adapter(
      * is done by queryin the adapter (or configured by user). If the
      * adapter doesn't have one, then the user must configure one.
      */
-    *r_adapter_ip = conf->nic[index].adapter_ip;
     if (*r_adapter_ip == 0) {
         *r_adapter_ip = pixie_nic_get_ipv4(ifname);
-        LOG(2, "auto-detected: adapter-ip=%u.%u.%u.%u\n",
+        LOG_INFO(C_NETWORK, "auto-detected: adapter-ip=%u.%u.%u.%u\n",
             (*r_adapter_ip>>24)&0xFF,
             (*r_adapter_ip>>16)&0xFF,
             (*r_adapter_ip>> 8)&0xFF,
@@ -394,10 +395,10 @@ initialize_adapter(
             );
     }
     if (*r_adapter_ip == 0) {
-        fprintf(stderr, "FAIL: failed to detect IP of interface \"%s\"\n", ifname);
-        fprintf(stderr, " [hint] did you spell the name correctly?\n");
-        fprintf(stderr, " [hint] if it has no IP address, manually set with \"--adapter-ip 192.168.100.5\"\n");
-        return -1;
+        LOG_ERR(C_NETWORK, "FAIL: failed to detect IP of interface \"%s\"\n", ifname);
+        LOG_ERR(C_NETWORK, " [hint] did you spell the name correctly?\n");
+        LOG_ERR(C_NETWORK, " [hint] if it has no IP address, manually set with \"--adapter-ip 192.168.100.5\"\n");
+        return 0;
     }
 
     /*
@@ -407,10 +408,9 @@ initialize_adapter(
      * matter what this address is, but to be a "responsible" citizen we
      * try to use the hardware address in the network card.
      */
-    memcpy(adapter_mac, conf->nic[index].adapter_mac, 6);
     if (memcmp(adapter_mac, "\0\0\0\0\0\0", 6) == 0) {
         pixie_nic_get_mac(ifname, adapter_mac);
-        LOG(2, "auto-detected: adapter-mac=%02x-%02x-%02x-%02x-%02x-%02x\n",
+        LOG_INFO(C_NETWORK, "auto-detected: adapter-mac=%02x-%02x-%02x-%02x-%02x-%02x\n",
             adapter_mac[0],
             adapter_mac[1],
             adapter_mac[2],
@@ -420,9 +420,9 @@ initialize_adapter(
             );
     }
     if (memcmp(adapter_mac, "\0\0\0\0\0\0", 6) == 0) {
-        fprintf(stderr, "FAIL: failed to detect MAC address of interface: \"%s\"\n", ifname);
-        fprintf(stderr, " [hint] try something like \"--adapter-mac 00-11-22-33-44-55\"\n");
-        return -1;
+        LOG_ERR(C_NETWORK, "FAIL: failed to detect MAC address of interface: \"%s\"\n", ifname);
+        LOG_ERR(C_NETWORK, " [hint] try something like \"--adapter-mac 00-11-22-33-44-55\"\n");
+        return 0;
     }
 
     /*
@@ -431,23 +431,18 @@ initialize_adapter(
      * Once we've figured out which adapter to use, we now need to
      * turn it on.
      */
-    conf->nic[index].adapter = rawsock_init_adapter(   
-                                            ifname, 
-                                            conf->is_pfring, 
-                                            conf->is_sendq,
-                                            conf->is_packet_trace,
-                                            conf->is_offline);
-    if (conf->nic[index].adapter == 0) {
+    raw_adapter = rawsock_init_adapter(ifname, flags);
+    if (raw_adapter == 0) {
         fprintf(stderr, "adapter[%s].init: failed\n", ifname);
-        return -1;
+        return 0;
     }
-    LOG(3, "rawsock: ignoring transmits\n");
-    rawsock_ignore_transmits(conf->nic[index].adapter, adapter_mac);
-    LOG(3, "rawsock: initialization done\n");
+    LOG_INFO(C_NETWORK, "rawsock: ignoring transmits\n");
+    rawsock_ignore_transmits(raw_adapter, adapter_mac);
+    LOG_INFO(C_NETWORK, "rawsock: initialization done\n");
 
 
     {
-        struct Adapter *a = conf->nic[index].adapter;
+        struct Adapter *a = raw_adapter;
 
         a->ipv4[a->ipv4_count].address = *r_adapter_ip;
         a->ipv4[a->ipv4_count].mask = 0xFFFFFFFF;
@@ -458,8 +453,8 @@ initialize_adapter(
         
     }
 
-    LOG(1, "adapter initialization done.\n");
-    return 0;
+    LOG_INFO(C_NETWORK, "adapter initialization done.\n");
+    return raw_adapter;
 }
 
 
@@ -470,6 +465,7 @@ initialize_adapter(
 static void
 pcap_thread(struct Core *conf)
 {
+#if 0
     unsigned index;
     struct ThreadParms parms_array[8];
 
@@ -496,58 +492,101 @@ pcap_thread(struct Core *conf)
 
         
 
-        parms->catalog = conf->db;
+        parms->catalog_run = conf->db_run;
         pixie_begin_thread(main_thread, 0, parms);
     }
 
     for (;;) {
         pixie_sleep(1000);
     }
-
+#endif
     return;
+}
+
+/****************************************************************************
+ ****************************************************************************/
+void change_logging(struct Core *core, struct Configuration *cfg_new, struct Configuration *cfg_old)
+{
 }
 
 /****************************************************************************
  ****************************************************************************/
 int server(int argc, char *argv[])
 {
+    struct Configuration *cfg_new;
+    struct Configuration *cfg_old = cfg_create();
     struct Core core[1];
     uint64_t start, stop;
+    uint64_t total_files=0, total_bytes=0;
 
     start = pixie_gettime();
 
     /*
-     * Initialie configuration structure
+     * Initialie the core structure structure
      */
-    conf_init(core);
+    core_init(core);
 
     /*
      * Create an empty database
      */
-    core->db = catalog_create();
+    core->db_load = catalog_create();
+    core->db_run = catalog_create();
+
+
+    /*
+     * Create a new configuration instance
+     */
+    cfg_new = cfg_create();
 
     /*
      * Read the command-line 
      */
-    conf_command_line(core, argc, argv);
+    conf_command_line(cfg_new, argc, argv);
 
     /*
-     * If we have lots of zones, then reset the count
+     * Test to see if the configuration has changed
      */
-    if (core->zonefiles.total_files > 200) {
-        catalog_reset_zonecount(core->db, (unsigned)core->zonefiles.total_files * 2);
+    if (conf_trackfile_has_changed(cfg_new->tf, cfg_old->tf)) {
+        unsigned count = conf_trackfile_count(cfg_new->tf);
+        unsigned i;
+
+        /* Read in the new configuration */
+        for (i=0; i<count; i++) {
+            const char *filename = conf_trackfile_filename(cfg_new->tf, i);
+            cfg_parse_file(cfg_new, filename);
+        }
+
+        /* Apply the changes */
+        change_logging(core, cfg_new, cfg_old);
+        change_worker_threads(core, cfg_new, cfg_old);
+
+    }
+
+
+
+
+
+
+
+
+    /*
+     * If we have lots of zones, then adjust the size of the hash table
+     * to make lookups efficient.
+     */
+    if (cfg->zones_length + cfg->zonedirs_filecount > 200) {
+        catalog_reset_zonecount(core->db_load, (unsigned)(cfg->zones_length + cfg->zonedirs_filecount) * 2);
     }
 
     /*
      * Load the zonefiles
      */
-    conf_zonefiles_parse(core->db, core);
+    conf_zonefiles_parse(core->db_load, cfg, &total_files, &total_bytes);
 
     /*
      * If we don't have a zone-file, then error out
      */
-    if (catalog_zone_count(core->db) == 0) {
-        LOG(0, "FAIL: no zones specified\n");
+    if (catalog_zone_count(core->db_load) == 0) {
+        LOG_INFO(C_CONFIG, "FAIL: no zones specified\n");
         exit(1);
     }
 
@@ -557,14 +596,14 @@ int server(int argc, char *argv[])
     stop = pixie_gettime();
     {
         double elapsed = (stop - start) * 1.0;
-        double rate = (1.0*core->zonefiles.total_bytes)/elapsed;
+        double rate = (1.0*(total_bytes))/elapsed;
 
         printf("elapsed: %u.%02u seconds\n",
             (unsigned)(((stop-start)/(1000000))),
             (unsigned)(((stop-start)/(10000))%100)
             );
-        printf("zone size: %llu bytes\n", core->zonefiles.total_bytes);
-        printf("zone files: %llu files\n", core->zonefiles.total_files);
+        printf("zone size: %llu bytes\n", total_bytes);
+        printf("zone files: %llu files\n", total_files);
         printf("speed: %5.3f-megabytes/second parsing zonefile\n", rate);
     }
 
@@ -572,11 +611,7 @@ int server(int argc, char *argv[])
     /*
      * Now start the network interface
      */
-    if (core->nic_count == 0) {
-        sockets_thread(core);
-    } else {
-        pcap_thread(core);
-    }
+    sockets_thread(core);
 
 
     return 0;

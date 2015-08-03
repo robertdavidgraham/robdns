@@ -125,7 +125,7 @@ network_receive(struct Frame *frame,
          * a response structure.
          *
          */
-        resolver_algorithm(thread->catalog, response, request);
+        resolver_algorithm(thread->catalog_run, response, request);
         
         
         /*

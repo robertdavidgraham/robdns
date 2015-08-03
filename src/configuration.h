@@ -1,6 +1,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 #include <stddef.h>
+#include <stdint.h>
 
 struct Cfg_AddrMatchList;
 
@@ -70,6 +71,14 @@ struct Cfg_Zone
      * and overwrite for slave zones */
     char *file;
 
+    /* The time when the file was last updated. This is used to detect changes
+     * in files in order to see if we must reload them */
+    time_t file_timestamp;
+
+    /* The size of the file. We use this in estimating the size of the hash
+     * table we'll need when creating the file */
+    uint64_t file_size;
+
     /* For 'slave' zones, in addition to masters, these servers can send us
      * NOTIFY packets. (allow incoming NOTIFYs) */
     struct Cfg_AddrMatchList *allow_notify;
@@ -107,9 +116,51 @@ struct ConfigurationOptions {
 
 };
 
+struct ConfigurationAdapter {
+    /** The name of the adapter, like "eth0" on Linux, or a number on Windows.
+     * Only used for raw-sockets or raw-ring, not used for normal sockets,
+     * where instead the IP address is used */
+    char *ifname;
+
+    /** The IP address to use */
+    union {
+        unsigned v4;
+        unsigned char v6[16];
+    } ip;
+};
+
 struct ConfigurationDataPlane {
+    /** The port to accept incoming requests. This is only reconfigured
+     * for testing purposes, otherwise the default of 53 will be used */
     unsigned port;
+
+    /** How often (in seconds) to re-check to see if the host operating 
+     * system's network configuration has changed, and if we need to open/close
+     * sockets in response */
     unsigned interface_interval;
+
+    struct ConfigurationAdapter adapters[16];
+    unsigned adapter_count;
+};
+
+struct Cfg_ZoneDir
+{
+    struct Cfg_Zone zone;
+
+    /*
+     * Zonefile list. During the configuration phase,
+     * we build up a list of zonefiles that need to be 
+     * parsed. After configuration, but before the 
+     * server starts, we read in all the zonefiles
+     * and insert their contents into the db.
+     */
+    struct {
+        const char *filename;
+        time_t timestamp;
+        size_t size;
+    } *files;
+    size_t file_count;
+    size_t file_max;
 };
 
 
@@ -124,8 +175,9 @@ struct Configuration
     struct Cfg_Zone **zones;
     size_t zones_length;
 
-    struct Cfg_Zone **zonedirs;
+    struct Cfg_ZoneDir **zonedirs;
     size_t zonedirs_length;
+    size_t zonedirs_filecount;
 
     struct Cfg_Zone *zone_defaults;
 
@@ -133,6 +185,32 @@ struct Configuration
     struct ConfigurationDataPlane data_plane;
     struct ConfigurationDataPlane control_plane;
 
+    struct Loader {
+        /** The number of threads that take parsed records and insert them
+         * into the catalog/db */
+        unsigned load_threads;
+
+        /** The number of threads parsing zonefiles. Only useful when there are
+         * multiple zones, since a single file (even a big one like the .com file)
+         * can only be parsed by a single thread */
+        unsigned parse_threads;
+    } loader;
+
+    unsigned insertion_threads;
+
+    /**
+     * The number of data-plane worker threads that should be running.
+     * If the number is 0, then a worker thread will be created for
+     * every CPU in the system.
+     */
+    unsigned worker_threads;
+
+    /**
+     * Keeps a list of the all the configuration files we load
+     * so that we can quickly check timestamps during HUP in order
+     * to see if any need to be reloaded
+     */
+    struct Conf_TrackFile *tf;
 };
 
 /**
@@ -168,6 +246,13 @@ cfg_addrlist_lookup(const struct Configuration *cfg, const char *name);
  */
 const struct Cfg_Key *
 cfg_key_lookup(const struct Configuration *cfg, const char *name);
+
+/**
+ * Add the fact we need to parse a zonefile with an unknown zone
+ * inside it.
+ */
+void
+cfg_add_zonefile(struct Configuration *cfg, const char *filename);
 
 
 #endif

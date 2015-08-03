@@ -37,6 +37,9 @@
     <Filter Include="Source Files\config">
       <UniqueIdentifier>{b71da1b9-cdc9-416e-b0a7-c37844356397}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\logging">
+      <UniqueIdentifier>{7c416808-5fc0-4b34-a352-bb3cf37abaa7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\adapter-pcapfile.c">
@@ -100,9 +103,6 @@
       <Filter>Source Files\util</Filter>
     </ClCompile>
     <ClCompile Include="..\src\pixie.c">
-      <Filter>Source Files\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\logger.c">
       <Filter>Source Files\util</Filter>
     </ClCompile>
     <ClCompile Include="..\src\proto-arp.c">
@@ -240,6 +240,18 @@
     <ClCompile Include="..\src\main-checkconf.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\conf-zonedir.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\conf-trackfile.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\logger.c">
+      <Filter>Source Files\logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\thread-worker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\adapter-pcapfile.h">
@@ -288,9 +300,6 @@
       <Filter>Source Files\util</Filter>
     </ClInclude>
     <ClInclude Include="..\src\pixie-nic.h">
-      <Filter>Source Files\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\logger.h">
       <Filter>Source Files\util</Filter>
     </ClInclude>
     <ClInclude Include="..\src\extract.h">
@@ -427,6 +436,15 @@
     </ClInclude>
     <ClInclude Include="..\src\conf-error.h">
       <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\conf-trackfile.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\logger.h">
+      <Filter>Source Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pixie-sockets.h">
+      <Filter>Source Files\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

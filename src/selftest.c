@@ -91,7 +91,8 @@ struct TestAdapter
 struct Selftest
 {
     va_list marker;
-    struct Catalog *db;
+    struct Catalog *db_run;
+    struct Catalog *db_load;
     struct ZoneFileParser *parser;
     struct Thread thread[1];
     struct TestAdapter client;
@@ -703,7 +704,7 @@ selftest(int argc, char *argv[])
     unsigned parse_results;
     unsigned i;
     const char *element;
-    struct Catalog *db;
+    struct Catalog *db_load;
     
 
     UNUSEDPARM(argc);
@@ -740,9 +741,11 @@ selftest(int argc, char *argv[])
 
     /* create a catalog/database, this is where all the parsed zonefile
      * records will be put */
-    selftest->db = catalog_create();
-    selftest->thread->catalog = selftest->db;
-    db = selftest->db;
+    selftest->db_run = catalog_create();
+    selftest->db_load = selftest->db_run;
+
+    selftest->thread->catalog_run = selftest->db_run;
+    db_load = selftest->db_load;
 
     /* create a parser object */
     parser = zonefile_begin(
@@ -751,7 +754,7 @@ selftest(int argc, char *argv[])
                 10000,          /* filesize */
                 "<selftest>",   /* filename */
                 zonefile_load,  /* callback */
-                db,             /* callback data */
+                db_load,
                 0
                 );
     selftest->parser = parser;

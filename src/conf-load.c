@@ -2,6 +2,7 @@
 #include "conf-load.h"
 #include "conf-parse.h"
 #include "configuration.h"
+#include "conf-trackfile.h"
 #include "smack.h"
 #include "util-filename.h"
 #include "conf-addrlist.h"
@@ -537,7 +538,10 @@ confload_configuration(struct Configuration *cfg, const char *filename, const st
 {
     unsigned char line[267];
     FILE *fp;
-    struct ConfParse *conf = confparse_create(filename, confload_toplevel, cfg);
+    struct ConfParse *conf;
+    
+    /* Create a parser to read in the file */
+    conf = confparse_create(filename, confload_toplevel, cfg);
 
     /* If this is the first configuration file, then record it as the base
      * directory until it changes.
@@ -549,6 +553,16 @@ confload_configuration(struct Configuration *cfg, const char *filename, const st
         cfg->options.directory = filename_get_directory(filename);
     }
 
+    /*
+     * Record the fact that we loaded this configuration file. During
+     * SIGHUP, we can quickly tell if any of the configuration has, or
+     * has not changed. If configuration hasn't changed, then we'll
+     * skip re-reading the configuration.
+     */
+    conf_trackfile_add(cfg->tf, filename);
+
+
+    /* Open the file */
     fp = fopen(filename, "rt");
     if (fp == NULL) {
         if (token)
@@ -558,14 +572,23 @@ confload_configuration(struct Configuration *cfg, const char *filename, const st
         return;
     }
 
+    /*
+     * Parse the configuration file chunk-by-chunk
+     * TODO: this reads in line-by-line, but the parser doesn't
+     * care about lines, so we should instead read a chunk at 
+     * a time.
+     */
     while (fgets((char*)line, sizeof(line), fp))
         confparse_parse(conf, line, strlen((char*)line));
 
-    printf("\n\n");
-
+    /*
+     * Close
+     */
     fclose(fp);
 }
 
+/****************************************************************************
+ ****************************************************************************/
 void
 cfg_parse_file(struct Configuration *cfg, const char *filename)
 {

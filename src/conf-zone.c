@@ -136,9 +136,30 @@ conf_load_zone( struct Configuration *cfg,
         cfg->zones = malloc(sizeof(cfg->zones[0]));
     else
         cfg->zones = realloc(cfg->zones, sizeof(cfg->zones[0]) * (cfg->zones_length + 1));
-    
-
     cfg->zones[cfg->zones_length++] = zone;
+}
 
 
+/****************************************************************************
+ ****************************************************************************/
+void
+cfg_add_zonefile(struct Configuration *cfg, const char *filename)
+{
+    struct Cfg_Zone *zone;
+
+    /* Create an empty zone record -- we won't know the name of the zone
+     * until we parse the file */
+    zone = conf_zone_create(0, 0);
+
+    /* Add in the zonefile name */
+    zone->file = filename_combine(cfg->options.directory, filename);
+
+    /*
+     * Add to our list of zones
+     */
+    if (cfg->zones_length == 0)
+        cfg->zones = malloc(sizeof(cfg->zones[0]));
+    else
+        cfg->zones = realloc(cfg->zones, sizeof(cfg->zones[0]) * (cfg->zones_length + 1));
+    cfg->zones[cfg->zones_length++] = zone;
 }

@@ -19,54 +19,59 @@ int verbosity = 0; /* yea! a global variable!! */
 /***************************************************************************
  ***************************************************************************/
 void
-vLOG(int level, const char *fmt, va_list marker)
+vLOG(enum LogLevel level, enum LogCategory cat, const char *fmt, va_list marker)
 {
-    if (level <= verbosity) {
-        vfprintf(stderr, fmt, marker);
-        fflush(stderr);
-    }
+    vfprintf(stderr, fmt, marker);
+    fflush(stderr);
 }
 
 
-/***************************************************************************
- * Prints the message if the global "verbosity" flag exceeds this level.
- ***************************************************************************/
-void
-LOG(int level, const char *fmt, ...)
+void LOG_CRIT(enum LogCategory cat, const char *fmt, ...)
 {
     va_list marker;
 
     va_start(marker, fmt);
-    vLOG(level, fmt, marker);
+    vLOG(L_CRIT, cat, fmt, marker);
     va_end(marker);
 }
 
-/***************************************************************************
- ***************************************************************************/
-void
-vLOGip(int level, unsigned ip, unsigned port, const char *fmt, va_list marker)
-{
-    if (level <= verbosity) {
-        char sz_ip[16];
-        
-        sprintf_s(sz_ip, sizeof(sz_ip), "%u.%u.%u.%u", 
-            (ip>>24)&0xFF, (ip>>16)&0xFF, (ip>>8)&0xFF, (ip>>0)&0xFF);
-        fprintf(stderr, "%-15s:%5u: ", sz_ip, port);
-        vfprintf(stderr, fmt, marker);
-        fflush(stderr);
-    }
-}
-
-
-/***************************************************************************
- ***************************************************************************/
-void
-LOGip(int level, unsigned ip, unsigned port, const char *fmt, ...)
+void LOG_ERR(enum LogCategory cat, const char *fmt, ...)
 {
     va_list marker;
 
     va_start(marker, fmt);
-    vLOGip(level, ip, port, fmt, marker);
+    vLOG(L_ERR, cat, fmt, marker);
     va_end(marker);
 }
+
+void LOG_WARN(enum LogCategory cat, const char *fmt, ...)
+{
+    va_list marker;
+
+    va_start(marker, fmt);
+    vLOG(L_WARN, cat, fmt, marker);
+    va_end(marker);
+}
+
+void LOG_INFO(enum LogCategory cat, const char *fmt, ...)
+{
+    va_list marker;
+
+    va_start(marker, fmt);
+    vLOG(L_INFO, cat, fmt, marker);
+    va_end(marker);
+}
+
+void LOG_DBG(enum LogCategory cat, int debug_level, const char *fmt, ...)
+{
+    va_list marker;
+
+    if (debug_level >= verbosity)
+        return;
+    va_start(marker, fmt);
+    vLOG(L_DBG0, cat, fmt, marker);
+    va_end(marker);
+}
+
+
 

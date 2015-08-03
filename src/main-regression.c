@@ -175,7 +175,7 @@ regression_test_pcap(struct Grind *grind, const char *filename)
     adapter->ipv6_count = 1;
 
     memset(&thread, 0, sizeof(thread[0]));
-    thread->catalog = grind_get_catalog(grind);
+    thread->catalog_run = grind_get_catalog(grind);
     
     
     

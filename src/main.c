@@ -1,4 +1,5 @@
 #include "grind.h"
+#include "logger.h"
 #include "main-regression.h"
 #include "selftest.h"
 #include "adapter-pcaplive.h"
@@ -64,7 +65,7 @@ main(int argc, char *argv[])
 {
     int i;
 
-  	fprintf(stderr, "--- Rob's DNS server v0.2 ----\n");
+  	LOG_INFO(C_GENERAL, "--- Rob's DNS server v0.2 ----\n");
 
     /*
      * Initialize various things that are process-wide.

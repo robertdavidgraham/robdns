@@ -8,7 +8,7 @@ struct Catalog;
 
 struct Thread
 {
-    struct Catalog *catalog;
+    struct Catalog *catalog_run;
 	unsigned ip_id;
 
 	struct Statistics {

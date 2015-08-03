@@ -165,7 +165,7 @@ perftest(int argc, char *argv[])
     /* create a catalog/database, this is where all the parsed zonefile
      * records will be put */
     perftest->db = catalog_create();
-    perftest->thread->catalog = perftest->db;
+    perftest->thread->catalog_run = perftest->db;
     db = perftest->db;
     
     /* 
