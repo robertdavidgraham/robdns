@@ -101,6 +101,7 @@
     <ClInclude Include="..\src\conf-parse.h" />
     <ClInclude Include="..\src\conf-trackfile.h" />
     <ClInclude Include="..\src\conf-zone.h" />
+    <ClInclude Include="..\src\configuration-adapter.h" />
     <ClInclude Include="..\src\configuration.h" />
     <ClInclude Include="..\src\crypto-base64.h" />
     <ClInclude Include="..\src\crypto-md5.h" />

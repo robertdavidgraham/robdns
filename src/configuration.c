@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "conf-trackfile.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -15,6 +16,8 @@ struct Configuration *cfg_create(void)
     cfg->zone_defaults = malloc(sizeof(*cfg->zone_defaults));
     memset(cfg->zone_defaults, 0, sizeof(*cfg->zone_defaults));
 
+    /* Create a subsystem that keeps track of all the configuration files */
+    cfg->tf = conf_trackfile_create();
     return cfg;
 }
 

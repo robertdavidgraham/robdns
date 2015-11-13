@@ -39,19 +39,20 @@ conf_trackfile_count(const struct Conf_TrackFile *tf)
     return tf->count;
 }
 
+
 /****************************************************************************
  ****************************************************************************/
 const char *
-conf_trackefile_filename(const struct Conf_TrackFile *tf, unsigned index)
+conf_trackfile_filename(const struct Conf_TrackFile *tf, unsigned index)
 {
-    return tf->files[i].filename;
+    return tf->files[index].filename;
 }
 
 
 /****************************************************************************
  ****************************************************************************/
 unsigned
-conf_trackfile_has_changed(
+conf_trackfile_has_changed2(
     const struct Conf_TrackFile *tfnew, 
     const struct Conf_TrackFile *tfold)
 {
@@ -111,6 +112,42 @@ conf_trackfile_has_changed(
 
 /****************************************************************************
  ****************************************************************************/
+unsigned
+conf_trackfile_has_changed(const struct Conf_TrackFile *tf)
+{
+    unsigned i;
+
+    /* On startup, when there are no old configuration files, this will
+     * be the default case. */
+    if (tf == NULL || tf->count == 0) {
+        return 1;
+    }
+
+    /* See if the timestamps or filesizes have changed */
+    for (i=0; i<tf->count; i++) {
+        const char *filename = tf->files[i].filename;
+        int64_t timestamp = tf->files[i].timestamp;
+        int64_t size = tf->files[i].size;
+        struct stat64 s;
+
+        if (stat64(filename, &s) != 0) {
+            if (timestamp != 0 || size != 0)
+                return 1; /* file is now gone, but didn't used to be */
+        } else {
+            if (timestamp != s.st_mtime || size != s.st_size)
+                return 1; /* file time or size has changed */
+        }
+    }
+
+    /* If we reach this point without returning, then it means that none
+     * of the files have changed. This is the expected condition, since 
+     * most of the time we process SIGHUP events, we'll be reloading
+     * zonefiles rather tha conf files. */
+    return 0;
+}
+
+/****************************************************************************
+ ****************************************************************************/
 void
 conf_trackfile_add(struct Conf_TrackFile *tf, const char *filename)
 {
@@ -133,7 +170,7 @@ conf_trackfile_add(struct Conf_TrackFile *tf, const char *filename)
         tf->files[tf->count].timestamp = s.st_mtime; /* last modified time */
         tf->files[tf->count].size = s.st_size; /* size of the file */
     } else {
-        LOG_WARN(C_CONFIG, "%s: %s\n", filename, strerror(errno));
+        //LOG_WARN(C_CONFIG, "%s: %s\n", filename, strerror(errno));
 
         /* remember the file if it doesn't exist now, in case it exists
          * in the future */

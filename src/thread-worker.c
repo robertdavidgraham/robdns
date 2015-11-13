@@ -181,9 +181,7 @@ thread_worker_stop(struct Core *core)
 /****************************************************************************
  ****************************************************************************/
 void
-change_worker_threads(  struct Core *core, 
-                        struct Configuration *cfg_new, 
-                        struct Configuration *cfg_old)
+change_resolver_threads(struct Core *core, struct Configuration *cfg_new)
 {
     /* If no threads were specified, then default to the number of threads
      * in the system */

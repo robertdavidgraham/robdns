@@ -2,23 +2,13 @@
 #define MAIN_CONF_H
 #include <stdint.h>
 #include "adapter.h"
+#include "configuration-adapter.h"
 
-enum SocketType {
-    ST_Unknown, ST_IPv4, ST_IPv6, ST_Any
-};
-struct SocketItem
-{
-    int fd;
-    enum SocketType type;
-    union {
-        unsigned v4;
-        unsigned char v6;
-    } ip;
-};
+struct Configuration;
 
 struct CoreSocketSet
 {
-    struct SocketItem *list;
+    struct CoreSocketItem *list;
     size_t count;
 };
 
@@ -155,7 +145,7 @@ conf_zonefiles_parse(   struct Catalog *db_load,
 /**
  * Change the number of data-plane worker-threads
  */
-void change_worker_threads(struct Core *core, struct Configuration *cfg_new, struct Configuration *cfg_old);
+void change_resolver_threads(struct Core *core, struct Configuration *cfg_new);
 
 
 /**

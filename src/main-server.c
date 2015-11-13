@@ -12,6 +12,7 @@
 #include "pixie.h"
 #include "pixie-timer.h"
 #include "pixie-threads.h"
+#include "pixie-sockets.h"
 #include "string_s.h"
 #include "logger.h"
 #include "adapter-pcaplive.h"
@@ -21,6 +22,7 @@
 #include "unusedparm.h"
 #include "adapter-pcapfile.h"
 #include "main-server-socket.h"
+#include "util-ipaddr.h"        /* format IPv6 address */
 #include <ctype.h>
 
 extern uint64_t entry_bytes;
@@ -509,110 +511,481 @@ void change_logging(struct Core *core, struct Configuration *cfg_new, struct Con
 {
 }
 
+
+/****************************************************************************
+ ****************************************************************************/
+struct CoreSocketItem *
+core_adapter_lookup(const struct CoreSocketSet *set, int type, void *addr, unsigned proto, unsigned port, const char *ifname)
+{
+    unsigned i;
+    for (i=0; i<set->count; i++) {
+        struct CoreSocketItem *item = &set->list[i];
+
+        /* compare type */
+        if (item->type != type)
+            continue;
+
+        if (item->proto != proto)
+            continue;
+
+        /* compare port */
+        if (item->port != port)
+            continue;
+
+        /* compare address */
+        switch (item->type) {
+        case ST_IPv4:
+            if (item->ip.v4 != *(unsigned*)addr)
+                continue;
+            break;
+        case ST_IPv6:
+            if (memcmp(item->ip.v6, addr, 16) != 0)
+                continue;
+            break;
+        case ST_Raw:
+            if (strcmp(item->ifname, ifname) != 0)
+                continue;
+            break;
+        default:
+            continue;
+        }
+
+        /* everything equal, so return */
+        return item;
+    }
+
+    return 0;
+}
+
+/****************************************************************************
+ ****************************************************************************/
+struct CoreSocketItem *
+core_adapter_add(struct CoreSocketSet *set, int type, 
+        void *addr, 
+        unsigned proto, 
+        unsigned port, 
+        const char *ifname)
+{
+    struct CoreSocketItem *item;
+
+    set->count++;
+    set->list = realloc(set->list, sizeof(set->list[0]) * set->count);
+
+    item = &set->list[set->count - 1];
+
+    item->fd = 0;
+    if (ifname) {
+        item->ifname = malloc(strlen(ifname)+1);
+        memcpy(item->ifname, ifname, strlen(ifname)+1);
+    }
+
+    item->proto = proto;
+
+    item->port = port;
+    
+    switch (item->type) {
+    case ST_IPv4:
+        item->ip.v4 = *(unsigned*)addr;
+        break;
+    case ST_IPv6:
+        memcpy(item->ip.v6, addr, 16);
+        break;
+    default:
+        memset(item->ip.v6, 0, 16);
+        break;
+    }
+
+    return item;
+}
+
+int
+sockitem_open(struct CoreSocketItem *adapt)
+{
+    int fd;
+    int err;
+
+    /*
+     * Create a socket descriptor
+     */
+    switch (adapt->type) {
+    case ST_Any:
+    case ST_IPv6:
+        /* By specifying IPv6, we allow both IPv4 and IPv6 on the same socket */
+        fd = socket(AF_INET6, SOCK_DGRAM, 0);
+        break;
+    case ST_IPv4:
+        fd = socket(AF_INET, SOCK_DGRAM, 0);
+        break;
+    default:
+        LOG_ERR(C_NETWORK, "impossible\n");
+        return -1;
+    }
+    if (fd <= 0) {
+        LOG_ERR(C_NETWORK, "couldn't create socket() %u\n", WSAGetLastError());
+        return -1;
+    }
+
+    
+    /*
+     * Set 'reuse', otherwise we'd need to wait before restarting process 
+     */
+    {
+        int on = 1;
+        err = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)&on,sizeof(on));
+        if (err < 0)
+            LOG_ERR(C_NETWORK, "fail: setsockopt(SO_REUSEADDR) %u\n", WSAGetLastError());
+    }
+
+    if (adapt->type == ST_Any) {
+        /*
+            * Enable both IPv4 and IPv6 to be used on the same sockets. This appears to
+            * be needed for Windows, but not needed for Mac OS X.
+            */
+        int on = 0;
+        err = setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&on, sizeof(on)); 
+        if (err < 0)
+            LOG_ERR(C_NETWORK, "fail: setsockopt(IPV6_V6ONLY) %u\n", WSAGetLastError());
+    }
+    
+    switch (adapt->type) {
+    case ST_Any:
+        /*
+         * Listen on any IPv4 or IPv6 address in the system
+         */
+        {
+            struct sockaddr_in6 sin;
+
+            memset(&sin, 0, sizeof(sin));
+            sin.sin6_family = AF_INET6;
+            sin.sin6_addr = in6addr_any;
+            sin.sin6_port = htons(adapt->port);
+            err = bind(fd, (struct sockaddr*)&sin, sizeof(sin));
+        }
+        break;
+    case ST_IPv6:
+        /*
+         * Listen on any IPv4 or IPv6 address in the system
+         */
+        {
+            struct sockaddr_in6 sin;
+
+            memset(&sin, 0, sizeof(sin));
+            sin.sin6_family = AF_INET6;
+            memcpy(&sin.sin6_addr, adapt->ip.v6, 16);
+            sin.sin6_port = htons(adapt->port);
+            err = bind(fd, (struct sockaddr*)&sin, sizeof(sin));
+        }
+        break;
+    case ST_IPv4:
+        {
+            struct sockaddr_in sin;
+
+            memset(&sin, 0, sizeof(sin));
+            sin.sin_family = AF_INET;
+            sin.sin_addr.s_addr = htonl(adapt->ip.v4);
+            sin.sin_port = htons(adapt->port);
+            err = bind(fd, (struct sockaddr*)&sin, sizeof(sin));
+        }
+        break;
+    default:
+        closesocket(fd);
+        return -1;
+    }
+
+    if (err) {
+        switch (WSAGetLastError()) {
+            case WSA(EACCES):
+                LOG_ERR(C_NETWORK, "FAIL: couldn't bind to port %u: %s\n", adapt->port, 
+                    "access denied");
+                if (adapt->port <= 1024)
+                    LOG_ERR(C_NETWORK, "  hint... need to be root for ports below 1024\n");
+                break;
+            case WSA(EADDRINUSE):
+                LOG_ERR(C_NETWORK, "FAIL: couldn't bind to port %u: %s\n", adapt->port, 
+                    "address in use");
+                LOG_ERR(C_NETWORK, "  hint... some other server is running on that port\n");
+                break;
+            default:
+                LOG_ERR(C_NETWORK, "FAIL: couldn't bind to port %u: %u\n", adapt->port,
+                    WSAGetLastError());
+        }
+        closesocket(fd);
+        return -1;
+    }
+
+
+    /*
+     * Now log a success message
+     */
+    switch (adapt->type) {
+    case ST_Any:
+        LOG_INFO(C_NETWORK, "Listening on any udp/%u\n", adapt->port);
+        break;
+    case ST_IPv4:
+        LOG_INFO(C_NETWORK, "Listening on %u.%u.%u.%u udp/%u\n", 
+            (adapt->ip.v4>>24)&0xFF, (adapt->ip.v4>>15)&0xFF, 
+            (adapt->ip.v4>> 8)&0xFF, (adapt->ip.v4>> 0)&0xFF, 
+            adapt->port);
+        break;
+    case ST_IPv6:
+        {
+            char text[64];
+            
+            format_ipv6_address(text, sizeof(text), adapt->ip.v6);
+
+            LOG_INFO(C_NETWORK, "Listening on [%s] udp/%u\n",
+                text,
+                adapt->port);
+        }
+        break;
+    default:
+        LOG_ERR(C_NETWORK, "impossible\n");
+        break;
+    }
+
+    /*
+     * Set the file descriptor
+     */
+    adapt->fd = fd;
+    return fd;
+}
+
+
+
+/****************************************************************************
+ ****************************************************************************/
+void change_network_adapters(struct Core *core, struct Configuration *cfg_load, struct Configuration *cfg_run)
+{
+    struct CoreSocketSet *socket_load;
+    struct ConfigurationDataPlane *list;
+    unsigned i;
+
+    /*
+     * Create a new sockets structure. We will first fill it with all the
+     * adapters we are using, then swap it in for the resolver threads
+     * to use.
+     */
+    socket_load = malloc(sizeof(*socket_load));
+    if (socket_load == NULL) {
+        LOG_CRIT(C_GENERAL, "out of memory error");
+        return;
+    }
+    memset(socket_load, 0, sizeof(*socket_load));
+
+    /*
+     * If no adapter exists, then create an "any" adapter by default
+     */
+    list = &cfg_load->data_plane;
+    if (list == NULL || list->adapter_count == 0) {
+        cfg_load_string(cfg_load, "options { listen-on { any; }; };");
+        list = &cfg_load->data_plane;
+    }
+
+    /*
+     * Add all the adapters to our 'load' list
+     */
+    for (i=0; i<list->adapter_count; i++) {
+        struct CoreSocketItem *adapt_c = &list->adapters[i];
+        struct CoreSocketItem *adapt_l;
+
+        /* ignore duplicates */
+        adapt_l = core_adapter_lookup(socket_load, 
+                                        adapt_c->type, 
+                                        &adapt_c->ip,
+                                        adapt_c->proto,
+                                        adapt_c->port,
+                                        adapt_c->ifname);
+        if (adapt_l)
+            continue;
+
+        /* add a new adapter */
+        adapt_l = core_adapter_add(socket_load,
+                            adapt_c->type,
+                            &adapt_c->ip,
+                            adapt_c->proto,
+                            adapt_c->port,
+                            adapt_c->ifname);
+
+    }
+
+    /*
+     * Now open all the sockets -- if they aren't already open
+     */
+    for (i=0; i<socket_load->count; i++) {
+        struct CoreSocketItem *adapt_l = &socket_load->list[i];
+        struct CoreSocketItem *adapt_r;
+
+        /* see if the  needs to be open */
+        adapt_r = core_adapter_lookup((struct CoreSocketSet *)core->socket_run, 
+                                        adapt_l->type, 
+                                        &adapt_l->ip, 
+                                        adapt_l->proto,
+                                        adapt_l->port,
+                                        adapt_l->ifname);
+    
+        /* If the socket is already open, then simply
+         * copy the value here */
+        if (adapt_r && adapt_r->fd) {
+            adapt_l->fd = adapt_r->fd;
+            continue;
+        } else {
+            sockitem_open(adapt_l);
+        }
+    }
+}
+
+
+
+
 /****************************************************************************
  ****************************************************************************/
 int server(int argc, char *argv[])
 {
-    struct Configuration *cfg_new;
-    struct Configuration *cfg_old = cfg_create();
+    struct Configuration *cfg_run = cfg_create();
     struct Core core[1];
     uint64_t start, stop;
     uint64_t total_files=0, total_bytes=0;
 
+    /*
+     * We want to track how long it takes to fully initialize the
+     * server, since because DNS is infrastructure, restarting
+     * quickly after a failure is important, so we want to benchmark
+     * how fast those startups happen
+     */
     start = pixie_gettime();
 
     /*
-     * Initialie the core structure structure
+     * Initialie the core structure structure. We don't have globals,
+     * so instead anything 'global' will either hang off this
+     * 'core' variable.
      */
     core_init(core);
 
     /*
-     * Create an empty database
+     * Create two databases. One database is for loading new/changed
+     * content. The other database is used by the running system, with
+     * multiple thtreads querying it. Once loaded, changes will be moved
+     * from the loading db to the running db in a thread-safe manner.
+     * (This is similar to cfg_load/cfg_run).
      */
     core->db_load = catalog_create();
     core->db_run = catalog_create();
 
 
     /*
-     * Create a new configuration instance
+     * Now sit in a loop waiting for configuration/zonefile changes to
+     * happen
      */
-    cfg_new = cfg_create();
+    for (;;) {
+        struct Configuration *cfg_load;
 
-    /*
-     * Read the command-line 
-     */
-    conf_command_line(cfg_new, argc, argv);
+        /*
+         * Create a temporary configuration structure for reading in new/changed
+         * configuration information. Changes will be then be moved over (in
+         * a thread-safe manner) into the running configuration instance (cfg_run).
+         * (Similar how db_load/db_run works)
+         */
+        cfg_load = cfg_create();
 
-    /*
-     * Test to see if the configuration has changed
-     */
-    if (conf_trackfile_has_changed(cfg_new->tf, cfg_old->tf)) {
-        unsigned count = conf_trackfile_count(cfg_new->tf);
-        unsigned i;
+        /*
+         * Re-read the command-line. This in turn will cause the system to read
+         * the master 'named.conf' file, plus additional  files through 'include'.
+         * All configuration is loaded into the "cfg_load" instance, but not
+         * the zonefiles/databases (which happens at a later step below).
+         */
+        conf_command_line(cfg_load, argc, argv);
+#if 0
+        {
+            unsigned count = conf_trackfile_count(cfg_load->tf);
+            unsigned i;
 
-        /* Read in the new configuration */
-        for (i=0; i<count; i++) {
-            const char *filename = conf_trackfile_filename(cfg_new->tf, i);
-            cfg_parse_file(cfg_new, filename);
+            /* Read in the new configuration */
+            for (i=0; i<count; i++) {
+                const char *filename = conf_trackfile_filename(cfg_load->tf, i);
+                cfg_parse_file(cfg_load, filename);
+            }
+        }
+#endif
+
+        /*
+         * If none of the configuration files have changed, then skip any
+         * reconfiguration events. If configuration has changed, then we'll need
+         * to apply each change one-by-one. Note that we track if configuration
+         * changes purely by whether the timestamps have changed.
+         */
+        if (conf_trackfile_has_changed(cfg_run->tf)) {
+
+            /* 
+             * We apply logging changes first. That's because everything else after
+             * this point can cause errors/warnings that need to be logged correctly.
+             * Note: At startup, logging both defautls to <stderr>, but in ADDITION
+             * the first megabyte of output text is buffered, and printed to the
+             * new logging channels.
+             */
+            change_logging(core, cfg_load, cfg_run);
+            /* todo: output buffered logging here */
+
+            /*
+             * Change the number of resolver threads. By default, at startup this
+             * will create resolver threads for each CPU on the system. The code
+             * is thread-scalable, so likes lots of threads on massive numbers of
+             * CPUs.
+             */
+            change_resolver_threads(core, cfg_load);
+
+            /*
+             * Change the network adapter configuration. It's at this stage that
+             * we'll open/close sockets.
+             */
+            change_network_adapters(core, cfg_load, cfg_run);
         }
 
-        /* Apply the changes */
-        change_logging(core, cfg_new, cfg_old);
-        change_worker_threads(core, cfg_new, cfg_old);
+
+        /*
+         * If we have lots of zones, then adjust the size of the hash table
+         * to make lookups efficient.
+         */
+        if (cfg_load->zones_length + cfg_load->zonedirs_filecount > 200) {
+            catalog_reset_zonecount(core->db_load, (unsigned)(cfg_load->zones_length + cfg_load->zonedirs_filecount) * 2);
+        }
+
+        /*
+         * Load the zonefiles
+         */
+        conf_zonefiles_parse(core->db_load, cfg_load, &total_files, &total_bytes);
+
+        /*
+         * If we don't have a zone-file, then error out
+         */
+        if (catalog_zone_count(core->db_load) == 0) {
+            LOG_INFO(C_CONFIG, "FAIL: no zones specified\n");
+            exit(1);
+        }
+
+        /*
+         * Benchmark
+         */
+        stop = pixie_gettime();
+        {
+            double elapsed = (stop - start) * 1.0;
+            double rate = (1.0*(total_bytes))/elapsed;
+
+            printf("elapsed: %u.%02u seconds\n",
+                (unsigned)(((stop-start)/(1000000))),
+                (unsigned)(((stop-start)/(10000))%100)
+                );
+            printf("zone size: %llu bytes\n", total_bytes);
+            printf("zone files: %llu files\n", total_files);
+            printf("speed: %5.3f-megabytes/second parsing zonefile\n", rate);
+        }
+
+
+        /*
+         * Now start the network interface
+         */
+        sockets_thread(core);
 
     }
-
-
-
-
-
-
-
-
-    /*
-     * If we have lots of zones, then adjust the size of the hash table
-     * to make lookups efficient.
-     */
-    if (cfg->zones_length + cfg->zonedirs_filecount > 200) {
-        catalog_reset_zonecount(core->db_load, (unsigned)(cfg->zones_length + cfg->zonedirs_filecount) * 2);
-    }
-
-    /*
-     * Load the zonefiles
-     */
-    conf_zonefiles_parse(core->db_load, cfg, &total_files, &total_bytes);
-
-    /*
-     * If we don't have a zone-file, then error out
-     */
-    if (catalog_zone_count(core->db_load) == 0) {
-        LOG_INFO(C_CONFIG, "FAIL: no zones specified\n");
-        exit(1);
-    }
-
-    /*
-     * Benchmark
-     */
-    stop = pixie_gettime();
-    {
-        double elapsed = (stop - start) * 1.0;
-        double rate = (1.0*(total_bytes))/elapsed;
-
-        printf("elapsed: %u.%02u seconds\n",
-            (unsigned)(((stop-start)/(1000000))),
-            (unsigned)(((stop-start)/(10000))%100)
-            );
-        printf("zone size: %llu bytes\n", total_bytes);
-        printf("zone files: %llu files\n", total_files);
-        printf("speed: %5.3f-megabytes/second parsing zonefile\n", rate);
-    }
-
-
-    /*
-     * Now start the network interface
-     */
-    sockets_thread(core);
-
 
     return 0;
 }

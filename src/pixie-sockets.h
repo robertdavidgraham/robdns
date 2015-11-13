@@ -7,6 +7,8 @@
 #define WSA(err) WSA##err
 #if defined(_MSC_VER)
 #pragma comment(lib, "ws2_32.lib")
+#pragma warning(disable:4389)
+#pragma warning(disable:4127)
 #endif
 typedef int socklen_t;
 #else

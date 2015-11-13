@@ -30,8 +30,6 @@ const char *conf_trackfile_filename(const struct Conf_TrackFile *tf, unsigned in
  * skip reconfiguration
  */
 unsigned
-conf_trackfile_has_changed(
-    const struct Conf_TrackFile *tfnew, 
-    const struct Conf_TrackFile *tfold);
+conf_trackfile_has_changed(const struct Conf_TrackFile *tf);
 
 #endif

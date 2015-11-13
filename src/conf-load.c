@@ -3,6 +3,7 @@
 #include "conf-parse.h"
 #include "configuration.h"
 #include "conf-trackfile.h"
+#include "logger.h"
 #include "smack.h"
 #include "util-filename.h"
 #include "conf-addrlist.h"
@@ -20,6 +21,7 @@
 #include <ws2tcpip.h> /* gethostname */
 #include <direct.h> /* getcwd */
 #define getcwd _getcwd
+#define strdup _strdup
 #else
 #include <unistd.h> /* getcwd, gethostname */
 #endif
@@ -540,18 +542,33 @@ confload_configuration(struct Configuration *cfg, const char *filename, const st
     FILE *fp;
     struct ConfParse *conf;
     
-    /* Create a parser to read in the file */
-    conf = confparse_create(filename, confload_toplevel, cfg);
-
     /* If this is the first configuration file, then record it as the base
      * directory until it changes.
-     * WARNING: BIND9 uses the current-working-directory as the initial
-     * base, but I don't like that. Therefore, I'm going to use the
-     * config file as the base
      */
     if (cfg->options.directory == 0) {
+        if (filename_is_absolute(filename)) {
+            filename = strdup(filename);
+        } else {
+            char dir[MAX_PATH];
+            getcwd(dir, sizeof(dir));
+            filename = filename_combine(dir, filename);
+        }
         cfg->options.directory = filename_get_directory(filename);
+    } else {
+        /*
+         * If the filename isn't absolute, then prefix it with the current
+         * directory
+         */
+        if (filename_is_absolute(filename))
+            filename = strdup(filename);
+        else
+            filename = filename_combine(cfg->options.directory, filename);
     }
+
+    LOG_INFO(C_CONFIG, "Loading conf: %s\n", filename);
+
+    /* Create a parser to read in the file */
+    conf = confparse_create(filename, confload_toplevel, cfg);
 
     /*
      * Record the fact that we loaded this configuration file. During
@@ -567,8 +584,9 @@ confload_configuration(struct Configuration *cfg, const char *filename, const st
     if (fp == NULL) {
         if (token)
             CONF_ERR(conf, token, "%s\n", strerror(errno));
-        else
-            perror(filename);
+        else {
+            LOG_ERR(C_CONFIG, "%s: %s\n", filename, strerror(errno));
+        }
         return;
     }
 
@@ -582,9 +600,26 @@ confload_configuration(struct Configuration *cfg, const char *filename, const st
         confparse_parse(conf, line, strlen((char*)line));
 
     /*
+     * Free up resources used by the parser
+     */
+    confparse_destroy(conf);
+
+    /*
      * Close
      */
     fclose(fp);
+}
+
+void
+cfg_load_string(struct Configuration *cfg, const char *string)
+{
+    struct ConfParse *conf;
+    
+    conf = confparse_create("<internal>", confload_toplevel, cfg);
+
+    confparse_parse(conf, (const unsigned char *)string, strlen(string));
+
+    confparse_destroy(conf);
 }
 
 /****************************************************************************

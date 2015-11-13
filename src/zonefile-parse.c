@@ -742,7 +742,7 @@ rr_end:
             /* If the line starts with a space, then that means we'll use the
              * the domain-name from the previous line, and just skip to the
              * next field */
-            block->buf[block->offset] = block->domain.length;
+            block->buf[block->offset] = (unsigned char)block->domain.length;
             memcpy(&block->buf[block->offset]+1, block->domain.name, block->domain.length);
             block->offset += block->domain.length + 1;
             block->buf[block->offset] = 0xA3;

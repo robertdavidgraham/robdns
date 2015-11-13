@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "configuration-adapter.h"
 struct Cfg_AddrMatchList;
 
 struct Cfg_AddrMatchElement
@@ -116,18 +117,7 @@ struct ConfigurationOptions {
 
 };
 
-struct ConfigurationAdapter {
-    /** The name of the adapter, like "eth0" on Linux, or a number on Windows.
-     * Only used for raw-sockets or raw-ring, not used for normal sockets,
-     * where instead the IP address is used */
-    char *ifname;
 
-    /** The IP address to use */
-    union {
-        unsigned v4;
-        unsigned char v6[16];
-    } ip;
-};
 
 struct ConfigurationDataPlane {
     /** The port to accept incoming requests. This is only reconfigured
@@ -139,7 +129,7 @@ struct ConfigurationDataPlane {
      * sockets in response */
     unsigned interface_interval;
 
-    struct ConfigurationAdapter adapters[16];
+    struct CoreSocketItem adapters[16];
     unsigned adapter_count;
 };
 
@@ -157,7 +147,7 @@ struct Cfg_ZoneDir
     struct {
         const char *filename;
         time_t timestamp;
-        size_t size;
+        uint64_t size;
     } *files;
     size_t file_count;
     size_t file_max;
@@ -254,5 +244,8 @@ cfg_key_lookup(const struct Configuration *cfg, const char *name);
 void
 cfg_add_zonefile(struct Configuration *cfg, const char *filename);
 
+
+void
+cfg_load_string(struct Configuration *cfg, const char *string);
 
 #endif

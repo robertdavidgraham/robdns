@@ -446,6 +446,9 @@
     <ClInclude Include="..\src\pixie-sockets.h">
       <Filter>Source Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\configuration-adapter.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile">

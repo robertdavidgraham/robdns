@@ -285,8 +285,8 @@ conf_zonefiles_parse_thread(void *v)
 enum SuccessFailure
 conf_zonefiles_parse(   struct Catalog *db_load,
                         struct Configuration *cfg,
-                        size_t *out_total_files,
-                        size_t *out_total_bytes)
+                        uint64_t *out_total_files,
+                        uint64_t *out_total_bytes)
 {
     struct XParseThread p[16];
     size_t exit_code;
@@ -770,7 +770,8 @@ conf_command_line(struct Configuration *cfg, int argc, char *argv[])
                     arg = argv[i]+2;
                 else
                     arg = argv[++i];
-                conf_trackfile_add(cfg->tf, argv[i]);
+                //conf_trackfile_add(cfg->tf, argv[i]);
+                cfg_parse_file(cfg, argv[i]);
                 break;
             case 'd':
                 if (argv[i][2])
@@ -806,7 +807,8 @@ conf_command_line(struct Configuration *cfg, int argc, char *argv[])
         else if (ends_with(argv[i], ".zone"))
             cfg_add_zonefile(cfg, argv[i]);
         else if (ends_with(argv[i], ".conf")) {
-            conf_trackfile_add(cfg->tf, argv[i]);
+            //conf_trackfile_add(cfg->tf, argv[i]);
+            cfg_parse_file(cfg, argv[i]);
         } else if (parse_ip_address(argv[i], 0, 0, &ipaddr)) {
             ;//conf_set_parameter(conf, "adapter-ip", argv[i]);
         } else if (pixie_nic_exists(argv[i])) {
@@ -817,8 +819,6 @@ conf_command_line(struct Configuration *cfg, int argc, char *argv[])
             LOG_ERR(C_CONFIG, "%s: unknown command-line parameter\n", argv[i]);
         }
     }
-
-    return cfg;
 }
 
 /***************************************************************************
