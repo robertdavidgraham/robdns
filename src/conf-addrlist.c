@@ -219,8 +219,6 @@ conf_load_addrlist2(const struct Configuration *cfg,
 {
     size_t i;
 
-
-
     for (i=0; i<parent->child_count; i++) {
         struct CF_Child child = confparse_node_getchild(parse, parent, i);
         struct ParsedIpAddress ip;

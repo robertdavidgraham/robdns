@@ -27,6 +27,7 @@
     <ClCompile Include="..\src\conf-addrlist.c" />
     <ClCompile Include="..\src\conf-keys.c" />
     <ClCompile Include="..\src\conf-load.c" />
+    <ClCompile Include="..\src\conf-load-options.c" />
     <ClCompile Include="..\src\conf-parse.c" />
     <ClCompile Include="..\src\conf-selftest.c" />
     <ClCompile Include="..\src\conf-trackfile.c" />

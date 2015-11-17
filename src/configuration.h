@@ -129,6 +129,11 @@ struct ConfigurationDataPlane {
      * sockets in response */
     unsigned interface_interval;
 
+    /**
+     * Whether to disable IPv6
+     */
+    unsigned is_ipv6_none:1;
+
     struct CoreSocketItem adapters[16];
     unsigned adapter_count;
 };
@@ -213,6 +218,7 @@ void cfg_parser_init(void);
 struct Configuration *cfg_create(void);
 void cfg_destroy(struct Configuration *cfg);
 
+int cfg_selftest(void);
 
 /**
  * Read a configuration file into the configuration structure.

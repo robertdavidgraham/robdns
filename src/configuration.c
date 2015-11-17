@@ -46,3 +46,17 @@ void cfg_destroy(struct Configuration *cfg)
     free(cfg);
 }
 
+
+int
+cfg_selftest(void)
+{
+    struct Configuration *cfg;
+
+    cfg = cfg_create();
+
+    cfg_load_string(cfg, "options {\n listen-on port 53 { any; { 127.0.0.1; ::1; }; }; };");
+    
+    cfg_destroy(cfg);
+
+    return 0;
+}

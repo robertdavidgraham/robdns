@@ -518,6 +518,10 @@ struct CoreSocketItem *
 core_adapter_lookup(const struct CoreSocketSet *set, int type, void *addr, unsigned proto, unsigned port, const char *ifname)
 {
     unsigned i;
+
+    if (set == NULL)
+        return 0;
+
     for (i=0; i<set->count; i++) {
         struct CoreSocketItem *item = &set->list[i];
 

@@ -18,8 +18,10 @@ conf_zone_create(const char *name, size_t name_length)
     zone = malloc(sizeof(*zone));
     memset(zone, 0, sizeof(*zone));
     
-    zone->name = malloc(name_length + 1);
-    memcpy(zone->name, name, name_length + 1);
+    if (name_length) {
+        zone->name = malloc(name_length + 1);
+        memcpy(zone->name, name, name_length + 1);
+    }
 
     while (name_length && zone->name[name_length-1] == '.')
         zone->name[--name_length] = '\0';

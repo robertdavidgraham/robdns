@@ -12,13 +12,21 @@ void confload_configuration(struct Configuration *cfg, const char *filename, con
 int confload_toplevel(struct ConfParse *parse, void *data, const struct CF_Child *node);
 
 
+void conf_load_options(struct Configuration *cfg, const struct ConfParse *parse, const struct CF_Child *parent);
 
 
 
-
+/**
+ * Translate a string to an integer, such as looking up the token
+ * with the value of "options", returning an integer S_OPTIONS.
+ * @token
+ *      A string parsed from the configuration file.
+ * @returns
+ *      A integer enumeration ConfTokenId.
+ */
 size_t lookup_token(const struct CF_Token *token);
 
-enum {
+enum ConfTokenId {
     S_UNKNOWN,
     S_ACL,
     S_ALGORITHM,

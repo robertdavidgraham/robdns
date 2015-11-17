@@ -8,6 +8,7 @@
     in order to verify that compilation has succeeded.
 */
 #include "adapter.h"
+#include "configuration.h"
 #include "network.h"
 #include "zonefile-parse.h"
 #include "success-failure.h"
@@ -710,6 +711,11 @@ selftest(int argc, char *argv[])
     UNUSEDPARM(argc);
     UNUSEDPARM(argv);
     
+
+    if (cfg_selftest() != 0) {
+        fprintf(stderr, "conf: selftest failed\n");
+        return Failure;
+    }
 
     /*
      * RING selftest

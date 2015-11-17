@@ -4,6 +4,7 @@
 enum CoreSocketType {
     ST_Unknown, ST_IPv4, ST_IPv6, ST_Any, ST_Raw,
 };
+
 struct CoreSocketItem
 {
     int fd;
