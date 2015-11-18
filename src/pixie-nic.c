@@ -1,6 +1,7 @@
 #include "pixie-nic.h"
 #include "string_s.h"
 #include "util-ipaddr.h"
+#include "util-realloc2.h"
 #include "adapter-pcaplive.h"
 
 unsigned pixie_nic_exists(const char *ifname)
@@ -448,11 +449,7 @@ pixie_nic_gateway(const char *ifname, unsigned *ipv4)
     /*
      * Allocate a proper sized buffer
      */
-    pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof (IP_ADAPTER_INFO));
-    if (pAdapterInfo == NULL) {
-        fprintf(stderr, "Error allocating memory needed to call GetAdaptersinfo\n");
-        return EFAULT;
-    }
+    pAdapterInfo = MALLOC2(sizeof (IP_ADAPTER_INFO));
 
     /*
      * Query the adapter info. If the buffer is not big enough, loop around
@@ -462,11 +459,7 @@ again:
     err = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
     if (err == ERROR_BUFFER_OVERFLOW) {
         free(pAdapterInfo);
-        pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen);
-        if (pAdapterInfo == NULL) {
-            fprintf(stderr, "Error allocating memory needed to call GetAdaptersinfo\n");
-            return EFAULT;
-        }
+        pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC2(ulOutBufLen);
         goto again;
     }
     if (err != NO_ERROR) {
@@ -540,7 +533,6 @@ again:
             const IP_ADDR_STRING *addr;
 
             for (addr = &pAdapter->GatewayList; addr; addr = addr->Next) {
-                int err;
                 unsigned offset;
                 struct ParsedIpAddress ipx;
 
@@ -576,11 +568,7 @@ pixie_nic_get_mac(const char *ifname, unsigned char *mac)
     /*
      * Allocate a proper sized buffer
      */
-    pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof (IP_ADAPTER_INFO));
-    if (pAdapterInfo == NULL) {
-        fprintf(stderr, "Error allocating memory needed to call GetAdaptersinfo\n");
-        return EFAULT;
-    }
+    pAdapterInfo = MALLOC2(sizeof (IP_ADAPTER_INFO));
 
     /*
      * Query the adapter info. If the buffer is not big enough, loop around
@@ -590,7 +578,7 @@ again:
     err = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
     if (err == ERROR_BUFFER_OVERFLOW) {
         free(pAdapterInfo);
-        pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen);
+        pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC2(ulOutBufLen);
         if (pAdapterInfo == NULL) {
             fprintf(stderr, "Error allocating memory needed to call GetAdaptersinfo\n");
             return EFAULT;
@@ -642,7 +630,7 @@ pixie_nic_get_ipv4(const char *ifname)
     /*
      * Allocate a proper sized buffer
      */
-    pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof (IP_ADAPTER_INFO));
+    pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC2(sizeof (IP_ADAPTER_INFO));
     if (pAdapterInfo == NULL) {
         fprintf(stderr, "error:malloc(): for GetAdaptersinfo\n");
         return 0;
@@ -656,7 +644,7 @@ again:
     err = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
     if (err == ERROR_BUFFER_OVERFLOW) {
         free(pAdapterInfo);
-        pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen);
+        pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC2(ulOutBufLen);
         if (pAdapterInfo == NULL) {
             fprintf(stderr, "error:malloc(): for GetAdaptersinfo\n");
             return 0;
@@ -683,7 +671,6 @@ again:
         const IP_ADDR_STRING *addr;
 
         for (addr = &pAdapter->IpAddressList; addr; addr = addr->Next) {
-            int err;
             struct ParsedIpAddress ipx;
 
 

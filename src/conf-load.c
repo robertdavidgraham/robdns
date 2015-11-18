@@ -9,6 +9,7 @@
 #include "conf-addrlist.h"
 #include "conf-keys.h"
 #include "conf-zone.h"
+#include "util-realloc2.h"
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
@@ -16,9 +17,6 @@
 #include <stdlib.h>
 
 #ifdef WIN32
-#pragma comment(lib, "ws2_32.lib")
-#include <winsock2.h>
-#include <ws2tcpip.h> /* gethostname */
 #include <direct.h> /* getcwd */
 #define getcwd _getcwd
 #define strdup _strdup
@@ -124,7 +122,7 @@ void cfg_parser_init(void)
          * appear as "hmac-md5-80" instead of simply
          * "hmac-md5" */
         len = strlen(tsigkeys[i].name);
-        foo = malloc(len + 2);
+        foo = MALLOC2(len + 2);
         memcpy(foo, tsigkeys[i].name, len+1);
         foo[len] = '-';
         foo[len+1] = '\0';
@@ -213,35 +211,6 @@ size_t lookup_token(const struct CF_Token *token)
                                 (unsigned)token->name_length + 1);
 }
 
-/****************************************************************************
- ****************************************************************************/
-static int
-is_number(const struct CF_Token *token)
-{
-    size_t i;
-    if (token->name_length == 0)
-        return 0;
-    for (i=0; i<token->name_length; i++) {
-        if (!isdigit(token->name[i]&0xFF))
-            return 0;
-    }
-    return 1;
-}
-
-/****************************************************************************
- ****************************************************************************/
-static unsigned
-to_number(const struct CF_Token *token)
-{
-    size_t i;
-    unsigned result = 0;
-
-    for (i=0; i<token->name_length; i++) {
-        result = result * 10 + token->name[i] - '0';
-    }
-    return result;
-}
-
 
 /****************************************************************************
  ****************************************************************************/
@@ -263,7 +232,7 @@ load_acl(struct Configuration *cfg, const struct ConfParse *parse, const struct 
         return;
 
     /* make sure it has a name */
-    acl->name = malloc(value.name_length + 1);
+    acl->name = MALLOC2(value.name_length + 1);
     memcpy(acl->name, value.name, value.name_length + 1);
     
     /*
@@ -271,10 +240,7 @@ load_acl(struct Configuration *cfg, const struct ConfParse *parse, const struct 
      * configuration parameters can refer back to this list rather than
      * redefining their own
      */
-    if (cfg->acls_length == 0)
-        cfg->acls = malloc(sizeof(cfg->acls[0]));
-    else
-        cfg->acls = realloc(cfg->acls, sizeof(cfg->acls[0]) * (cfg->acls_length + 1));
+    cfg->acls = REALLOC2(cfg->acls, sizeof(cfg->acls[0]), cfg->acls_length + 1);
     
 
     cfg->acls[cfg->acls_length++] = acl;
@@ -350,8 +316,9 @@ confload_configuration(struct Configuration *cfg, const char *filename, const st
         if (filename_is_absolute(filename)) {
             filename = strdup(filename);
         } else {
-            char dir[MAX_PATH];
-            getcwd(dir, sizeof(dir));
+            char dir[512];
+            if (getcwd(dir, sizeof(dir)) == 0)
+                exit(1);
             filename = filename_combine(dir, filename);
         }
         cfg->options.directory = filename_get_directory(filename);

@@ -36,7 +36,7 @@ sockets_thread(struct Core *core)
      * Legacy Windows is legacy.
      */
 #if defined(WIN32)
-    {WSADATA x; WSAStartup(0x201, &x);}
+    {WSADATA x; if (WSAStartup(0x201, &x)) exit(1);}
 #endif
     
     /*
@@ -66,6 +66,7 @@ sockets_thread(struct Core *core)
      * Enable both IPv4 and IPv6 to be used on the same sockets. This appears to
      * be needed for Windows, but not needed for Mac OS X.
      */
+#ifdef IPV6_V6ONLY
     {
         int on = 0;
         err = setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&on, sizeof(on)); 
@@ -74,6 +75,7 @@ sockets_thread(struct Core *core)
             exit(1); 
         }
     }
+#endif
     
     
     /*

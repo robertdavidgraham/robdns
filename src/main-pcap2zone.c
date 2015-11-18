@@ -190,7 +190,6 @@ pcap2zone(int argc, char *argv[])
      * Initialize it with a pseudo-SOA record for the root zone
      */
     {
-        static const struct DomainPointer root = {(const unsigned char*)"\0",1};
     	struct ZoneFileParser *parser;
         parser = zonefile_begin(
                     root,           /* origin */
@@ -253,9 +252,7 @@ pcap2zone(int argc, char *argv[])
 
             {
                 struct PreprocessedInfo info;
-                unsigned x;
 
-                
                 x = preprocess_frame(
                     buf, 
                     bytes_read,

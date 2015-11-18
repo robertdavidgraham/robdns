@@ -1,5 +1,6 @@
 #include "configuration.h"
 #include "conf-trackfile.h"
+#include "util-realloc2.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -10,10 +11,10 @@ struct Configuration *cfg_create(void)
 {
     struct Configuration *cfg;
 
-    cfg = malloc(sizeof(*cfg));
+    cfg = REALLOC2(0, 1, sizeof(*cfg));
     memset(cfg, 0, sizeof(cfg[0]));
 
-    cfg->zone_defaults = malloc(sizeof(*cfg->zone_defaults));
+    cfg->zone_defaults = REALLOC2(0, 1, sizeof(*cfg->zone_defaults));
     memset(cfg->zone_defaults, 0, sizeof(*cfg->zone_defaults));
 
     /* Create a subsystem that keeps track of all the configuration files */

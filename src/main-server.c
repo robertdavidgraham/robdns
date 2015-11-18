@@ -23,6 +23,7 @@
 #include "adapter-pcapfile.h"
 #include "main-server-socket.h"
 #include "util-ipaddr.h"        /* format IPv6 address */
+#include "util-realloc2.h"
 #include <ctype.h>
 
 extern uint64_t entry_bytes;
@@ -138,7 +139,8 @@ rawsock_init_adapter(const char *adapter_name,
     struct Adapter *adapter;
     char errbuf[PCAP_ERRBUF_SIZE];
 
-    adapter = (struct Adapter *)malloc(sizeof(*adapter));
+    errbuf[0] = '\0';
+    adapter = REALLOC2(NULL, sizeof(*adapter), 1);
     memset(adapter, 0, sizeof(*adapter));
     
     if (flags->is_offline)
@@ -573,19 +575,20 @@ core_adapter_add(struct CoreSocketSet *set, int type,
     struct CoreSocketItem *item;
 
     set->count++;
-    set->list = realloc(set->list, sizeof(set->list[0]) * set->count);
+    set->list = REALLOC2(set->list, sizeof(set->list[0]), set->count);
 
     item = &set->list[set->count - 1];
+    memset(item, 0, sizeof(*item));
 
+    item->type = type;
+    item->proto = proto;
+    item->port = port;
     item->fd = 0;
+
     if (ifname) {
-        item->ifname = malloc(strlen(ifname)+1);
+        item->ifname = REALLOC2(0, strlen(ifname)+1, 1);
         memcpy(item->ifname, ifname, strlen(ifname)+1);
     }
-
-    item->proto = proto;
-
-    item->port = port;
     
     switch (item->type) {
     case ST_IPv4:
@@ -646,7 +649,9 @@ sockitem_open(struct CoreSocketItem *adapt)
             * be needed for Windows, but not needed for Mac OS X.
             */
         int on = 0;
-        err = setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&on, sizeof(on)); 
+#ifdef IPV6_V6ONLY
+        err = setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&on, sizeof(on));
+#endif
         if (err < 0)
             LOG_ERR(C_NETWORK, "fail: setsockopt(IPV6_V6ONLY) %u\n", WSAGetLastError());
     }
@@ -769,11 +774,7 @@ void change_network_adapters(struct Core *core, struct Configuration *cfg_load, 
      * adapters we are using, then swap it in for the resolver threads
      * to use.
      */
-    socket_load = malloc(sizeof(*socket_load));
-    if (socket_load == NULL) {
-        LOG_CRIT(C_GENERAL, "out of memory error");
-        return;
-    }
+    socket_load = REALLOC2(NULL, sizeof(*socket_load), 1);
     memset(socket_load, 0, sizeof(*socket_load));
 
     /*
@@ -849,6 +850,13 @@ int server(int argc, char *argv[])
     struct Core core[1];
     uint64_t start, stop;
     uint64_t total_files=0, total_bytes=0;
+
+    /*
+     * Legacy Windows is legacy.
+     */
+#if defined(WIN32)
+    {WSADATA x; if (WSAStartup(0x201, &x)) exit(1);}
+#endif
 
     /*
      * We want to track how long it takes to fully initialize the

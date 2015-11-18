@@ -2,6 +2,7 @@
 #define CONFIGURATION_H
 #include <stddef.h>
 #include <stdint.h>
+#include <time.h>
 
 #include "configuration-adapter.h"
 struct Cfg_AddrMatchList;

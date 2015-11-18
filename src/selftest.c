@@ -22,6 +22,7 @@
 #include "zonefile-load.h"
 #include "string_s.h"
 #include "rte-ring.h"
+#include "util-realloc2.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -492,7 +493,7 @@ selftest_verify(struct Selftest *selftest,
      * Now go through and pull out all the variable length parms
      */
     for (;;) {
-        unsigned i = checker->a_count;
+        i = checker->a_count;
         
         if (print_message) {
             printf(">");
@@ -700,7 +701,7 @@ QUERY(
 int
 selftest(int argc, char *argv[])
 {
-    struct Selftest selftest[1];
+    struct Selftest *selftest = REALLOC2(NULL, sizeof(*selftest), 1);
 	struct ZoneFileParser *parser;
     unsigned parse_results;
     unsigned i;

@@ -4,6 +4,7 @@
 #include "resolver.h"
 #include "packet.h"
 #include "string_s.h"
+#include "util-realloc2.h"
 #include <string.h>
 
 
@@ -252,7 +253,7 @@ compressor_init(struct Compressor *compressor,
 int
 compressor_selftest(const struct DNS_OutgoingResponse *response)
 {
-    unsigned char buf[65536];
+    unsigned char *buf = REALLOC2(NULL, 65536, 1);
     struct Packet pkt;
     struct Compressor compressor[1];
     unsigned i;

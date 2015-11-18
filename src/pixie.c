@@ -823,6 +823,8 @@ pixie_readdir(void *vdir)
 		errno = EBADF;
 	}
 
+    if (result == NULL)
+        return NULL;
 	return (result->d_name);
 }
 #else

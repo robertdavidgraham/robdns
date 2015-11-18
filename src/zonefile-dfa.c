@@ -98,7 +98,6 @@ void mydfa_add_pattern(struct MyDFA *dfa, const unsigned char *str, unsigned len
 	c = ' ';
 	symbol = dfa->char_to_symbol[c];
 	if (dfa->table[state][symbol] == 0xFF) {
-		unsigned i;
 		dfa->table[state][symbol] = (unsigned char)++dfa->state_count;
 		state = dfa->table[state][symbol];
 		for (i=0; i<MAX_DFA_SYMBOLS; i++)
@@ -129,7 +128,7 @@ unsigned mydfa_search(struct MyDFA *dfa, unsigned *in_state, const void *in_buf,
 	*in_state = state;
 	*offset = i;
 	if (state >= accept_start)
-		return dfa->accepts[255 - state];
+		return dfa->accepts[255 - state&0x3F];
 	else
 		return 0;
 }

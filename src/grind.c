@@ -13,8 +13,8 @@
 #include "db-zone.h"
 #include "db-entry.h"
 #include "zonefile-tracker.h"
+#include "util-realloc2.h"
 #include <string.h>
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -40,7 +40,7 @@ grind_create()
     /*
      * Allocate memory for our DNS server instance.
      */
-    grind = (struct Grind *)malloc(sizeof(grind[0]));
+    grind = REALLOC2(0, 1, sizeof(grind[0]));
     memset(grind, 0, sizeof(grind[0]));
 
    	/*
@@ -253,11 +253,7 @@ grind_load_zonefile(struct Grind *grind, const char *filename, struct DomainPoin
          * overhead reading from disk.
          * TODO: use async I/O (overlapped) in order to read file even
          * faster. */
-        buf = (unsigned char*)malloc(sizeof_buf);
-        if (buf == NULL) {
-            fprintf(stderr, "%s: out of memory\n", filename);
-            return Failure;
-        }
+        buf = MALLOC2(sizeof_buf);
 
         /* read through the file */
 		for (;;) {

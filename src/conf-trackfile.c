@@ -7,6 +7,7 @@
 */
 #include "conf-trackfile.h"
 #include "logger.h"
+#include "util-realloc2.h"
 #include <stdint.h>
 #include <assert.h>
 #include <stdio.h>
@@ -15,9 +16,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef WIN32
+#if defined(_MSC_VER)
 #define stat64 _stat64
 #define strdup _strdup
+#elif defined(__GNUC__)
+#define stat64 stat
 #endif
 
 struct Conf_TrackFile
@@ -156,16 +159,13 @@ conf_trackfile_add(struct Conf_TrackFile *tf, const char *filename)
     /* expand storage if there is not enough space */
     if (tf->count + 1 >= tf->max) {
         tf->max = tf->max * 2 + 1;
-        if (tf->count == 0)
-            tf->files = malloc(tf->max * sizeof(tf->files[0]));
-        else
-            tf->files = realloc(tf->files, tf->max * sizeof(tf->files[0]));
+        tf->files = REALLOC2(tf->files, tf->max, sizeof(tf->files[0]));
     }
 
     /*
      * Grab the size/timestamp so that we can detect when it changes
      */
-    tf->files[tf->count].filename = strdup(filename);
+    tf->files[tf->count].filename = STRDUP2(filename);
     if (stat64(filename, &s) == 0) {
         tf->files[tf->count].timestamp = s.st_mtime; /* last modified time */
         tf->files[tf->count].size = s.st_size; /* size of the file */
@@ -188,7 +188,7 @@ conf_trackfile_create(void)
 {
     struct Conf_TrackFile *result;
 
-    result = malloc(sizeof(*result));
+    result = MALLOC2(sizeof(*result));
     memset(result, 0, sizeof(*result));
 
     return result;

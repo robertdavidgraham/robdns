@@ -211,8 +211,8 @@ perftest(int argc, char *argv[])
         requests_per_second = 1000000.0 
                                 * (1.0 * threads_desired * perftest->loop_count)
                                 / (stop - start);
-	fprintf(stderr, "queries = %u\n", (unsigned)(threads_desired * perftest->loop_count));
-	fprintf(stderr, "seconds = %5.3f\n", (stop - start)/1000000.0);
+	    fprintf(stderr, "queries = %u\n", (unsigned)(threads_desired * perftest->loop_count));
+	    fprintf(stderr, "seconds = %5.3f\n", (stop - start)/1000000.0);
         fprintf(stderr, "queries/second = %5.3f\n", requests_per_second);
     }
     

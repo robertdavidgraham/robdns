@@ -4,6 +4,7 @@
 #include "zonefile-rr.h"
 #include "pixie-threads.h"
 #include "logger.h"
+#include "util-realloc2.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -62,7 +63,9 @@ catalog_reset_zonecount(struct Catalog *db, unsigned new_count)
     new_count = (unsigned)pow2(new_count);
     db->zone_count = new_count;
     db->zone_mask = new_count - 1;
-    db->zones = (struct DBZone **)malloc(sizeof(db->zones[0]) * db->zone_count);
+    db->zones = MALLOC2(sizeof(db->zones[0]) * db->zone_count);
+    if (db->zones == NULL)
+        exit(1);
     memset(db->zones, 0, sizeof(db->zones[0]) * db->zone_count);
 
     for (i=0; i<old_count; i++) {
@@ -90,7 +93,7 @@ catalog_create()
 
 
     /* Create object */
-	db = (struct Catalog *)malloc(sizeof(*db));
+	db = REALLOC2(0, 1, sizeof(*db));
 	memset(db, 0, sizeof(*db));
 	
     /* Create the zone table */

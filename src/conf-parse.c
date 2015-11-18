@@ -1,5 +1,6 @@
 #include "conf-parse.h"
 #include "conf-error.h"
+#include "util-realloc2.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -269,10 +270,7 @@ GET_ITEM(struct ConfParse *parser)
 
     if (parent->item_current >= parent->item_count) {
         parent->item_count++;
-        if (parent->item_count == 1)
-            parent->items = malloc(parent->item_count * sizeof(parent->items[0]));
-        else
-            parent->items = realloc(parent->items, parent->item_count * sizeof(parent->items[0]));
+        parent->items = REALLOC2(parent->items, parent->item_count, sizeof(parent->items[0]));
         
         item = &parent->items[parent->item_current];
         memset(item, 0, sizeof(*item));
@@ -312,10 +310,7 @@ GET_TOKEN(struct ConfParse *parser)
 
     if (item->token_current >= item->token_count) {
         item->token_count++;
-        if (item->token_count == 1)
-            item->tokens = malloc(item->token_count * sizeof(item->tokens[0]));
-        else 
-            item->tokens = realloc(item->tokens, item->token_count * sizeof(item->tokens[0]));
+        item->tokens = REALLOC2(item->tokens, item->token_count, sizeof(item->tokens[0]));
         token = &item->tokens[item->token_current];
         memset(token, 0, sizeof(token[0]));
         token->offset = parser->buf.offset;
@@ -337,7 +332,7 @@ APPEND_TOKEN(struct ConfParse *parser, unsigned char c)
 
     if (parser->buf.offset + 2 >= parser->buf.max) {
         parser->buf.max = parser->buf.max * 2 + 1;
-        parser->buf.data = realloc(parser->buf.data, parser->buf.max + 2);
+        parser->buf.data = REALLOC2(parser->buf.data, parser->buf.max + 2, 1);
     }
 
     parser->buf.data[parser->buf.offset++] = c;
@@ -358,7 +353,7 @@ END_TOKEN(struct ConfParse *parser, unsigned is_string)
      */
     if (parser->buf.offset + 2 >= parser->buf.max) {
         parser->buf.max = parser->buf.max * 2 + 1;
-        parser->buf.data = realloc(parser->buf.data, parser->buf.max + 2);
+        parser->buf.data = REALLOC2(parser->buf.data, parser->buf.max + 2, 1);
     }
     parser->buf.data[parser->buf.offset++] = '\0';
 
@@ -598,14 +593,14 @@ confparse_create(const char *filename, CONF_STATEMENT_CALLBACK callback, void *d
 {
     struct ConfParse *parser;
 
-    parser = malloc(sizeof(*parser));
+    parser = MALLOC2(sizeof(*parser));
 
     memset(parser, 0, sizeof(*parser));
 
     parser->callback_fn = callback;
     parser->callback_data = data;
 
-    parser->filename = malloc(strlen(filename)+1);
+    parser->filename = MALLOC2(strlen(filename)+1);
     memcpy(parser->filename, filename, strlen(filename)+1);
 
     return parser;

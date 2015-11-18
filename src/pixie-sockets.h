@@ -1,5 +1,8 @@
 #ifndef PIXIE_SOCKETS_H
 #define PIXIE_SOCKETS_H
+#if defined(_MSC_VER)
+#pragma warning(disable:6386)
+#endif
 
 #if defined(WIN32)
 #include <WinSock2.h>

@@ -47,7 +47,7 @@
 #include "conf-load.h"
 #include "conf-parse.h"
 #include "util-ipaddr.h"
-
+#include "util-realloc2.h"
 #include <ctype.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -83,10 +83,7 @@ addrmatchlist_add_ipv4(struct Cfg_AddrMatchList *list, unsigned ipv4, unsigned c
 {
     struct Cfg_AddrMatchElement *element;
 
-    if (list->elements == NULL)
-        list->elements = malloc(sizeof(list->elements[0]));
-    else
-        list->elements = realloc(list->elements, sizeof(list->elements[0]) * (list->elements_count + 1));
+    list->elements = REALLOC2(list->elements, sizeof(list->elements[0]), list->elements_count + 1);
 
     element = &list->elements[list->elements_count++];
     memset(element, 0, sizeof(*element));
@@ -109,10 +106,7 @@ addrmatchlist_add_ipv6(struct Cfg_AddrMatchList *list, const unsigned char *ipv6
 {
     struct Cfg_AddrMatchElement *element;
 
-    if (list->elements == NULL)
-        list->elements = malloc(sizeof(list->elements[0]));
-    else
-        list->elements = realloc(list->elements, sizeof(list->elements[0]) * (list->elements_count + 1));
+    list->elements = REALLOC2(list->elements, sizeof(list->elements[0]), list->elements_count + 1);
 
     element = &list->elements[list->elements_count++];
     memset(element, 0, sizeof(*element));
@@ -133,10 +127,7 @@ addrmatchlist_add_other(struct Cfg_AddrMatchList *list, const struct Cfg_AddrMat
 {
     struct Cfg_AddrMatchElement *element;
 
-    if (list->elements == NULL)
-        list->elements = malloc(sizeof(list->elements[0]));
-    else
-        list->elements = realloc(list->elements, sizeof(list->elements[0]) * (list->elements_count + 1));
+    list->elements = REALLOC2(list->elements, sizeof(list->elements[0]), list->elements_count + 1);
 
     element = &list->elements[list->elements_count++];
     memset(element, 0, sizeof(*element));
@@ -153,10 +144,7 @@ addrmatchlist_add_special(struct Cfg_AddrMatchList *list, int version, int is_no
 {
     struct Cfg_AddrMatchElement *element;
 
-    if (list->elements == NULL)
-        list->elements = malloc(sizeof(list->elements[0]));
-    else
-        list->elements = realloc(list->elements, sizeof(list->elements[0]) * (list->elements_count + 1));
+    list->elements = REALLOC2(list->elements, sizeof(list->elements[0]), list->elements_count + 1);
 
     element = &list->elements[list->elements_count++];
     memset(element, 0, sizeof(*element));
@@ -278,8 +266,11 @@ conf_load_addrlist2(const struct Configuration *cfg,
             char foo[64];
             format_ip_address(foo, sizeof(foo), ip.address, ip.version, ip.prefix_length);
             switch (ip.version) {
-            case 4: 
-                addrmatchlist_add_ipv4(result, *(unsigned*)ip.address, ip.prefix_length, port, is_not);
+            case 4:
+                {
+                    unsigned ipv4 = ip.address[0]<<24 | ip.address[1]<<16 | ip.address[2]<<8 | ip.address[3];
+                    addrmatchlist_add_ipv4(result, ipv4, ip.prefix_length, port, is_not);
+                }
                 break;
             case 6:
                 addrmatchlist_add_ipv6(result, ip.address, ip.prefix_length, port, is_not);
@@ -310,11 +301,11 @@ conf_load_addrlist(const struct Configuration *cfg,
 {
     struct Cfg_AddrMatchList *result;
   
-    result = malloc(sizeof(*result));
+    result = MALLOC2(sizeof(*result));
     memset(result, 0, sizeof(*result));
 
     if (name) {
-        result->name = malloc(strlen(name) + 1);
+        result->name = MALLOC2(strlen(name) + 1);
         memcpy(result->name, name, strlen(name) + 1);
     }
     conf_load_addrlist2(cfg, parse, parent, port, result);

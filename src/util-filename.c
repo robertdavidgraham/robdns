@@ -97,6 +97,8 @@ filename_combine(const char *dirname, const char *filename)
 	filename_length = (unsigned)strlen(filename);
 	if (dirname == NULL || dirname[0] == '\0') {
 		result = (char*)malloc(filename_length+1);
+        if (result == NULL)
+            exit(1);
 		memcpy(result, filename, filename_length+1);
 		return result;
 	}
@@ -116,6 +118,8 @@ filename_combine(const char *dirname, const char *filename)
 	/* Allocate space for the result */
 	result_max = dirname_length + filename_length + 2;
 	result = (char*)malloc(result_max + 1);
+    if (result == NULL)
+        exit(1);
 
 	/*
 	 * Get the prefix, which is something like "C:\" on Windows,
@@ -171,6 +175,8 @@ filename_get_directory(const char *filename)
         len--;
     
     filename2 = malloc(len+1);
+    if (filename2 == NULL)
+        exit(1);
     memcpy(filename2, filename, len+1);
     filename2[len] = '\0';
     
@@ -178,7 +184,8 @@ filename_get_directory(const char *filename)
         result = filename_combine(filename2, "");
     else {
         char buf[512];
-        getcwd(buf, sizeof(buf));
+        if (getcwd(buf, sizeof(buf)) == NULL)
+            exit(1);
         result = filename_combine(buf, filename2);
     }
     free(filename2);

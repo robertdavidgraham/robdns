@@ -3,6 +3,7 @@
 #include "network.h"
 #include "thread.h"
 #include "adapter.h"
+#include "util-realloc2.h"
 #include <stdlib.h>
 
 #define PACKET_SIZE 1514
@@ -41,7 +42,7 @@ void main_thread(void *v)
      */
     memset(thread, 0, sizeof(thread[0]));
     thread->catalog_run = parms->catalog_run;
-    thread->userdata = (char*)malloc(PACKET_SIZE);
+    thread->userdata = (char*)MALLOC2(PACKET_SIZE);
 
     adapter->alloc_packet = alloc_packet;
     adapter->xmit_packet = rawsock_send_packet;

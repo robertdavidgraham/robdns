@@ -81,6 +81,7 @@
     <ClCompile Include="..\src\util-filename.c" />
     <ClCompile Include="..\src\util-ipaddr.c" />
     <ClCompile Include="..\src\util-keyword.c" />
+    <ClCompile Include="..\src\util-realloc2.c" />
     <ClCompile Include="..\src\zonefile-field-charstring.c" />
     <ClCompile Include="..\src\zonefile-field-loc.c" />
     <ClCompile Include="..\src\zonefile-insertion.c" />
@@ -150,6 +151,7 @@
     <ClInclude Include="..\src\util-filename.h" />
     <ClInclude Include="..\src\util-ipaddr.h" />
     <ClInclude Include="..\src\util-keyword.h" />
+    <ClInclude Include="..\src\util-realloc2.h" />
     <ClInclude Include="..\src\zonefile-insertion.h" />
     <ClInclude Include="..\src\zonefile-dfa.h" />
     <ClInclude Include="..\src\zonefile-fields.h" />
@@ -213,6 +215,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\bin\</OutDir>
     <IntDir>..\tmp\$(Configuration)\</IntDir>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -236,6 +239,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnablePREfast>true</EnablePREfast>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -68,11 +68,11 @@ thread_worker(void *p)
             struct sockaddr_storage sin;
             socklen_t sizeof_sin = sizeof(sin);
             unsigned char buf[2048];
+            unsigned char buf2[2048];
             int bytes_received;
             struct DNS_Incoming request[1];
             struct DNS_OutgoingResponse response[1];
             struct Packet pkt;
-            unsigned char buf2[2048];
             int fd;
 
             fd = sockets->list[i].fd;
@@ -140,6 +140,8 @@ thread_worker_start(struct Core *core)
     struct CoreWorkerThread *t;
 
     t = malloc(sizeof(*t));
+    if (t == 0)
+        return;
     memset(t, 0, sizeof(t));
 
     t->core = core;

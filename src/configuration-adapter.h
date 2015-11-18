@@ -8,7 +8,7 @@ enum CoreSocketType {
 struct CoreSocketItem
 {
     int fd;
-    enum SocketType type;
+    enum CoreSocketType type;
     unsigned proto;
     unsigned port;
     char *ifname;

@@ -3,14 +3,13 @@
 #include "conf-parse.h"
 #include "util-filename.h"
 #include "util-ipaddr.h"
+#include "util-realloc2.h"
+#include "pixie-sockets.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
 #ifdef WIN32
-#pragma comment(lib, "ws2_32.lib")
-#include <winsock2.h>
-#include <ws2tcpip.h> /* gethostname */
 #include <direct.h> /* getcwd */
 #define getcwd _getcwd
 #define strdup _strdup
@@ -144,7 +143,6 @@ conf_load_listen_on2(struct Configuration *cfg, const struct ConfParse *parse, c
         unsigned j = 1;
         unsigned my_port = port;
         const char *my_keyname = 0;
-        unsigned is_not = 0;
 
         /*
          * see if there are "port" or "key" keywords after the
@@ -322,7 +320,7 @@ conf_load_options(struct Configuration *cfg, const struct ConfParse *parse, cons
             default:
                 if (options->version)
                     free(options->version);
-                options->version = malloc(value.name_length + 1);
+                options->version = MALLOC2(value.name_length + 1);
                 memcpy(options->version, value.name, value.name_length + 1);
                 options->version_length = value.name_length;
                 break;
@@ -338,7 +336,7 @@ conf_load_options(struct Configuration *cfg, const struct ConfParse *parse, cons
             case S_HOSTNAME:
                 if (options->hostname)
                     free(options->hostname);
-                options->hostname = malloc(130);
+                options->hostname = MALLOC2(130);
                 if (gethostname(options->hostname, 130) != 0) {
                     perror("gethostname()");
                     free(options->hostname);
@@ -348,7 +346,7 @@ conf_load_options(struct Configuration *cfg, const struct ConfParse *parse, cons
             default:
                 if (options->hostname)
                     free(options->hostname);
-                options->hostname = malloc(value.name_length + 1);
+                options->hostname = MALLOC2(value.name_length + 1);
                 memcpy(options->hostname, value.name, value.name_length + 1);
                 break;
             }
@@ -364,7 +362,7 @@ conf_load_options(struct Configuration *cfg, const struct ConfParse *parse, cons
             case S_HOSTNAME:
                 if (options->server_id)
                     free(options->server_id);
-                options->server_id = malloc(130);
+                options->server_id = MALLOC2(130);
                 if (gethostname(options->server_id, 130) != 0) {
                     perror("gethostname()");
                     free(options->server_id);
@@ -376,7 +374,7 @@ conf_load_options(struct Configuration *cfg, const struct ConfParse *parse, cons
             default:
                 if (options->server_id)
                     free(options->server_id);
-                options->server_id = malloc(value.name_length + 1);
+                options->server_id = MALLOC2(value.name_length + 1);
                 memcpy(options->server_id, value.name, value.name_length + 1);
                 options->server_id_length = value.name_length;
                 break;

@@ -5,6 +5,7 @@
 #include "zonefile-fields.h"
 #include "string_s.h"
 #include "logger.h"
+#include "util-realloc2.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -1627,7 +1628,7 @@ zonefile_begin(struct DomainPointer origin, uint64_t ttl, uint64_t filesize,
 {
     struct ZoneFileParser *parser;
 
-    parser = (struct ZoneFileParser *)malloc(sizeof(parser[0]));
+    parser = MALLOC2(sizeof(parser[0]));
     memset(parser, 0, sizeof(parser[0]));
 
     /* remember filesize as a hint when creating the zone hash table */

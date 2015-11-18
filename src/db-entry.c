@@ -22,6 +22,7 @@
 #include "proto-dns-compressor.h"
 #include "success-failure.h"
 #include "string_s.h"
+#include "util-realloc2.h"
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -571,10 +572,8 @@ again:
         } else
             entry->sizeof_buf = (unsigned short)new_size;
 
-        *p_record = (struct DBEntry *)realloc(
-                            *p_record,
-                            offsetof(struct DBEntry, buf) + entry->sizeof_buf + 1
-                            );
+        *p_record = REALLOC2(*p_record, offsetof(struct DBEntry, buf) + entry->sizeof_buf + 1, 1);
+
         entry = *p_record;
         if (entry == 0) {
             fprintf(stderr, "ran out of memory\n");
@@ -686,7 +685,7 @@ entry_create_self(
     const unsigned char *rdata
     )
 {
-    unsigned char name[256];
+    unsigned char name[256+1];
     unsigned name_length;
     unsigned i;
     unsigned chain_length;
@@ -700,7 +699,7 @@ entry_create_self(
         unsigned label_length = xdomain->labels[i-1].name[0] + 1;
         memcpy(name+name_length, xdomain->labels[i-1].name, label_length);
         name_length += label_length;
-        assert(name_length < sizeof(name));
+        assert(name_length + 1 < sizeof(name));
         name[name_length] = '\0'; /*FIXME: test this for overflow */
     }
 
@@ -741,11 +740,7 @@ entry_create_self(
         size_to_malloc = ALIGN(size_to_malloc, BLOCK_SIZE-1);
 
         /* Allocate space for a linked-list at this hash location */
-        entry = (struct DBEntry *)malloc(size_to_malloc+1);
-        if (entry == 0) {
-            fprintf(stderr, "ran out of memory\n");
-            exit(1);
-        }
+        entry = MALLOC2(size_to_malloc+1);
         memset(entry, 0, offsetof(struct DBEntry, buf));
 
         //entry->hash = hash;

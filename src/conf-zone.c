@@ -4,6 +4,7 @@
 #include "conf-parse.h"
 #include "util-filename.h"
 #include "conf-addrlist.h"
+#include "util-realloc2.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -15,11 +16,17 @@ conf_zone_create(const char *name, size_t name_length)
 {
     struct Cfg_Zone *zone;
 
-    zone = malloc(sizeof(*zone));
+    zone = MALLOC2(sizeof(*zone));
+
     memset(zone, 0, sizeof(*zone));
-    
+    if (zone == NULL) {
+        exit(1);
+    }
+
     if (name_length) {
-        zone->name = malloc(name_length + 1);
+        zone->name = MALLOC2(name_length + 1);
+        if (zone->name == NULL)
+            exit(1);
         memcpy(zone->name, name, name_length + 1);
     }
 
@@ -134,10 +141,7 @@ conf_load_zone( struct Configuration *cfg,
     /*
      * Add to our list of zones
      */
-    if (cfg->zones_length == 0)
-        cfg->zones = malloc(sizeof(cfg->zones[0]));
-    else
-        cfg->zones = realloc(cfg->zones, sizeof(cfg->zones[0]) * (cfg->zones_length + 1));
+    cfg->zones = REALLOC2(cfg->zones, sizeof(cfg->zones[0]), cfg->zones_length + 1);
     cfg->zones[cfg->zones_length++] = zone;
 }
 
@@ -159,9 +163,6 @@ cfg_add_zonefile(struct Configuration *cfg, const char *filename)
     /*
      * Add to our list of zones
      */
-    if (cfg->zones_length == 0)
-        cfg->zones = malloc(sizeof(cfg->zones[0]));
-    else
-        cfg->zones = realloc(cfg->zones, sizeof(cfg->zones[0]) * (cfg->zones_length + 1));
+    cfg->zones = REALLOC2(cfg->zones, sizeof(cfg->zones[0]), cfg->zones_length + 1);
     cfg->zones[cfg->zones_length++] = zone;
 }

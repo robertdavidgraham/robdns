@@ -83,7 +83,8 @@ int checkzone(int argc, char *argv[])
         printf("ellapsed = %f-sec\n", ellapsed);
         if (entry_count) {
             double avg_chain_len = (1.0*total_chain_length)/entry_count;
-            printf(" %llu-entries, %llu-bytes, %llu-avg, %f-chain\n", entry_count, entry_bytes, entry_bytes/entry_count, avg_chain_len);
+            printf(" %llu-entries, %llu-bytes, %llu-avg, %f-chain\n", 
+                entry_count, entry_bytes, entry_bytes/entry_count, avg_chain_len);
         }
 
     }

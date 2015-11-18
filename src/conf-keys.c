@@ -3,6 +3,7 @@
 #include "conf-keys.h"
 #include "configuration.h"
 #include "crypto-base64.h"
+#include "util-realloc2.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -34,10 +35,10 @@ conf_load_key(struct Configuration *cfg, const struct ConfParse *parse, const st
         return;
     }
 
-    key = malloc(sizeof(*key));
+    key = MALLOC2(sizeof(*key));
     memset(key, 0, sizeof(*key));
 
-    key->name = malloc(value.name_length + 1);
+    key->name = MALLOC2(value.name_length + 1);
     memcpy(key->name, value.name, value.name_length + 1);
 
 
@@ -45,7 +46,8 @@ conf_load_key(struct Configuration *cfg, const struct ConfParse *parse, const st
     for (i=0; i<parent->child_count; i++) {
         struct CF_Child child = confparse_node_getchild(parse, parent, i);
         struct CF_Token token = confparse_node_gettoken(parse, &child, 0);
-        struct CF_Token value = confparse_node_gettoken(parse, &child, 1);
+        
+        value = confparse_node_gettoken(parse, &child, 1);
 
         switch (lookup_token(&token)) {
         case S_ALGORITHM:
@@ -66,7 +68,7 @@ conf_load_key(struct Configuration *cfg, const struct ConfParse *parse, const st
                 unsigned char *secret;
                 size_t secret_length = value.name_length;
 
-                secret = malloc(secret_length);
+                secret = MALLOC2(secret_length);
 
                 secret_length = base64_decode(  secret,
                                                 secret_length,
@@ -106,10 +108,7 @@ conf_load_key(struct Configuration *cfg, const struct ConfParse *parse, const st
     /*
      * Now add to our list of keys
      */
-    if (cfg->keys_length == 0)
-        cfg->keys = malloc(sizeof(cfg->keys[0]));
-    else
-        cfg->keys = realloc(cfg->keys, sizeof(cfg->keys[0]) * (cfg->keys_length + 1));
+    cfg->keys = REALLOC2(cfg->keys, sizeof(cfg->keys[0]), cfg->keys_length + 1);
     
     cfg->keys[cfg->keys_length++] = key;
 

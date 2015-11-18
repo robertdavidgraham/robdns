@@ -191,7 +191,7 @@ struct SmackPattern
      * private data structure */
     size_t                    id;
 
-    /** This holds a malloc-ed copy of the pattern the caller gave us.
+    /** This holds a malloced copy of the pattern the caller gave us.
      * If the engine is running "nocase", then this is converted to
      * lower case */
     unsigned char *          pattern;
@@ -581,8 +581,8 @@ smack_add_symbol(struct SMACK *smack, unsigned c)
     symbol = smack->symbol_count;
 
     /* Map it in both directions */
-    smack->symbol_to_char[symbol] = c;
-    smack->char_to_symbol[c] = (unsigned char)symbol;
+    smack->symbol_to_char[(unsigned char)symbol] = c;
+    smack->char_to_symbol[(unsigned char)c] = (unsigned char)symbol;
 
     return symbol;
 }
@@ -1474,6 +1474,8 @@ smack_benchmark(void)
 
     /* Fill a buffer full of junk */
     buf = (char*)malloc(BUF_SIZE);
+    if (buf == 0)
+        return -1;
     for (i=0; i<BUF_SIZE; i++)
         buf[i] = (char)r_rand(&seed)&0x7F;
 

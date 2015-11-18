@@ -1,5 +1,6 @@
 #include "adapter.h"
 #include "unusedparm.h"
+#include "util-realloc2.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -51,7 +52,7 @@ adapter_create(ALLOC_PACKET alloc_packet, XMIT_PACKET xmit_packet, void *userdat
 {
     struct Adapter *adapter;
 
-    adapter = (struct Adapter *)malloc(sizeof(adapter[0]));
+    adapter = REALLOC2(0, 1, sizeof(adapter[0]));
     memset(&adapter[0], 0, sizeof(adapter[0]));
 
     adapter->alloc_packet = alloc_packet;

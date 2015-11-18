@@ -26,7 +26,8 @@ md5(const void *p, unsigned length, uint64_t secret)
     MD5Final((unsigned char *)digest, ctx);
 
     
-    return *(uint64_t*)digest ^ *(uint64_t*)(digest + 8);
+    return (*(uint64_t*)(digest + 0)) 
+         ^ (*(uint64_t*)(digest + 8));
 }
 
 

@@ -264,7 +264,10 @@ parse_ipv4_address(const char *px, unsigned *offset, size_t length, struct Parse
     if (offset == NULL && length == 0) {
         offset = &tmp_offset;
         length = strlen(px);
+    } else if (offset == NULL) {
+        offset = &tmp_offset;
     }
+
 
     i = *offset;
 
@@ -286,7 +289,7 @@ parse_ipv4_address(const char *px, unsigned *offset, size_t length, struct Parse
             return RETURN_ERR(false);
 
         /* Parse the number */
-        for (k=0; k<3 && i+k < length && isdigit(px[i+k]); k++)
+        for (k=0; k<3 && i+k < length && isdigit(px[i+k]&0xFF); k++)
             num = num * 10 + (px[i+k]-'0');
         i += k;
         if (num > 255)
@@ -312,13 +315,13 @@ parse_ipv4_address(const char *px, unsigned *offset, size_t length, struct Parse
         
         i++;
 
-        if (i>=length || !isdigit(px[i]))
+        if (i>=length || !isdigit(px[i]*0xFF))
             return RETURN_ERR(false);
 
         n = px[i] - '0';
         i++;
 
-        if (i<length && isdigit(px[i])) {
+        if (i<length && isdigit(px[i]&0xFF)) {
             n = n * 10 + px[i] - '0';
             i++;
         }
@@ -370,7 +373,7 @@ parse_ipv6_address(const char *px, unsigned *offset, size_t length, struct Parse
 	if (i<length && px[i] == '[') {
 		is_bracket_seen = 1;
 		i++;
-		while (i<length && isspace(px[i]))
+		while (i<length && isspace(px[i]&0xFF))
 			i++;
 	}
 
@@ -468,13 +471,13 @@ parse_ipv6_address(const char *px, unsigned *offset, size_t length, struct Parse
         
         i++;
 
-        if (i>=length || !isdigit(px[i]))
+        if (i>=length || !isdigit(px[i]&0xFF))
             return RETURN_ERR(false);
 
         n = px[i] - '0';
         i++;
 
-        if (i<length && isdigit(px[i])) {
+        if (i<length && isdigit(px[i]&0xFF)) {
             n = n * 10 + px[i] - '0';
             i++;
         }

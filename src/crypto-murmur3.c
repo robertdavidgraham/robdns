@@ -120,7 +120,7 @@ void MurmurHash3_x86_32 ( const void * key, int len,
 
   for(i = -nblocks; i; i++)
   {
-    uint32_t k1 = getblock32(blocks,i);
+    k1 = getblock32(blocks,i);
 
     k1 *= c1;
     k1 = ROTL32(k1,15);

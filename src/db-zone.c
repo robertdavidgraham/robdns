@@ -4,6 +4,7 @@
 #include "zonefile-rr.h"
 #include "domainname.h"
 #include "pixie-threads.h"
+#include "util-realloc2.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -297,7 +298,7 @@ zone_insert_self(struct DBZone *zone, volatile struct DBZone **location)
 #if SIZE_MAX == 0xffffffff
         /* 32-bit architectures */
         if (!pixie_locked_CAS32(location, (unsigned)zone, (unsigned)zone->next))
-            printf("\nerr %u %u\n", *location, zone);
+            printf("\nlock err %u %u\n", (unsigned)*location, (unsigned)zone);
         else
             break;
 #else
@@ -321,7 +322,7 @@ zone_create_self(
 	uint64_t hash = xdomain->hash;
 
 	/* Fill in the zone */
-    zone = (struct DBZone*)malloc(sizeof(*zone));
+    zone = REALLOC2(0, 1, sizeof(*zone));
     memset(zone, 0, sizeof(*zone));
     zone->hash = hash;
     zone->domain.name = zone->domain_buffer;
@@ -336,7 +337,7 @@ zone_create_self(
     //fprintf(stderr, "%u zone entry count\n", zone->entry_count);
     //xdomain_err(xdomain, ": initial entries %u\n", zone->entry_count);
     zone->entry_mask = zone->entry_count - 1;
-    zone->records = (struct DBEntry **)malloc(zone->entry_count * sizeof(zone->records[0]));
+    zone->records = REALLOC2(0, zone->entry_count, sizeof(zone->records[0]));
     if (zone->records == NULL) {
         xdomain_err(xdomain, ": allocation failed\n");
         exit(1);

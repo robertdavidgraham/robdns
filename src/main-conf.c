@@ -11,6 +11,7 @@
 #include "pixie-nic.h"
 #include "pixie-timer.h"
 #include "pixie-threads.h"
+#include "util-realloc2.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdint.h>
@@ -61,7 +62,7 @@ combine_filename(const char *dirname, const char *filename)
 {
     size_t dirname_len = strlen(dirname);
     size_t filename_len = strlen(filename);
-    char *xfilename = malloc(dirname_len + filename_len + 2);
+    char *xfilename = REALLOC2(0, 1, dirname_len + filename_len + 2);
 
     memcpy(xfilename, dirname, dirname_len);
 
@@ -531,16 +532,16 @@ parseTime(const char *value)
         num = num*10 + (value[0] - '0');
         value++;
     }
-    while (ispunct(value[0]) || isspace(value[0]))
+    while (ispunct(value[0]&0xFF) || isspace(value[0]&0xFF))
         value++;
 
-    if (isalpha(value[0]) && num == 0)
+    if (isalpha(value[0]&0xFF) && num == 0)
         num = 1;
 
     if (value[0] == '\0')
         return num;
 
-    switch (tolower(value[0])) {
+    switch (tolower(value[0]&0xFF)) {
     case 's':
         num *= 1;
         break;

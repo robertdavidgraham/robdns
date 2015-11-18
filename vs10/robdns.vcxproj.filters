@@ -255,6 +255,9 @@
     <ClCompile Include="..\src\conf-load-options.c">
       <Filter>Source Files\config</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\util-realloc2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\adapter-pcapfile.h">
@@ -451,6 +454,9 @@
     </ClInclude>
     <ClInclude Include="..\src\configuration-adapter.h">
       <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\util-realloc2.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

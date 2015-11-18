@@ -105,7 +105,7 @@ rangelist_add_range(struct RangeList *task, unsigned begin, unsigned end)
 
         if (new_max >= SIZE_MAX/sizeof(*new_list))
             exit(1); /* integer overflow */
-        new_list = (struct Range *)malloc(sizeof(*new_list) * new_max);
+        new_list = malloc(sizeof(*new_list) * new_max);
         if (new_list == NULL)
             exit(1); /* out of memory */
 
@@ -470,7 +470,7 @@ rangelist_pick2_create(struct RangeList *targets)
     if (((size_t)targets->count) >= (size_t)(SIZE_MAX/sizeof(*picker)))
         exit(1); /* integer overflow */
     else
-    picker = (unsigned *)malloc(targets->count * sizeof(*picker));
+    picker = malloc(targets->count * sizeof(*picker));
     if (picker == NULL)
         exit(1); /* out of memory */
 
