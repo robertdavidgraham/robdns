@@ -22,18 +22,27 @@ struct DBZone
     struct DomainPointer domain;
     unsigned label_count;
 
+    /* optimizes wildcard searches */
     struct {
         unsigned shortest;
         unsigned longest;
     } wildcard;
+
+    /* optimize delegation searches */
     struct {
         unsigned shortest;
         unsigned longest;
     } delegation;
 
+    /* The master hash table */
     unsigned entry_count;
     unsigned entry_mask;
     struct DBEntry **records;
+
+    /** Tracks the timestamp/size of the file(s) that contains all the zone
+     * data in order to detect when any files have changed */
+    struct Conf_TrackFile *file_tracker;
+
     unsigned char domain_buffer[256];
 };
 
@@ -316,7 +325,8 @@ zone_insert_self(struct DBZone *zone, volatile struct DBZone **location)
 struct DBZone *
 zone_create_self(
     const struct DB_XDomain *xdomain,
-    uint64_t filesize)
+    uint64_t filesize,
+    const char *filename)
 {
 	struct DBZone *zone;
 	uint64_t hash = xdomain->hash;
@@ -334,8 +344,8 @@ zone_create_self(
 
     /* Allocate space for records */
     zone->entry_count = (unsigned)pow2(filesize/64);
-    //fprintf(stderr, "%u zone entry count\n", zone->entry_count);
-    //xdomain_err(xdomain, ": initial entries %u\n", zone->entry_count);
+    
+    
     zone->entry_mask = zone->entry_count - 1;
     zone->records = REALLOC2(0, zone->entry_count, sizeof(zone->records[0]));
     if (zone->records == NULL) {

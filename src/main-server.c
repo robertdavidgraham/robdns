@@ -1,29 +1,30 @@
-#include "main-conf.h"
-#include "conf-trackfile.h"
 #include "configuration.h"
+#include "main-conf.h"
+
+#include "adapter.h"
+#include "adapter-pcapfile.h"
+#include "adapter-pcaplive.h"
 #include "db.h"
 #include "domainname.h"
-#include "zonefile-parse.h"
-#include "zonefile-load.h"
-#include "zonefile-tracker.h"
-#include "success-failure.h"
-#include "util-ipaddr.h"
-#include "pixie-nic.h"
-#include "pixie.h"
-#include "pixie-timer.h"
-#include "pixie-threads.h"
-#include "pixie-sockets.h"
-#include "string_s.h"
+#include "conf-trackfile.h"
+#include "conf-zone.h"
 #include "logger.h"
-#include "adapter-pcaplive.h"
-#include "adapter.h"
-#include "rawsock-pfring.h"
-#include "main-thread.h"
-#include "unusedparm.h"
-#include "adapter-pcapfile.h"
 #include "main-server-socket.h"
+#include "main-thread.h"
+#include "pixie.h"
+#include "pixie-nic.h"
+#include "pixie-threads.h"
+#include "pixie-timer.h"
+#include "pixie-sockets.h"
+#include "rawsock-pfring.h"
+#include "string_s.h"
+#include "success-failure.h"
+#include "unusedparm.h"
 #include "util-ipaddr.h"        /* format IPv6 address */
 #include "util-realloc2.h"
+#include "zonefile-load.h"
+#include "zonefile-parse.h"
+#include "zonefile-tracker.h"
 #include <ctype.h>
 
 extern uint64_t entry_bytes;
@@ -651,6 +652,8 @@ sockitem_open(struct CoreSocketItem *adapt)
         int on = 0;
 #ifdef IPV6_V6ONLY
         err = setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&on, sizeof(on));
+#else
+        err = 0;
 #endif
         if (err < 0)
             LOG_ERR(C_NETWORK, "fail: setsockopt(IPV6_V6ONLY) %u\n", WSAGetLastError());
@@ -766,8 +769,10 @@ sockitem_open(struct CoreSocketItem *adapt)
 void change_network_adapters(struct Core *core, struct Configuration *cfg_load, struct Configuration *cfg_run)
 {
     struct CoreSocketSet *socket_load;
+    struct CoreSocketSet *socket_old;
     struct ConfigurationDataPlane *list;
     unsigned i;
+
 
     /*
      * Create a new sockets structure. We will first fill it with all the
@@ -784,6 +789,15 @@ void change_network_adapters(struct Core *core, struct Configuration *cfg_load, 
     if (list == NULL || list->adapter_count == 0) {
         cfg_load_string(cfg_load, "options { listen-on { any; }; };");
         list = &cfg_load->data_plane;
+    }
+
+    /*
+     * Cleanup/defaults
+     */
+    for (i=0; i<cfg_load->data_plane.adapter_count; i++) {
+        struct CoreSocketItem *adapt = &cfg_load->data_plane.adapters[i];
+        if (adapt->port >= 65536)
+            adapt->port = cfg_load->data_plane.port;
     }
 
     /*
@@ -833,14 +847,118 @@ void change_network_adapters(struct Core *core, struct Configuration *cfg_load, 
         if (adapt_r && adapt_r->fd) {
             adapt_l->fd = adapt_r->fd;
             continue;
-        } else {
-            sockitem_open(adapt_l);
+        }
+        
+        /*
+         * Now open the socket
+         */
+        sockitem_open(adapt_l);
+        
+    }
+
+
+    /* [SYNCHRONIZATION POINT]
+     * Set the new socket set. The resolver worker-threads should immediately
+     * start using these new sockets
+     */
+    socket_old = core->socket_run;
+    core->socket_run = socket_load;
+    for (i=0; i<core->workers_count; i++) {
+        size_t loop_count;
+
+        loop_count = core->workers[i]->loop_count;
+        while (loop_count == core->workers[i]->loop_count)
+            pixie_sleep(1);
+    }
+
+    /*
+     * Cleanup the old sockets
+     */
+    if (socket_old)
+    for (i=0; i<socket_old->count; i++) {
+        struct CoreSocketItem *adapt_old = &socket_old->list[i];
+        struct CoreSocketItem *adapt_run;
+
+        /* ignore duplicates */
+        adapt_run = core_adapter_lookup(socket_load, 
+                                        adapt_old->type, 
+                                        &adapt_old->ip,
+                                        adapt_old->proto,
+                                        adapt_old->port,
+                                        adapt_old->ifname);
+        
+        /* If the OLD adapter isn't in the RUN set, then close it's
+         * socket file-descriptior, because it's not used anywmore */
+        if (adapt_run == NULL) {
+            if (adapt_old->fd > 0)
+                closesocket(adapt_old->fd);
+        }
+
+        if (adapt_old->ifname)
+            free(adapt_old->ifname);
+
+        memset(adapt_old, 0xa3, sizeof(*adapt_old));
+    }
+    free(socket_old);
+
+}
+
+
+/****************************************************************************
+ ****************************************************************************/
+int change_zones(struct Core *core, struct Configuration *cfg_load, const struct Configuration *cfg_run)
+{
+    unsigned i;
+    int is_changed = 0;
+
+    for (i=0; i<cfg_load->zones_length; i++) {
+        struct Cfg_Zone *zone = cfg_load->zones[i];
+        const struct Cfg_Zone *zone_run;
+
+        zone_run = conf_zone_lookup(cfg_run, zone->name);
+
+        /* If zone doesn't exist in the old configuration, we'll have
+         * to create it */
+        if (zone_run == NULL) {
+            zone->action = CFGZ_Create;
+            is_changed = 1;
+            continue;
+        }
+
+        /* If the filename has changed, we'll have to update it */
+        if (strcmp(zone_run->file, zone->file) != 0) {
+            zone->action = CFGZ_Update;
+            is_changed = 1;
+        }
+    }
+
+    for (i=0; i<cfg_run->zones_length; i++) {
+        struct Cfg_Zone *zone_run = cfg_run->zones[i];
+        const struct Cfg_Zone *zone_load;
+
+        zone_load = conf_zone_lookup(cfg_load, zone_run->name);
+
+        /* If the old zone is not in the new configuration, then we need
+         * to delete it. This requires creating a new record with
+         * an action set to "delete" */
+        if (zone_load == NULL) {
+            struct Cfg_Zone *zone = conf_zone_create(zone_run->name, strlen(zone_run->name));
+            zone->action = CFGZ_Delete;
+            conf_zone_append(cfg_load, zone);
+            is_changed = 1;
         }
     }
 }
 
+/****************************************************************************
+ * Checks the timestamps on all the files in order to see if a zone
+ * has changed.
+ ****************************************************************************/
+int
+zones_have_changed(const struct Catalog *db, const struct Configuration *cfg)
+{
 
-
+}
 
 /****************************************************************************
  ****************************************************************************/
@@ -874,50 +992,11 @@ int server(int argc, char *argv[])
     core_init(core);
 
     /*
-     * Create two databases. One database is for loading new/changed
-     * content. The other database is used by the running system, with
-     * multiple thtreads querying it. Once loaded, changes will be moved
-     * from the loading db to the running db in a thread-safe manner.
-     * (This is similar to cfg_load/cfg_run).
-     */
-    core->db_load = catalog_create();
-    core->db_run = catalog_create();
-
-
-    /*
      * Now sit in a loop waiting for configuration/zonefile changes to
      * happen
      */
     for (;;) {
-        struct Configuration *cfg_load;
-
-        /*
-         * Create a temporary configuration structure for reading in new/changed
-         * configuration information. Changes will be then be moved over (in
-         * a thread-safe manner) into the running configuration instance (cfg_run).
-         * (Similar how db_load/db_run works)
-         */
-        cfg_load = cfg_create();
-
-        /*
-         * Re-read the command-line. This in turn will cause the system to read
-         * the master 'named.conf' file, plus additional  files through 'include'.
-         * All configuration is loaded into the "cfg_load" instance, but not
-         * the zonefiles/databases (which happens at a later step below).
-         */
-        conf_command_line(cfg_load, argc, argv);
-#if 0
-        {
-            unsigned count = conf_trackfile_count(cfg_load->tf);
-            unsigned i;
-
-            /* Read in the new configuration */
-            for (i=0; i<count; i++) {
-                const char *filename = conf_trackfile_filename(cfg_load->tf, i);
-                cfg_parse_file(cfg_load, filename);
-            }
-        }
-#endif
+        int is_zones_changed = 0;
 
         /*
          * If none of the configuration files have changed, then skip any
@@ -926,6 +1005,23 @@ int server(int argc, char *argv[])
          * changes purely by whether the timestamps have changed.
          */
         if (conf_trackfile_has_changed(cfg_run->tf)) {
+            struct Configuration *cfg_load;
+
+            /*
+             * Create a temporary configuration structure for reading in new/changed
+             * configuration information. Changes will be then be moved over (in
+             * a thread-safe manner) into the running configuration instance (cfg_run).
+             * (Similar how db_load/db_run works)
+             */
+            cfg_load = cfg_create();
+
+            /*
+             * Re-read the command-line. This in turn will cause the system to read
+             * the master 'named.conf' file, plus additional  files through 'include'.
+             * All configuration is loaded into the "cfg_load" instance, but not
+             * the zonefiles/databases (which happens at a later step below).
+             */
+            conf_command_line(cfg_load, argc, argv);
 
             /* 
              * We apply logging changes first. That's because everything else after
@@ -950,53 +1046,75 @@ int server(int argc, char *argv[])
              * we'll open/close sockets.
              */
             change_network_adapters(core, cfg_load, cfg_run);
+
+            /*
+             * Detect if zone information has changed
+             */
+            is_zones_changed = change_zones(core, cfg_load, cfg_run);
+
+            /*
+             * Now change swap the two configurations. Note that there is
+             * synchronization step, as the running system doesn't consult
+             * the configuration object while running, but imports
+             * new configuration information in the "change_xxx()" functions
+             * right above this.
+             */
+            {
+                struct Configuration *cfg_old;
+
+                cfg_old = cfg_run;
+                cfg_run = cfg_load;
+
+                cfg_destroy(cfg_old);
+            }
         }
 
+        if (is_zones_changed || zones_have_changed(core->db_run, cfg_run)) {
 
-        /*
-         * If we have lots of zones, then adjust the size of the hash table
-         * to make lookups efficient.
-         */
-        if (cfg_load->zones_length + cfg_load->zonedirs_filecount > 200) {
-            catalog_reset_zonecount(core->db_load, (unsigned)(cfg_load->zones_length + cfg_load->zonedirs_filecount) * 2);
+            /*
+             * If we have lots of zones, then adjust the size of the hash table
+             * to make lookups efficient.
+             */
+            if (cfg_run->zones_length + cfg_run->zonedirs_filecount > 200) {
+                catalog_reset_zonecount(core->db_load, (unsigned)(cfg_run->zones_length + cfg_run->zonedirs_filecount) * 2);
+            }
+
+            /*
+             * Load the zonefiles
+             */
+            conf_zonefiles_parse(core->db_load, cfg_run, &total_files, &total_bytes);
+
+            /*
+             * If we don't have a zone-file, then error out
+             */
+            if (catalog_zone_count(core->db_load) == 0) {
+                LOG_INFO(C_CONFIG, "FAIL: no zones specified\n");
+                exit(1);
+            }
+
+            /*
+             * Benchmark
+             */
+            stop = pixie_gettime();
+            {
+                double elapsed = (stop - start) * 1.0;
+                double rate = (1.0*(total_bytes))/elapsed;
+
+                printf("elapsed: %u.%02u seconds\n",
+                    (unsigned)(((stop-start)/(1000000))),
+                    (unsigned)(((stop-start)/(10000))%100)
+                    );
+                printf("zone size: %llu bytes\n", total_bytes);
+                printf("zone files: %llu files\n", total_files);
+                printf("speed: %5.3f-megabytes/second parsing zonefile\n", rate);
+            }
+
+
         }
 
-        /*
-         * Load the zonefiles
-         */
-        conf_zonefiles_parse(core->db_load, cfg_load, &total_files, &total_bytes);
-
-        /*
-         * If we don't have a zone-file, then error out
-         */
-        if (catalog_zone_count(core->db_load) == 0) {
-            LOG_INFO(C_CONFIG, "FAIL: no zones specified\n");
-            exit(1);
+        for (;;) {
+            pixie_sleep(100);
         }
-
-        /*
-         * Benchmark
-         */
-        stop = pixie_gettime();
-        {
-            double elapsed = (stop - start) * 1.0;
-            double rate = (1.0*(total_bytes))/elapsed;
-
-            printf("elapsed: %u.%02u seconds\n",
-                (unsigned)(((stop-start)/(1000000))),
-                (unsigned)(((stop-start)/(10000))%100)
-                );
-            printf("zone size: %llu bytes\n", total_bytes);
-            printf("zone files: %llu files\n", total_files);
-            printf("speed: %5.3f-megabytes/second parsing zonefile\n", rate);
-        }
-
-
-        /*
-         * Now start the network interface
-         */
-        sockets_thread(core);
-
     }
 
     return 0;

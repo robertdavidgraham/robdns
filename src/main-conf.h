@@ -40,11 +40,9 @@ struct RawSet
 
 struct CoreWorkerThread
 {
-    /** We maintain a linked-list of threads.
-     * [SYNC] This is only accessed or changed by the single
-     * configuration thread, so there is no thread-safety issue 
-     * here. */
-    struct CoreWorkerThread *next;
+    /* [SYNCHRONIZATION POINT]
+     */
+    volatile size_t loop_count;
 
     /** Pointer back to the parent system */
     struct Core *core;
@@ -59,16 +57,6 @@ struct CoreWorkerThread
      * will be used by the "join" function to wait for thread 
      * termination */
     size_t handle;
-
-    /** The set of interfaces/sockets that we are reading from.
-     * [SYNC] Config threads writes to the 'sockets' variable,
-     * this thread reads from it on every loop. Conversely,
-     * this thread writes to 'sockets_using', which the config
-     * thread uses to test if this thread has begone using the
-     * new socket set, and therefore that it's safe to destroy
-     * the old one */
-    struct CoreSocketSet * volatile sockets;
-    struct CoreSocketSet * volatile sockets_using;
 
     /**
      * Set by the config-thread telling this worker-thread that it's
@@ -98,14 +86,14 @@ struct Core
      * The set of Sockets that the data-plane run threads are using.
      * During a reconfiguration event, these sockets can change
      */
-    volatile struct SocketSet *socket_run;
+    volatile struct CoreSocketSet *socket_run;
 
     /**
      * These are the data-plane worker-threads that process queries from
      * the network. Note that there are other types of worker threads for
      * parsing zonefiles and inserting records into databases, but this 
      * is the classic 'worker' for DNS servers, so we use that name here. */
-    struct CoreWorkerThread *workers;
+    struct CoreWorkerThread **workers;
     unsigned workers_count;
 
 

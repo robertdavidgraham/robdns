@@ -5,8 +5,26 @@
 #include "util-filename.h"
 #include "conf-addrlist.h"
 #include "util-realloc2.h"
+#include "string_s.h"
 #include <string.h>
 #include <stdlib.h>
+
+/****************************************************************************
+ ****************************************************************************/
+const struct Cfg_Zone *
+conf_zone_lookup(const struct Configuration *cfg, const char *name)
+{
+    unsigned i;
+
+    for (i=0; i<cfg->zones_length; i++) {
+        const struct Cfg_Zone *zone = cfg->zones[i];
+
+        if (strcasecmp(zone->name, name) == 0)
+            return zone;
+    }
+
+    return 0;
+}
 
 
 /****************************************************************************
@@ -111,6 +129,13 @@ conf_load_zone_item( struct Configuration *cfg,
     }
 }
 
+void
+conf_zone_append( struct Configuration *cfg, struct Cfg_Zone *zone)
+{
+    cfg->zones = REALLOC2(cfg->zones, sizeof(cfg->zones[0]), cfg->zones_length + 1);
+    cfg->zones[cfg->zones_length++] = zone;
+}
+
 /****************************************************************************
  ****************************************************************************/
 void
@@ -141,8 +166,7 @@ conf_load_zone( struct Configuration *cfg,
     /*
      * Add to our list of zones
      */
-    cfg->zones = REALLOC2(cfg->zones, sizeof(cfg->zones[0]), cfg->zones_length + 1);
-    cfg->zones[cfg->zones_length++] = zone;
+    conf_zone_append(cfg, zone);
 }
 
 

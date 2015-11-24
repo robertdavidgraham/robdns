@@ -9,6 +9,7 @@
 #include "proto-dns-compressor.h"
 #include "proto-dns-formatter.h"
 #include "resolver.h"
+#include "util-realloc2.h"
 
 /****************************************************************************
  ****************************************************************************/
@@ -20,14 +21,16 @@ thread_worker(void *p)
 
     while (!t->should_end) {
         unsigned i;
-        struct CoreSocketSet *sockets = (struct CoreSocketSet *)t->sockets;
+        struct CoreSocketSet *sockets;
         fd_set readfds;
         int nfds = 0;
         int x;
         struct timeval ts;
 
-        /* [SYNC] mark the fact we are using the new socket-set */
-        t->sockets_using = sockets;
+        /* [SYNCHRONIZATION POINT] 
+        * mark the fact we are using the new socket-set */
+        sockets = core->socket_run;
+        t->loop_count++;
 
         /* During startup, the sockets argument may be NULL for a time.
          * if that's the case, then just wait for a little bit, and try
@@ -142,7 +145,7 @@ thread_worker_start(struct Core *core)
     t = malloc(sizeof(*t));
     if (t == 0)
         return;
-    memset(t, 0, sizeof(t));
+    memset(t, 0, sizeof(*t));
 
     t->core = core;
     t->index = core->workers_count;
@@ -154,8 +157,11 @@ thread_worker_start(struct Core *core)
         return;
     }
 
-    t->next = core->workers;
-    core->workers = t;
+    /*
+     * Append to our list of worker threads
+     */
+    core->workers = REALLOC2(core->workers, core->workers_count + 1, sizeof(core->workers[0]));
+    core->workers[core->workers_count] = t;
     core->workers_count++;
 }
 
@@ -167,15 +173,16 @@ thread_worker_stop(struct Core *core)
     struct CoreWorkerThread *t;
     size_t x = 0;
 
-    /* Unlink from list */
-    t = core->workers;
-    core->workers = t->next;
-
+    /*
+     * Remove a random worker thread from the list
+     */
+    core->workers_count--;
+    t = core->workers[core->workers_count];
+    
     /* Wait until the thread ends */
     t->should_end = 1;
     pixie_join(t->handle, &x);
-    core->workers_count--;
-
+    
     /* Destroy the thread object */
     free(t);
 }
@@ -202,6 +209,7 @@ change_resolver_threads(struct Core *core, struct Configuration *cfg_new)
 
     /* See if we need to start some threads */
     while (core->workers_count < cfg_new->worker_threads) {
+
         thread_worker_start(core);
     }
 }

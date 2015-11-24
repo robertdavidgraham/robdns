@@ -1,4 +1,5 @@
 #include "main-conf.h"
+#include "db.h"
 #include "conf-trackfile.h"
 #include "configuration.h"
 #include "string_s.h"
@@ -820,6 +821,7 @@ conf_command_line(struct Configuration *cfg, int argc, char *argv[])
             LOG_ERR(C_CONFIG, "%s: unknown command-line parameter\n", argv[i]);
         }
     }
+
 }
 
 /***************************************************************************
@@ -841,5 +843,16 @@ void
 core_init(struct Core *core)
 {
     memset(core, 0, sizeof(*core));
+
+    /*
+     * Create two databases. One database is for loading new/changed
+     * content. The other database is used by the running system, with
+     * multiple thtreads querying it. Once loaded, changes will be moved
+     * from the loading db to the running db in a thread-safe manner.
+     * (This is similar to cfg_load/cfg_run).
+     */
+    core->db_load = catalog_create();
+    core->db_run = catalog_create();
+
 }
 

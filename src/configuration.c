@@ -1,6 +1,7 @@
 #include "configuration.h"
 #include "conf-trackfile.h"
 #include "util-realloc2.h"
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -19,6 +20,14 @@ struct Configuration *cfg_create(void)
 
     /* Create a subsystem that keeps track of all the configuration files */
     cfg->tf = conf_trackfile_create();
+
+    /*
+     * Set some defaults
+     */
+    cfg_load_string(cfg, "options { port 53; };");
+
+    assert(cfg->data_plane.port == 53);
+
     return cfg;
 }
 

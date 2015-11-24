@@ -53,12 +53,15 @@ const struct DBZone *
 catalog_create_zone(
     struct Catalog *catalog,
     const struct DB_XDomain *xdomain,
-    uint64_t filesize
+    uint64_t filesize,
+    const char *filename
     );
 
 /* called with an SOA record to create a zone */    
 const struct DBZone *
-catalog_create_zone2(struct Catalog *db, struct DomainPointer domain, struct DomainPointer origin, uint64_t filesize);
+catalog_create_zone2(struct Catalog *db, 
+    struct DomainPointer domain, struct DomainPointer origin, 
+    uint64_t filesize, const char *filename);
 
 
 

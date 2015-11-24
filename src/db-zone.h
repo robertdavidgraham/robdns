@@ -14,7 +14,8 @@ struct DomainPointer;
 
 struct DBZone *zone_create_self(
     const struct DB_XDomain *xdomain, 
-    uint64_t filesize);
+    uint64_t filesize,
+    const char *filename);
 
 void zone_create_record(
     struct DBZone *zone, 

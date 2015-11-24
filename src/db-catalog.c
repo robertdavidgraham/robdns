@@ -191,7 +191,8 @@ const struct DBZone *
 catalog_create_zone(
     struct Catalog *catalog,
     const struct DB_XDomain *domain,
-    uint64_t filesize
+    uint64_t filesize,
+    const char *filename
     )
 {
 	struct DBZone **location;
@@ -218,7 +219,8 @@ catalog_create_zone(
      */
     zone = zone_create_self(
                         domain,
-                        filesize
+                        filesize,
+                        filename
                         );
     zone_insert_self(zone, (volatile struct DBZone **)location);
 
@@ -244,11 +246,12 @@ catalog_create_zone2(
     struct Catalog *db,
 	struct DomainPointer domain,
     struct DomainPointer origin,
-    uint64_t filesize)
+    uint64_t filesize,
+    const char *filename)
 {
     struct DB_XDomain xdomain[1];
 
     xdomain_reverse3(xdomain, &domain, &origin);
 
-    return catalog_create_zone(db, xdomain, filesize);
+    return catalog_create_zone(db, xdomain, filesize, filename);
 }

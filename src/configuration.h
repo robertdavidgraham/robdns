@@ -1,3 +1,8 @@
+/*
+    This is the module that reads the 'named.conf' file and creates a configuration
+    structure out of it. The configuration changes are then applied to the running
+    system.
+*/
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 #include <stddef.h>
@@ -55,11 +60,17 @@ struct Cfg_Key
     unsigned truncate_bits;
 };
 
+enum CFGZ_Action {CFGZ_Unknown, CFGZ_Create, CFGZ_Delete, CFGZ_Update};
+
 enum {CFGZ_UNKNOWN, CFGZ_SLAVE, CFGZ_MASTER};
 struct Cfg_Zone
 {
     /* the domain name of the zone */
     char *name;
+
+    /* Whether we should create this zone, delete it, or take no action */
+    int action;
+
 
     /* Zones of type 'slave' read zonefiles once upon startup, but forever
      * after receive their updates via UPDATE/IXR/AXFR from a master, an
@@ -138,6 +149,7 @@ struct ConfigurationDataPlane {
     struct CoreSocketItem adapters[16];
     unsigned adapter_count;
 };
+
 
 struct Cfg_ZoneDir
 {

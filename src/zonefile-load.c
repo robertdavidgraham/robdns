@@ -79,7 +79,7 @@ zonefile_load(
      * exists.
      */
     if (type == TYPE_SOA) {
-        catalog_create_zone2(db, domain, origin, filesize);
+        catalog_create_zone2(db, domain, origin, filesize, filename);
     }
 
     /*
