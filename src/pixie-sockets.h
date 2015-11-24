@@ -21,6 +21,7 @@ typedef int socklen_t;
 #define WSAGetLastError() (errno)
 #define SOCKET int
 #define WSA(err) (err)
+#define closesocket(fd) close(fd)
 #endif
 
 
