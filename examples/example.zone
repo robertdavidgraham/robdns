@@ -17,3 +17,4 @@ ftp    IN  CNAME  www.example.com.  ;ftp server definition
 ; non server domain hosts
 bill   IN  A      192.168.0.3
 fred   IN  A      192.168.0.4 
+foo A 1.2.3.4
