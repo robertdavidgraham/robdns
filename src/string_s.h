@@ -96,6 +96,8 @@ errno_t gmtime_s(struct tm* _tm, const time_t *time);
 #  define PRIu64 "I64u"
 #  define PRId64 "I64d"
 #  define PRIx64 "I64x"
+# else
+#  include <inttypes.h>
 # endif
 #endif
 
