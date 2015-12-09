@@ -91,6 +91,14 @@ errno_t localtime_s(struct tm* _tm, const time_t *time);
 errno_t gmtime_s(struct tm* _tm, const time_t *time);
 #undef strerror
 
+#ifdef WIN32
+# ifndef PRIu64
+#  define PRIu64 "I64u"
+#  define PRId64 "I64d"
+#  define PRIx64 "I64x"
+# endif
+#endif
+
 #else
 # error unknown compiler
 #endif

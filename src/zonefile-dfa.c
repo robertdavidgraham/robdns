@@ -128,7 +128,7 @@ unsigned mydfa_search(struct MyDFA *dfa, unsigned *in_state, const void *in_buf,
 	*in_state = state;
 	*offset = i;
 	if (state >= accept_start)
-		return dfa->accepts[255 - state&0x3F];
+		return dfa->accepts[(255 - state) & 0xFF];
 	else
 		return 0;
 }

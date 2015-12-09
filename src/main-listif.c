@@ -35,7 +35,7 @@ int win32_list_interfaces()
 {
 // Declare and initialize variables
     PIP_INTERFACE_INFO pInfo = NULL;
-    ULONG ulOutBufLen = 0;
+    DWORD ulOutBufLen = 0;
 
     DWORD dwRetVal = 0;
     int iReturn = 1;
@@ -69,7 +69,7 @@ int win32_list_interfaces()
             ("There are no network adapters with IPv4 enabled on the local system\n");
         iReturn = 0;
     } else {
-        printf("GetInterfaceInfo failed with error: %d\n", dwRetVal);
+        printf("GetInterfaceInfo failed with error: %u\n", (unsigned)dwRetVal);
         iReturn = 1;
     }
 
@@ -106,7 +106,7 @@ int win32_list_adapters()
     if ((dwRetVal = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen)) == NO_ERROR) {
         pAdapter = pAdapterInfo;
         while (pAdapter) {
-            printf("\tComboIndex: \t%d\n", pAdapter->ComboIndex);
+            printf("\tComboIndex: \t%u\n", (unsigned)pAdapter->ComboIndex);
             printf("\tAdapter Name: \t%s\n", pAdapter->AdapterName);
             printf("\tAdapter Desc: \t%s\n", pAdapter->Description);
             printf("\tAdapter Addr: \t");
@@ -116,7 +116,7 @@ int win32_list_adapters()
                 else
                     printf("%.2X-", (int) pAdapter->Address[i]);
             }
-            printf("\tIndex: \t%d\n", pAdapter->Index);
+            printf("\tIndex: \t%u\n", (unsigned)pAdapter->Index);
             printf("\tType: \t");
             switch (pAdapter->Type) {
             case MIB_IF_TYPE_OTHER:
@@ -141,7 +141,7 @@ int win32_list_adapters()
                 printf("Slip\n");
                 break;
             default:
-                printf("Unknown type %ld\n", pAdapter->Type);
+                printf("Unknown type %u\n", (unsigned)pAdapter->Type);
                 break;
             }
 
@@ -156,7 +156,7 @@ int win32_list_adapters()
             pAdapter = pAdapter->Next;
         }
     } else {
-        printf("GetAdaptersInfo failed with error: %d\n", dwRetVal);
+        printf("GetAdaptersInfo failed with error: %u\n", (unsigned)dwRetVal);
 
     }
     if (pAdapterInfo)
@@ -425,10 +425,10 @@ int listif(int argc, char *argv[])
                 {
                     struct sockaddr_in *sin = (struct sockaddr_in*)address->addr;
 				    printf("%u.%u.%u.%u  ",
-                        (sin->sin_addr.s_addr>> 0)&0xFF,
-                        (sin->sin_addr.s_addr>> 8)&0xFF,
-                        (sin->sin_addr.s_addr>>16)&0xFF,
-                        (sin->sin_addr.s_addr>>24)&0xFF
+                        (unsigned char)(sin->sin_addr.s_addr>> 0)&0xFF,
+                        (unsigned char)(sin->sin_addr.s_addr>> 8)&0xFF,
+                        (unsigned char)(sin->sin_addr.s_addr>>16)&0xFF,
+                        (unsigned char)(sin->sin_addr.s_addr>>24)&0xFF
 				    );
                 }
 				break;

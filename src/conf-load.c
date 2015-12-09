@@ -144,7 +144,7 @@ void cfg_parser_init(void)
 
 /****************************************************************************
  ****************************************************************************/
-static void
+void
 print_node(struct ConfParse *conf, FILE *fp, const struct CF_Child *node, unsigned depth)
 {
     size_t i;

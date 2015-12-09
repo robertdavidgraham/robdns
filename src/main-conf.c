@@ -383,45 +383,6 @@ static void conf_usage(void)
     exit(1);
 }
 
-/***************************************************************************
- * Echoes the configuration for one nic
- ***************************************************************************/
-static void
-conf_echo_nic(struct Core *conf, FILE *fp, unsigned i)
-{
-#if 0
-    char zzz[64];
-    /* If we have only one adapter, then don't print the array indexes.
-     * Otherwise, we need to print the array indexes to distinguish
-     * the NICs from each other */
-    if (conf->nic_count <= 1)
-        zzz[0] = '\0';
-    else
-        sprintf_s(zzz, sizeof(zzz), "[%u]", i);
-
-    fprintf(fp, "adapter%s = %s\n", zzz, conf->nic[i].ifname);
-    fprintf(fp, "adapter-ip%s = %u.%u.%u.%u\n", zzz,
-        (conf->nic[i].adapter_ip>>24)&0xFF,
-        (conf->nic[i].adapter_ip>>16)&0xFF,
-        (conf->nic[i].adapter_ip>> 8)&0xFF,
-        (conf->nic[i].adapter_ip>> 0)&0xFF
-        );
-    fprintf(fp, "adapter-mac%s = %02x:%02x:%02x:%02x:%02x:%02x\n", zzz,
-            conf->nic[i].adapter_mac[0],
-            conf->nic[i].adapter_mac[1],
-            conf->nic[i].adapter_mac[2],
-            conf->nic[i].adapter_mac[3],
-            conf->nic[i].adapter_mac[4],
-            conf->nic[i].adapter_mac[5]);
-    fprintf(fp, "router-mac%s = %02x:%02x:%02x:%02x:%02x:%02x\n", zzz,
-            conf->nic[i].router_mac[0],
-            conf->nic[i].router_mac[1],
-            conf->nic[i].router_mac[2],
-            conf->nic[i].router_mac[3],
-            conf->nic[i].router_mac[4],
-            conf->nic[i].router_mac[5]);
-#endif
-}
 
 /***************************************************************************
  * Prints the current configuration to the command-line then exits.
@@ -460,7 +421,7 @@ hexval(char c)
 
 /***************************************************************************
  ***************************************************************************/
-static int
+int
 parse_mac_address(const char *text, unsigned char *mac)
 {
     unsigned i;
@@ -824,17 +785,6 @@ conf_command_line(struct Configuration *cfg, int argc, char *argv[])
 
 }
 
-/***************************************************************************
- * remove leading/trailing whitespace
- ***************************************************************************/
-static void
-trim(char *line)
-{
-    while (isspace(*line & 0xFF))
-        memmove(line, line+1, strlen(line));
-    while (isspace(line[strlen(line)-1] & 0xFF))
-        line[strlen(line)-1] = '\0';
-}
 
 
 /***************************************************************************

@@ -29,7 +29,7 @@ thread_worker(void *p)
 
         /* [SYNCHRONIZATION POINT] 
         * mark the fact we are using the new socket-set */
-        sockets = core->socket_run;
+        sockets = (struct CoreSocketSet *)core->socket_run;
         t->loop_count++;
 
         /* During startup, the sockets argument may be NULL for a time.

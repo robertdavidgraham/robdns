@@ -27,12 +27,15 @@
 #include "zonefile-tracker.h"
 #include <ctype.h>
 
+#ifdef WIN32
+#define strdup _strdup
+#endif
+
 extern uint64_t entry_bytes;
 extern uint64_t entry_count;
 extern uint64_t total_chain_length;
 static const struct DomainPointer root = {(const unsigned char*)"\0",1};
 #define SENDQ_SIZE 65536 * 8
-
 
 
 /******************************************************************************
@@ -342,7 +345,7 @@ rawsock_ignore_transmits(struct Adapter *adapter, const unsigned char *adapter_m
 
 /******************************************************************************
  ******************************************************************************/
-static struct Adapter *
+struct Adapter *
 initialize_adapter(
     //struct Core *conf,
     const char *in_ifname,
@@ -366,7 +369,7 @@ initialize_adapter(
      * interface with a "default route" (aka. "gateway") defined
      */
     if (in_ifname && in_ifname[0])
-        ifname = _strdup(in_ifname);
+        ifname = strdup(in_ifname);
     else {
         /* no adapter specified, so find a default one */
         int err;
@@ -467,7 +470,7 @@ initialize_adapter(
 
 /******************************************************************************
  ******************************************************************************/
-static void
+void
 pcap_thread(struct Core *conf)
 {
 #if 0
@@ -646,17 +649,15 @@ sockitem_open(struct CoreSocketItem *adapt)
 
     if (adapt->type == ST_Any) {
         /*
-            * Enable both IPv4 and IPv6 to be used on the same sockets. This appears to
-            * be needed for Windows, but not needed for Mac OS X.
-            */
-        int on = 0;
+         * Enable both IPv4 and IPv6 to be used on the same sockets. This appears to
+         * be needed for Windows, but not needed for Mac OS X.
+         */
 #ifdef IPV6_V6ONLY
+        int on = 0;
         err = setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&on, sizeof(on));
-#else
-        err = 0;
-#endif
         if (err < 0)
             LOG_ERR(C_NETWORK, "fail: setsockopt(IPV6_V6ONLY) %u\n", WSAGetLastError());
+#endif
     }
     
     switch (adapt->type) {
@@ -861,7 +862,7 @@ void change_network_adapters(struct Core *core, struct Configuration *cfg_load, 
      * Set the new socket set. The resolver worker-threads should immediately
      * start using these new sockets
      */
-    socket_old = core->socket_run;
+    socket_old = (struct CoreSocketSet *)core->socket_run;
     core->socket_run = socket_load;
     for (i=0; i<core->workers_count; i++) {
         size_t loop_count;
@@ -948,6 +949,8 @@ int change_zones(struct Core *core, struct Configuration *cfg_load, const struct
             is_changed = 1;
         }
     }
+
+    return is_changed;
 }
 
 /****************************************************************************
@@ -958,6 +961,7 @@ int
 zones_have_changed(const struct Catalog *db, const struct Configuration *cfg)
 {
 
+    return 0;
 }
 
 /****************************************************************************
@@ -1104,8 +1108,8 @@ int server(int argc, char *argv[])
                     (unsigned)(((stop-start)/(1000000))),
                     (unsigned)(((stop-start)/(10000))%100)
                     );
-                printf("zone size: %llu bytes\n", total_bytes);
-                printf("zone files: %llu files\n", total_files);
+                printf("zone size: %" PRIu64 " bytes\n", total_bytes);
+                printf("zone files: %" PRIu64 " files\n", total_files);
                 printf("speed: %5.3f-megabytes/second parsing zonefile\n", rate);
             }
 

@@ -14,7 +14,8 @@ struct DomainPointer ROOT = {0,0};
 
 /****************************************************************************
  ****************************************************************************/
-uint64_t
+#if 0
+static uint64_t
 md5(const void *p, unsigned length, uint64_t secret)
 {
     MD5_CTX ctx[1];
@@ -29,7 +30,7 @@ md5(const void *p, unsigned length, uint64_t secret)
     return (*(uint64_t*)(digest + 0)) 
          ^ (*(uint64_t*)(digest + 8));
 }
-
+#endif
 
 /******************************************************************************
  * A domain-name comparison function.
