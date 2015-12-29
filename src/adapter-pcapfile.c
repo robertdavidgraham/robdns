@@ -246,7 +246,7 @@ smells_like_valid_packet(const unsigned char *px, unsigned length, unsigned byte
 	} else 
 	switch (link_type) {
 	case 1: /*ethernet*/
-		if (px[12] == 0x08 && px[13] == 0x00 && px[13] == 0x45)
+		if (px[12] == 0x08 && px[13] == 0x00 && px[14] == 0x45)
 			return 1;
 	}
 
